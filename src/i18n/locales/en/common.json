@@ -1,0 +1,231 @@
+{
+  "navigation": {
+    "home": "Home",
+    "labs": "Labs",
+    "feedback": "Feedback"
+  },
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "clear": "Clear",
+    "close": "Close",
+    "update": "Update"
+  },
+   "settings": {
+    "title": "Settings",
+    "description": "Customize your application appearance and language",
+    "appearance": {
+      "themeMode": "Theme Mode",
+      "colorTheme": "Color Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language",
+      "chooseLanguage": "Choose language"
+    },
+    "colors": {
+      "blue": "Blue",
+      "cyan": "Cyan",
+      "green": "Green",
+      "purple": "Purple",
+      "orange": "Orange",
+      "pink": "Pink"
+    },
+    "currentSettings": "Current Settings",
+    "theme": "Theme",
+    "color": "Color",
+    "languages": {
+      "vi": "Tiếng Việt",
+      "en": "English"
+    },
+    "openSettings": "Open settings",
+    "customizePreferences": "Customize your preferences"
+  },
+   "sidebar": {
+    "account": "Account",
+    "settings": "Settings",
+  
+    "logout": "Logout",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "premiumAccount": "Premium Account",
+    "loggingOut": "Logging out...",
+    "logoutSuccess": "Logout successful!",
+    "seeYouSoon": "See you soon!",
+    "localSessionCleared": "Local session cleared"
+  },
+  "labs": {
+    "title": "Labs List",
+    "labManagement": "Lab Management",
+    "labManagementDescription": "Create and manage lab templates for the system",
+    "labCount": "labs",
+    "refresh": "Refresh",
+    "refreshSuccess": "Labs list refreshed",
+    "createNewLab": "Create New Lab",
+    "createFirstLab": "Create first lab",
+    "loadError": "Unable to load lab information",
+    "loadingLab": "Loading lab...",
+    "loadingLabs": "Loading labs...",
+    "createSuccess": "Lab \"{{name}}\" has been created",
+    "createError": "Failed to create lab",
+    "updateSuccess": "Lab \"{{name}}\" has been updated",
+    "updateError": "Failed to update lab",
+    "deleteSuccess": "Lab \"{{name}}\" has been deleted",
+    "deleteError": "Failed to delete lab",
+    "toggleStatusSuccess": "Lab \"{{name}}\" has been {{status}}",
+    "toggleStatusError": "Failed to change lab status",
+    "activated": "activated",
+    "deactivated": "deactivated",
+    "setupStepCreateSuccess": "Setup step \"{{title}}\" has been created",
+    "setupStepCreateError": "Failed to create setup step",
+    "setupStepUpdateSuccess": "Setup step \"{{title}}\" has been updated",
+    "setupStepUpdateError": "Failed to update setup step",
+    "setupStepDeleteSuccess": "Setup step \"{{title}}\" has been deleted",
+    "setupStepDeleteError": "Failed to delete setup step",
+    "moveStepUpSuccess": "Step moved up successfully",
+    "moveStepDownSuccess": "Step moved down successfully",
+    "moveStepError": "Failed to move step",
+    "notFound": "Lab not found",
+    "notFoundDescription": "This lab ID was not found or has been deleted.",
+    "backToList": "Back to labs list",
+    "setupSteps": "Setup Steps",
+    "addStep": "Add Step",
+    "addNewStep": "Add new step",
+    "steps": "steps",
+    "setupStepsDescription": "Setup steps will be executed in order when initializing the lab",
+    "noSetupSteps": "No setup steps yet",
+    "noSetupStepsDescription": "Create automated setup steps to prepare the lab environment. Steps will be executed in order.",
+    "createFirstStep": "Create first setup step",
+    "tip": "Tip",
+    "setupStepsTip": "Setup steps usually include software installation, system configuration, or downloading necessary resources for the lab.",
+    "labsTip": "Labs help set up practice environments with automated configuration steps.",
+    "labInfo": "Lab Information",
+    "labInfoDescription": "Configuration details and lab specifications",
+    "labId": "Lab ID",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "labName": "Lab Name",
+    "description": "Description",
+    "technicalSpecs": "Technical Specifications",
+    "baseDockerImage": "Base Docker Image",
+    "estimatedTime": "Estimated Time",
+    "minutes": "minutes",
+    "otherInfo": "Other Information",
+    "createdDate": "Created Date",
+    "created": "Created",
+    "unknownDate": "Unknown",
+    "actions": "Actions",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "deleteLab": "Delete lab",
+    "details": "Details",
+    "searchPlaceholder": "Search labs by name or description...",
+    "statusFilter": "Status",
+    "allStatus": "All Status",
+    "sortBy": "Sort By",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "nameSort": "Name",
+    "timeSort": "Time",
+    "showing": "Showing",
+    "lab": "lab",
+    "labs": "labs",
+    "activeFilters": "filters",
+    "clearFilters": "Clear filters",
+    "noLabsFound": "No labs found",
+    "noLabsFoundDescription": "No labs match the current filters. Try adjusting your search criteria or clearing the filters.",
+    "noLabsYet": "No labs yet",
+    "noLabsYetDescription": "Start by creating your first lab template. Labs help set up practice environments with automated configuration steps.",
+     "createLab": "Create New Lab",
+    "editLab": "Edit Lab",
+    "createLabDescription": "Create a new lab template for the system.",
+    "editLabDescription": "Update your lab information.",
+    "labNamePlaceholder": "Enter lab name...",
+    "descriptionPlaceholder": "Detailed description about the lab...",
+    "descriptionHelper": "Detailed description about the purpose and content of the lab",
+    "baseImage": "Base Image",
+    "selectBaseImage": "Select base image...",
+    "baseImageHelper": "Docker image will be used as the base environment",
+    "estimatedTimeHelper": "Estimated time to complete the lab (1-600 minutes)",
+    "validation": {
+      "nameRequired": "Lab name is required",
+      "baseImageRequired": "Base image is required",
+      "timeMin": "Estimated time must be at least 1 minute",
+      "timeMax": "Estimated time cannot exceed 600 minutes"
+    },
+    "itemsPerPage": "Items per page",
+    "goToPage": "Go to page",
+    "pageInfo": "Page {{current}} / {{total}}",
+    "totalItems": "Total {{count}} items",
+    "testSetupSteps": "Test"
+  },
+  "setupSteps": {
+    "editTitle": "Edit Setup Step",
+    "createTitle": "Create New Setup Step", 
+    "editDescription": "Update setup step information.",
+    "createDescription": "Add a new setup step for the lab.",
+    "createButton": "Create Setup Step",
+    
+    "fields": {
+      "title": "Title",
+      "description": "Description", 
+      "setupCommand": "Setup Command",
+      "expectedExitCode": "Expected Exit Code",
+      "retryCount": "Retry Count",
+      "timeout": "Timeout (seconds)",
+      "continueOnFailure": "Continue on Failure"
+    },
+    
+    "placeholders": {
+      "title": "e.g: Install Docker",
+      "description": "Detailed description of this setup step...",
+      "setupCommand": "sudo apt-get update && sudo apt-get install -y docker.io"
+    },
+    
+    "hints": {
+      "description": "Brief description of this step's functionality.",
+      "setupCommand": "Command to be executed for lab environment setup.",
+      "expectedExitCode": "Exit code to determine command success (usually 0).",
+      "retryCount": "Number of retry attempts if command fails.",
+      "timeout": "Maximum wait time (1-3600 seconds).",
+      "continueOnFailure": "Allow subsequent steps to run even if this step fails."
+    },
+    
+    "sections": {
+      "commandConfig": "Command Configuration",
+      "executionConfig": "Execution Configuration"
+    },
+    
+    "validation": {
+      "titleRequired": "Title is required",
+      "commandRequired": "Setup command is required"
+    },
+    "badges": {
+      "exitCode": "Exit",
+      "retry": "Retry",
+      "seconds": "s", 
+      "continueOnFailure": "Continue on failure"
+    },
+    
+    "tooltips": {
+      "expectedExitCode": "Expected exit code",
+      "retryCount": "Number of retry attempts on failure",
+      "timeout": "Timeout duration", 
+      "continueOnFailure": "Continue execution when this step fails"
+    }
+  }
+}
