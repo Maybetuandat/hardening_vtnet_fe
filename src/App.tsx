@@ -5,7 +5,8 @@ import { MainLayout } from "./layouts/MainLayout";
 import "./i18n"; 
 
 import Lab from "./app/labs/lab-page";
-import HomePage from "./app/home";
+import HomePage from "./app/dashboard";
+import SystemHardeningDashboard from "./app/dashboard";
 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
             element={
               
                 <MainLayout>
-                  <HomePage />
+                  <SystemHardeningDashboard />
                 </MainLayout>
               
             }

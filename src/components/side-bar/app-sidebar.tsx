@@ -10,9 +10,9 @@ import {
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { NavMain } from "@/components/dashboard/nav-main";
-import { NavSecondary } from "@/components/dashboard/nav-secondary";
-import { NavUser } from "@/components/dashboard/nav-user";
+import { NavMain } from "@/components/side-bar/nav-main";
+import { NavSecondary } from "@/components/side-bar/nav-secondary";
+import { NavUser } from "@/components/side-bar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -35,7 +35,7 @@ export function AppSidebar({
       {
         title: t("navigation.home"),
         url: "/",
-        icon: Home,
+        icon: LayoutDashboardIcon,
         isActive: location.pathname === "/" || location.pathname === "/home",
       },
       {
@@ -73,7 +73,7 @@ export function AppSidebar({
               <Link to="/">
                 <Boxes className="h-5 w-5 text-sidebar-primary" />
                 <span className="text-base font-semibold text-sidebar-foreground">
-                  TEST
+                  Hardening System
                 </span>
               </Link>
             </SidebarMenuButton>
