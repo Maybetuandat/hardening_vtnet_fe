@@ -5,7 +5,8 @@ import {
   
   LayoutDashboardIcon,
   
-  Home,
+  
+  Key,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -43,6 +44,12 @@ export function AppSidebar({
         url: "/labs",
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/labs",
+      },
+      {
+        title: "SSH Keys",
+        url: "/ssh-keys",
+        icon: Key,
+        isActive: location.pathname === "/ssh-keys" || location.pathname.startsWith("/ssh-keys"),
       },
       
     

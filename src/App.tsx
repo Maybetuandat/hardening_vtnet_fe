@@ -7,6 +7,7 @@ import "./i18n";
 import Lab from "./app/labs/lab-page";
 import HomePage from "./app/dashboard";
 import SystemHardeningDashboard from "./app/dashboard";
+import SshKeysPage from "./app/ssh-keys/ssh-keys-page";
 
 
 function App() {
@@ -44,6 +45,22 @@ function App() {
               
                 <MainLayout>
                   <Lab />
+                </MainLayout>
+              
+            }
+          />
+
+
+
+
+
+
+           <Route
+            path="/ssh-keys"
+            element={
+              
+                <MainLayout>
+                  <SshKeysPage />
                 </MainLayout>
               
             }
