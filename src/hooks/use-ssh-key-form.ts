@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// src/hooks/use-ssh-key-form.ts
+import { useState, useCallback } from 'react';
 import { SshKeyFormData, SshKeyType } from '@/types/ssh-key';
 
 interface UseSshKeyFormReturn {
@@ -26,31 +27,36 @@ export const useSshKeyForm = (initialData?: Partial<SshKeyFormData>): UseSshKeyF
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const setFormData = (data: Partial<SshKeyFormData>) => {
+  // ✅ Memoize setFormData để tránh re-render
+  const setFormData = useCallback((data: Partial<SshKeyFormData>) => {
     setFormDataState(prev => ({ ...prev, ...data }));
     // Clear errors for updated fields
-    const clearedErrors = { ...errors };
-    Object.keys(data).forEach(key => {
-      delete clearedErrors[key];
+    setErrors(prevErrors => {
+      const clearedErrors = { ...prevErrors };
+      Object.keys(data).forEach(key => {
+        delete clearedErrors[key];
+      });
+      return clearedErrors;
     });
-    setErrors(clearedErrors);
-  };
+  }, []); // Empty dependency
 
-  const updateField = (field: keyof SshKeyFormData, value: any) => {
+  // ✅ Memoize updateField
+  const updateField = useCallback((field: keyof SshKeyFormData, value: any) => {
     setFormData({ [field]: value });
-  };
+  }, [setFormData]); // Depend on stable setFormData
 
-  const validateForm = (): boolean => {
+  // ✅ Memoize validateForm
+  const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
-    
+    // Validate name
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     } else if (formData.name.length > 100) {
       newErrors.name = 'Name must be less than 100 characters';
     }
 
-    
+    // Validate public key
     if (!formData.public_key.trim()) {
       newErrors.public_key = 'Public key is required';
     } else {
@@ -76,7 +82,7 @@ export const useSshKeyForm = (initialData?: Partial<SshKeyFormData>): UseSshKeyF
       }
     }
 
-    
+    // Validate key pair match
     if (formData.public_key && formData.private_key) {
       const publicKeyType = formData.public_key.split(' ')[0];
       const privateKey = formData.private_key;
@@ -99,12 +105,13 @@ export const useSshKeyForm = (initialData?: Partial<SshKeyFormData>): UseSshKeyF
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]); // Depend on formData
 
-  const resetForm = () => {
+  // ✅ Memoize resetForm
+  const resetForm = useCallback(() => {
     setFormDataState(initialFormData);
     setErrors({});
-  };
+  }, []); // Empty dependency
 
   return {
     formData,

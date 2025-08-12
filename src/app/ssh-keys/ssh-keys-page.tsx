@@ -1,9 +1,7 @@
-// src/app/ssh-keys/ssh-keys-page.tsx
+// src/app/ssh-keys/ssh-keys-page.tsx  
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-
-
 
 import { useSshKeys } from '@/hooks/use-ssh-keys';
 import { useSshKeyForm } from '@/hooks/use-ssh-key-form';
@@ -17,30 +15,6 @@ type ViewMode = 'list' | 'create' | 'edit';
 export default function SshKeysPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
-
-
-
-const handleDialogClose = (open: boolean) => {
-  setDeleteDialogOpen(open);
-  if (!open) {
-    // Cleanup khi đóng
-    setSshKeyToDelete(null);
-    setTimeout(() => {
-      // Re-focus vào main content
-      document.getElementById('main-content')?.focus();
-    }, 100);
-  }
-};
-
-  React.useEffect(() => {
-  // Reset form khi component unmount
-  return () => {
-    resetForm();
-    setDeleteDialogOpen(false);
-    setSshKeyToDelete(null);
-  };
-}, []);
   
   // Get view mode from URL params
   const viewMode = (searchParams.get('mode') as ViewMode) || 'list';
@@ -73,7 +47,49 @@ const handleDialogClose = (open: boolean) => {
   const [sshKeyToDelete, setSshKeyToDelete] = React.useState<SshKey | null>(null);
   const [deleteLoading, setDeleteLoading] = React.useState(false);
 
-  // Load SSH key data when editing
+  // Simple dialog close handler (chỉ fix vấn đề delete dialog)
+  const handleDialogClose = (open: boolean) => {
+    setDeleteDialogOpen(open);
+    if (!open) {
+      // Cleanup khi đóng
+      setSshKeyToDelete(null);
+      setDeleteLoading(false);
+      
+      // Chỉ cleanup overlay của dialog nếu cần
+      setTimeout(() => {
+        const overlays = document.querySelectorAll('[data-radix-focus-scope]');
+        overlays.forEach(overlay => {
+          const openDialog = overlay.querySelector('[data-state="open"]');
+          if (!openDialog) {
+            overlay.remove();
+          }
+        });
+        
+        // Reset pointer events nếu bị block
+        document.body.style.pointerEvents = 'auto';
+      }, 150);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!sshKeyToDelete) return;
+
+    setDeleteLoading(true);
+    try {
+      await deleteSshKey(sshKeyToDelete.id);
+      toast.success('SSH key deleted successfully');
+      setDeleteDialogOpen(false);
+      setSshKeyToDelete(null);
+      // Refresh danh sách
+      fetchSshKeys();
+    } catch (err) {
+      toast.error('Failed to delete SSH key');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Load SSH key data when editing - FIX INFINITE LOOP
   React.useEffect(() => {
     if (viewMode === 'edit' && editId) {
       const loadSshKey = async () => {
@@ -94,7 +110,16 @@ const handleDialogClose = (open: boolean) => {
       };
       loadSshKey();
     }
-  }, [viewMode, editId, getSshKeyById, setFormData]);
+  }, [viewMode, editId]); // ✅ Chỉ depend vào viewMode và editId
+
+  // Simple cleanup on unmount (không ảnh hưởng đến form)
+  React.useEffect(() => {
+    return () => {
+      setDeleteDialogOpen(false);
+      setSshKeyToDelete(null);
+      setDeleteLoading(false);
+    };
+  }, []);
 
   // Navigation helpers
   const setViewMode = (mode: ViewMode, id?: number) => {
@@ -167,7 +192,6 @@ const handleDialogClose = (open: boolean) => {
       resetForm();
       setViewMode('list');
     } catch (err) {
-      // Error is already handled in the hook and displayed via error state
       console.error('Submit error:', err);
     }
   };
@@ -175,22 +199,6 @@ const handleDialogClose = (open: boolean) => {
   const handleDeleteClick = (sshKey: SshKey) => {
     setSshKeyToDelete(sshKey);
     setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!sshKeyToDelete) return;
-
-    setDeleteLoading(true);
-    try {
-      await deleteSshKey(sshKeyToDelete.id);
-      toast.success('SSH key deleted successfully');
-      setDeleteDialogOpen(false);
-      setSshKeyToDelete(null);
-    } catch (err) {
-      toast.error('Failed to delete SSH key');
-    } finally {
-      setDeleteLoading(false);
-    }
   };
 
   const handleRefresh = () => {
@@ -211,7 +219,7 @@ const handleDialogClose = (open: boolean) => {
         />
       ) : (
         <SshKeyForm
-         key={`${viewMode}-${editId}`}
+          key={`${viewMode}-${editId}`}
           formData={formData}
           errors={errors}
           loading={loading}
@@ -222,13 +230,13 @@ const handleDialogClose = (open: boolean) => {
         />
       )}
 
-     <SshKeyDeleteDialog
-  sshKey={sshKeyToDelete}
-  open={deleteDialogOpen}
-  onOpenChange={handleDialogClose}  
-  onConfirm={handleDeleteConfirm}
-  loading={deleteLoading}
-/>
+      <SshKeyDeleteDialog
+        sshKey={sshKeyToDelete}
+        open={deleteDialogOpen}
+        onOpenChange={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

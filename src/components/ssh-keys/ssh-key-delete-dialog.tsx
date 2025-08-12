@@ -47,7 +47,7 @@ export const SshKeyDeleteDialog: React.FC<SshKeyDeleteDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -76,7 +76,7 @@ export const SshKeyDeleteDialog: React.FC<SshKeyDeleteDialogProps> = ({
                 )}
                 
                 <div className="pl-6">
-                  <code className="text-xs bg-background px-2 py-1 rounded font-mono">
+                  <code className="text-xs bg-background px-2 py-1 rounded font-mono break-all">
                     {sshKey.fingerprint}
                   </code>
                 </div>
@@ -92,7 +92,9 @@ export const SshKeyDeleteDialog: React.FC<SshKeyDeleteDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={loading}
