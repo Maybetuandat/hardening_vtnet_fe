@@ -1,13 +1,25 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "warning": "Warning",
+    "actionFailed": "Action failed"
+  },
   "sshKeys": {
-    "title": "SSH Key Management",
+    "title": "SSH Keys",
+    "loading": "Loading SSH keys...",
     "subtitle": "Manage SSH key credentials for secure authentication",
     "addSshKey": "Add SSH Key",
+    "status": "Status",
+    "active": "Active",
+    "action": "Action",
+    "all": "All",
+    "inactive": "Inactive",
     "newSshKey": "New SSH Key",
-    "editSshKey": "Edit SSH Key",
-    "refresh": "Refresh",
+
     "deleteSshKey": "Delete SSH Key",
-    "createSshKey": "Create SSH Key",
+
+    "refresh": "Refresh",
     "updateSshKey": "Update SSH Key",
     "sshKeyCreated": "SSH key created successfully",
     "sshKeyUpdated": "SSH key updated successfully",
@@ -18,21 +30,24 @@
       "basicInformation": "Basic Information",
       "sshKeyPair": "SSH Key Pair",
       "settings": "Settings",
+      "editSshKey": "Edit SSH Key",
+      "createSshKey": "Create SSH Key",
       "name": "Name",
-      "nameHelp": "A unique identifier for this SSH key",
+      "nameHelp": "Unique identifier for this SSH key",
       "namePlaceholder": "my-ssh-key",
       "description": "Description (Optional)",
-      "descriptionPlaceholder": "SSH key for production servers",
+      "descriptionPlaceholder": "SSH key for production server",
       "keyType": "Key Type",
       "publicKey": "Public Key",
-      "publicKeyHelp": "The public key that will be shared with remote servers",
+      "publicKeyHelp": "The public key will be shared with remote servers",
       "publicKeyPlaceholder": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ...",
       "privateKey": "Private Key",
-      "privateKeyHelp": "The private key used for authentication (keep secure!)",
+      "privateKeyEmptyHelp": "Leave empty to keep existing private key",
+      "privateKeyHelp": "The private key is used for authentication (keep it safe!)",
       "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----\\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAAB...\\n-----END OPENSSH PRIVATE KEY-----",
-      "active": "Active",
-      "activeHelp": "Enable this SSH key for use in deployments",
-      "securityNotice": "Security Notice: Private keys are stored securely and encrypted. Only use trusted key pairs and never share your private key."
+      "isActive": "Active",
+      "activeHelp": "Enable this SSH key for deployments",
+      "securityNotice": "Security Notice: Private keys are securely stored and encrypted. Use only trusted key pairs and never share your private key."
     },
     "table": {
       "name": "Name",
@@ -43,12 +58,13 @@
       "actions": "Actions",
       "copyFingerprint": "Copy Fingerprint",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "noKeys": "No SSH keys found"
     },
     "filters": {
       "searchPlaceholder": "Search by name, description, or fingerprint...",
       "allTypes": "All Types",
-      "allStatus": "All Status",
+      "allStatus": "All Statuses",
       "active": "Active",
       "inactive": "Inactive"
     },
@@ -67,7 +83,7 @@
       },
       "dsa": {
         "name": "DSA",
-        "description": "Legacy, not recommended"
+        "description": "Old, not recommended"
       }
     },
     "validation": {
@@ -78,11 +94,11 @@
       "privateKeyRequired": "Private key is required",
       "privateKeyInvalid": "Invalid private key format",
       "privateKeyType": "Invalid private key type",
-      "keyPairMismatch": "Public and private keys do not match"
+      "keyPairMismatch": "Public and private key do not match"
     },
     "empty": {
       "noKeys": "No SSH keys found",
-      "noMatches": "No SSH keys match your filters",
+      "noMatches": "No SSH keys match your filter",
       "addFirst": "Add your first SSH key"
     }
   }

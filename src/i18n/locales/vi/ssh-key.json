@@ -1,12 +1,23 @@
 {
+  "common": {
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "warning": "Cảnh báo",
+    "actionFailed": "Thao tác thất bại"
+  },
   "sshKeys": {
     "title": "SSH Keys",
+    "loading": "Đang tải SSH keys...",
     "subtitle": "Quản lý thông tin xác thực SSH key để xác thực an toàn",
     "addSshKey": "Thêm SSH Key",
+    "status": "Trạng Thái",
+    "active": "Hoạt Động",
+    "action": "Hành Động",
+    "all": "Tất Cả",
+    "inactive": "Không Hoạt Động",
     "newSshKey": "SSH Key Mới",
-    "editSshKey": "Chỉnh Sửa SSH Key",
     "deleteSshKey": "Xóa SSH Key",
-    "createSshKey": "Tạo SSH Key",
+
     "refresh": "Làm Mới",
     "updateSshKey": "Cập Nhật SSH Key",
     "sshKeyCreated": "SSH key đã được tạo thành công",
@@ -17,33 +28,37 @@
     "form": {
       "basicInformation": "Thông Tin Cơ Bản",
       "sshKeyPair": "Cặp SSH Key",
+      "editSshKey": "Chỉnh Sửa SSH Key",
+      "createSshKey": "Tạo SSH Key",
       "settings": "Cài Đặt",
       "name": "Tên",
       "nameHelp": "Định danh duy nhất cho SSH key này",
       "namePlaceholder": "my-ssh-key",
       "description": "Mô Tả (Tùy chọn)",
-      "descriptionPlaceholder": "SSH key cho máy chủ production",
+      "descriptionPlaceholder": "SSH key cho máy chủ ",
       "keyType": "Loại Key",
-      "publicKey": "Public Key",
-      "publicKeyHelp": "Public key sẽ được chia sẻ với các máy chủ từ xa",
+      "publicKey": "Khóa công khai",
+      "privateKeyEmptyHelp": "Để trống trường này sẽ giữ nguyên khóa bí mật",
+      "publicKeyHelp": "Khóa công khai sẽ được chia sẻ với các máy chủ từ xa",
       "publicKeyPlaceholder": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ...",
-      "privateKey": "Private Key",
-      "privateKeyHelp": "Private key được sử dụng để xác thực (giữ an toàn!)",
+      "privateKey": "Khóa bí mật",
+      "privateKeyHelp": "Khóa bí mật được sử dụng để xác thực (giữ an toàn!)",
       "privateKeyPlaceholder": "-----BEGIN OPENSSH PRIVATE KEY-----\\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAAB...\\n-----END OPENSSH PRIVATE KEY-----",
-      "active": "Hoạt Động",
+      "isActive": "Hoạt Động",
       "activeHelp": "Kích hoạt SSH key này để sử dụng trong triển khai",
-      "securityNotice": "Thông Báo Bảo Mật: Private key được lưu trữ an toàn và mã hóa. Chỉ sử dụng cặp key đáng tin cậy và không bao giờ chia sẻ private key của bạn."
+      "securityNotice": "Thông Báo Bảo Mật: Khóa bí mật được lưu trữ an toàn và mã hóa. Chỉ sử dụng cặp key đáng tin cậy và không bao giờ chia sẻ khóa bí mật của bạn."
     },
     "table": {
       "name": "Tên",
       "type": "Loại",
       "fingerprint": "Fingerprint",
       "status": "Trạng Thái",
-      "created": "Tạo",
+      "created": "Ngày Tạo",
       "actions": "Hành Động",
       "copyFingerprint": "Sao Chép Fingerprint",
       "edit": "Chỉnh Sửa",
-      "delete": "Xóa"
+      "delete": "Xóa",
+      "noKeys": "Không tìm thấy SSH keys"
     },
     "filters": {
       "searchPlaceholder": "Tìm kiếm theo tên, mô tả hoặc fingerprint...",
@@ -73,8 +88,8 @@
     "validation": {
       "nameRequired": "Tên là bắt buộc",
       "nameTooLong": "Tên phải ít hơn 100 ký tự",
-      "publicKeyRequired": "Public key là bắt buộc",
-      "publicKeyInvalid": "Định dạng SSH public key không hợp lệ",
+      "publicKeyRequired": "Khóa công khai là bắt buộc",
+      "publicKeyInvalid": "Định dạng SSH khóa công khai không hợp lệ",
       "privateKeyRequired": "Private key là bắt buộc",
       "privateKeyInvalid": "Định dạng private key không hợp lệ",
       "privateKeyType": "Loại private key không hợp lệ",

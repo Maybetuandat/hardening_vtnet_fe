@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Key, Loader2 } from "lucide-react";
 import { SshKey, SshKeyType } from "@/types/ssh-key";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface SshKeyDeleteDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ export function SshKeyDeleteDialog({
   onConfirm,
   onSuccess,
 }: SshKeyDeleteDialogProps) {
+  const { t } = useTranslation("sshkey");
   const [loading, setLoading] = useState(false);
 
   const getKeyTypeColor = (type: SshKeyType) => {
@@ -55,13 +57,22 @@ export function SshKeyDeleteDialog({
     setLoading(true);
     try {
       await onConfirm(sshKey.id);
-      toast.success("SSH key deleted successfully");
-      onSuccess();
+      toast.success(t("sshKeys.sshKeyDeleted"));
       onClose();
+      setTimeout(() => {
+        onSuccess();
+      }, 150);
     } catch (err) {
-      toast.error("Failed to delete SSH key");
+      console.error("Error deleting SSH key:", err);
+      toast.error(t("common.actionFailed"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!loading) {
+      onClose();
     }
   };
 
@@ -73,14 +84,11 @@ export function SshKeyDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-600" />
-            Delete SSH Key
+            {t("sshKeys.deleteSshKey")}
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3">
-              <p>
-                Are you sure you want to delete this SSH key? This action cannot
-                be undone.
-              </p>
+              <p>{t("sshKeys.confirmDelete")}</p>
 
               {/* SSH Key Info */}
               <div className="bg-muted p-4 rounded-lg space-y-2">
@@ -111,17 +119,16 @@ export function SshKeyDeleteDialog({
 
               <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
                 <p className="text-sm text-red-800">
-                  <strong>Warning:</strong> Any systems or deployments using
-                  this SSH key will lose access. Make sure to update them with a
-                  different key before deletion.
+                  <strong>{t("common.warning")}:</strong>{" "}
+                  {t("sshKeys.deleteWarning")}
                 </p>
               </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose} disabled={loading}>
-            Cancel
+          <AlertDialogCancel onClick={handleClose} disabled={loading}>
+            {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button
@@ -130,7 +137,7 @@ export function SshKeyDeleteDialog({
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+              {t("common.delete")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

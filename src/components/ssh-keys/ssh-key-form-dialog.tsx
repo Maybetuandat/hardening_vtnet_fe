@@ -37,6 +37,7 @@ import {
   SshKeyUpdate,
   SshKeyType,
 } from "@/types/ssh-key";
+import { useTranslation } from "react-i18next";
 
 interface SshKeyFormDialogProps {
   open: boolean;
@@ -62,7 +63,7 @@ export function SshKeyFormDialog({
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
+  const { t } = useTranslation("sshkey");
   const {
     formData,
     errors,
@@ -70,7 +71,7 @@ export function SshKeyFormDialog({
     validateForm,
     resetForm,
     updateField,
-  } = useSshKeyForm();
+  } = useSshKeyForm(undefined, !!editingSshKey);
 
   // Key type options with colors and descriptions
   const keyTypeOptions = [
@@ -210,7 +211,9 @@ export function SshKeyFormDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            {editingSshKey ? "Edit SSH Key" : "Create SSH Key"}
+            {editingSshKey
+              ? t("sshKeys.form.editSshKey")
+              : t("sshKeys.form.createSshKey")}
           </DialogTitle>
         </DialogHeader>
 
@@ -218,7 +221,7 @@ export function SshKeyFormDialog({
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
-              <p className="text-muted-foreground">Loading SSH key...</p>
+              <p className="text-muted-foreground">{t("sshKeys.loading")}</p>
             </div>
           </div>
         ) : (
@@ -229,7 +232,7 @@ export function SshKeyFormDialog({
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Key className="h-4 w-4" />
-                    Basic Information
+                    {t("sshKeys.form.basicInformation")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -237,7 +240,8 @@ export function SshKeyFormDialog({
                     {/* Name */}
                     <div className="space-y-2">
                       <Label htmlFor="name">
-                        Name <span className="text-red-500">*</span>
+                        {t("sshKeys.form.name")}{" "}
+                        <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="name"
@@ -254,7 +258,7 @@ export function SshKeyFormDialog({
                     {/* Key Type */}
                     <div className="space-y-2">
                       <Label className="flex items-center gap-2">
-                        Key Type
+                        {t("sshKeys.form.keyType")}{" "}
                         <Badge
                           className={`${getKeyTypeColor(
                             formData.key_type
@@ -292,14 +296,16 @@ export function SshKeyFormDialog({
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Label htmlFor="description">
+                      {t("sshKeys.form.description")}
+                    </Label>
                     <Textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) =>
                         updateField("description", e.target.value)
                       }
-                      placeholder="SSH key for production servers"
+                      placeholder={t("sshKeys.form.descriptionPlaceholder")}
                       rows={2}
                       className="resize-none"
                     />
@@ -312,7 +318,7 @@ export function SshKeyFormDialog({
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Shield className="h-4 w-4" />
-                    SSH Key Pair
+                    {t("sshKeys.form.sshKeyPair")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -323,16 +329,14 @@ export function SshKeyFormDialog({
                       className="flex items-center justify-between"
                     >
                       <span className="flex items-center gap-2">
-                        Public Key <span className="text-red-500">*</span>
+                        {t("sshKeys.form.publicKey")}{" "}
+                        <span className="text-red-500">*</span>
                         <Tooltip>
                           <TooltipTrigger>
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              The public key that will be shared with remote
-                              servers
-                            </p>
+                            <p>{t("sshKeys.form.publicKeyHelp")}</p>
                           </TooltipContent>
                         </Tooltip>
                       </span>
@@ -360,8 +364,8 @@ export function SshKeyFormDialog({
                       onChange={(e) =>
                         updateField("public_key", e.target.value)
                       }
-                      placeholder="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
-                      rows={3}
+                      placeholder={t("sshKeys.form.publicKeyPlaceholder")}
+                      rows={10}
                       className={`font-mono text-sm resize-none ${
                         errors.public_key ? "border-red-500" : ""
                       }`}
@@ -380,7 +384,7 @@ export function SshKeyFormDialog({
                       className="flex items-center justify-between"
                     >
                       <span className="flex items-center gap-2">
-                        Private Key{" "}
+                        {t("sshKeys.form.privateKey")}
                         {!editingSshKey && (
                           <span className="text-red-500">*</span>
                         )}
@@ -389,10 +393,7 @@ export function SshKeyFormDialog({
                             <HelpCircle className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              The private key used for authentication (keep
-                              secure!)
-                            </p>
+                            <p>{t("sshKeys.form.privateKeyHelp")}</p>
                           </TooltipContent>
                         </Tooltip>
                       </span>
@@ -420,8 +421,8 @@ export function SshKeyFormDialog({
                       onChange={(e) =>
                         updateField("private_key", e.target.value)
                       }
-                      placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAAB...&#10;-----END OPENSSH PRIVATE KEY-----"
-                      rows={6}
+                      placeholder={t("sshKeys.form.privateKeyPlaceholder")}
+                      rows={10}
                       className={`font-mono text-sm resize-none ${
                         errors.private_key ? "border-red-500" : ""
                       }`}
@@ -433,7 +434,7 @@ export function SshKeyFormDialog({
                     )}
                     {editingSshKey && (
                       <p className="text-xs text-muted-foreground">
-                        Leave empty to keep existing private key
+                        {t("sshKeys.form.privateKeyEmptyHelp")}
                       </p>
                     )}
                   </div>
@@ -451,10 +452,8 @@ export function SshKeyFormDialog({
                   {/* Security Notice */}
                   <Alert>
                     <Shield className="h-4 w-4" />
-                    <AlertDescription>
-                      <strong>Security Notice:</strong> Private keys are stored
-                      securely and encrypted. Only use trusted key pairs and
-                      never share your private key.
+                    <AlertDescription className="text-red-500">
+                      {t("sshKeys.form.securityNotice")}
                     </AlertDescription>
                   </Alert>
                 </CardContent>
@@ -463,14 +462,18 @@ export function SshKeyFormDialog({
               {/* Settings */}
               <Card>
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Settings</CardTitle>
+                  <CardTitle className="text-lg">
+                    {t("sshKeys.form.settings")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <Label htmlFor="is_active">Active</Label>
+                      <Label htmlFor="is_active">
+                        {t("sshKeys.form.isActive")}
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Enable this SSH key for use in deployments
+                        {t("sshKeys.form.activeHelp")}
                       </p>
                     </div>
                     <Switch
@@ -492,7 +495,7 @@ export function SshKeyFormDialog({
                   onClick={handleCancel}
                   disabled={loading}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -500,7 +503,9 @@ export function SshKeyFormDialog({
                   className="flex items-center gap-2"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {editingSshKey ? "Update SSH Key" : "Create SSH Key"}
+                  {editingSshKey
+                    ? t("sshKeys.form.editSshKey")
+                    : t("sshKeys.form.createSshKey")}
                 </Button>
               </div>
             </form>

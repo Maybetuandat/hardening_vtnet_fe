@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { vi, enUS } from "date-fns/locale";
 import {
   Table,
   TableBody,
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 import { SshKey, SshKeyType } from "@/types/ssh-key";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface SshKeyListProps {
   sshKeys: SshKey[];
@@ -52,6 +54,7 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
     string | null
   >(null);
 
+  const { t } = useTranslation("sshkey");
   const handleCopyFingerprint = async (fingerprint: string) => {
     try {
       await navigator.clipboard.writeText(fingerprint);
@@ -78,16 +81,23 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
   };
 
   const formatDate = (dateString: string) => {
+    const { i18n } = useTranslation();
     try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+      const currentLocale = i18n.language === "vi" ? vi : enUS;
+      return formatDistanceToNow(new Date(dateString), {
+        addSuffix: true,
+        locale: currentLocale,
+      });
     } catch {
-      return "Unknown";
+      return i18n.language === "vi" ? "Không xác định" : "Unknown";
     }
   };
 
-  const truncateFingerprint = (fingerprint: string, length: number = 20) => {
-    if (fingerprint.length <= length) return fingerprint;
-    return `${fingerprint.substring(0, length)}...`;
+  const truncateFingerprint = (fingerprint?: string, length: number = 20) => {
+    if (!fingerprint) return "";
+    return fingerprint.length <= length
+      ? fingerprint
+      : `${fingerprint.substring(0, length)}...`;
   };
 
   return (
@@ -107,14 +117,16 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">Loading SSH keys...</p>
+                <p className="text-muted-foreground">{t("sshKeys.loading")}</p>
               </div>
             </div>
           ) : sshKeys.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <Key className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground mb-2">No SSH keys found</p>
+                <p className="text-muted-foreground mb-2">
+                  {t("sshKeys.table.noKeys")}
+                </p>
               </div>
             </div>
           ) : (
@@ -122,11 +134,11 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Fingerprint</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead>{t("sshKeys.table.name")}</TableHead>
+                    <TableHead>{t("sshKeys.table.type")}</TableHead>
+                    <TableHead>{t("sshKeys.table.fingerprint")}</TableHead>
+                    <TableHead>{t("sshKeys.table.status")}</TableHead>
+                    <TableHead>{t("sshKeys.table.created")}</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -177,7 +189,9 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                         <Badge
                           variant={sshKey.is_active ? "default" : "secondary"}
                         >
-                          {sshKey.is_active ? "Active" : "Inactive"}
+                          {sshKey.is_active
+                            ? t("sshKeys.active")
+                            : t("sshKeys.inactive")}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -193,10 +207,12 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>
+                              {t("sshKeys.action")}
+                            </DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => onEdit(sshKey)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              {t("sshKeys.table.edit")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
@@ -204,7 +220,7 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                               }
                             >
                               <Copy className="mr-2 h-4 w-4" />
-                              Copy Fingerprint
+                              {t("sshKeys.table.copyFingerprint")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -212,7 +228,7 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                               className="text-red-600"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
+                              {t("sshKeys.table.delete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

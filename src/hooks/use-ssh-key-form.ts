@@ -1,4 +1,3 @@
-// src/hooks/use-ssh-key-form.ts - SIMPLIFIED VERSION
 import { useState, useCallback } from "react";
 import { SshKeyFormData, SshKeyType } from "@/types/ssh-key";
 
@@ -21,7 +20,8 @@ const initialFormData: SshKeyFormData = {
 };
 
 export const useSshKeyForm = (
-  initialData?: Partial<SshKeyFormData>
+  initialData?: Partial<SshKeyFormData>,
+  isEditMode = false
 ): UseSshKeyFormReturn => {
   const [formData, setFormDataState] = useState<SshKeyFormData>({
     ...initialFormData,
@@ -31,7 +31,6 @@ export const useSshKeyForm = (
 
   const setFormData = useCallback((data: Partial<SshKeyFormData>) => {
     setFormDataState((prev) => ({ ...prev, ...data }));
-    // Clear errors for updated fields
     setErrors((prevErrors) => {
       const clearedErrors = { ...prevErrors };
       Object.keys(data).forEach((key) => {
@@ -39,9 +38,8 @@ export const useSshKeyForm = (
       });
       return clearedErrors;
     });
-  }, []); // Empty dependency
+  }, []);
 
-  //  Memoize updateField
   const updateField = useCallback(
     (field: keyof SshKeyFormData, value: any) => {
       setFormData({ [field]: value });
@@ -72,18 +70,31 @@ export const useSshKeyForm = (
       }
     }
 
-    // Validate private key - chỉ check format cơ bản và required
-    if (!formData.private_key.trim()) {
-      newErrors.private_key = "Private key is required";
+    if (isEditMode) {
+      // Edit mode: Private key không bắt buộc, nhưng nếu có thì phải đúng format
+      if (formData.private_key.trim()) {
+        const privateKey = formData.private_key.trim();
+        if (
+          !privateKey.startsWith("-----BEGIN") ||
+          !privateKey.endsWith("-----")
+        ) {
+          newErrors.private_key =
+            "Invalid private key format - must start with -----BEGIN and end with -----";
+        }
+      }
     } else {
-      const privateKey = formData.private_key.trim();
-      // Chỉ check basic format
-      if (
-        !privateKey.startsWith("-----BEGIN") ||
-        !privateKey.endsWith("-----")
-      ) {
-        newErrors.private_key =
-          "Invalid private key format - must start with -----BEGIN and end with -----";
+      // Create mode: Private key bắt buộc
+      if (!formData.private_key.trim()) {
+        newErrors.private_key = "Private key is required";
+      } else {
+        const privateKey = formData.private_key.trim();
+        if (
+          !privateKey.startsWith("-----BEGIN") ||
+          !privateKey.endsWith("-----")
+        ) {
+          newErrors.private_key =
+            "Invalid private key format - must start with -----BEGIN and end with -----";
+        }
       }
     }
 
