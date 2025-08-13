@@ -39,12 +39,7 @@ export function AppSidebar({
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/" || location.pathname === "/home",
       },
-      {
-        title: t("navigation.labs"),
-        url: "/labs",
-        icon: LayoutDashboardIcon,
-        isActive: location.pathname === "/labs",
-      },
+     
       {
         title: "SSH Keys",
         url: "/ssh-keys",

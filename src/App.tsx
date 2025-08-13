@@ -4,7 +4,7 @@ import { MainLayout } from "./layouts/MainLayout";
 
 import "./i18n"; 
 
-import Lab from "./app/labs/lab-page";
+
 import HomePage from "./app/dashboard";
 import SystemHardeningDashboard from "./app/dashboard";
 import SshKeysPage from "./app/ssh-keys/ssh-keys-page";
@@ -38,22 +38,6 @@ function App() {
               
             }
           />
-
-          <Route
-            path="/labs"
-            element={
-              
-                <MainLayout>
-                  <Lab />
-                </MainLayout>
-              
-            }
-          />
-
-
-
-
-
 
            <Route
             path="/ssh-keys"
