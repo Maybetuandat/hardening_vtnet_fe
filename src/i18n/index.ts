@@ -4,10 +4,10 @@ import { initReactI18next } from "react-i18next";
 // Import translation files
 import viCommon from "./locales/vi/common.json";
 
-
-
 import enCommon from "./locales/en/common.json";
 
+import enSshKey from "./locales/en/ssh-key.json";
+import viSshKey from "./locales/vi/ssh-key.json";
 
 // Configuration
 i18n.use(initReactI18next).init({
@@ -23,11 +23,11 @@ i18n.use(initReactI18next).init({
   resources: {
     vi: {
       common: viCommon,
-     
+      sshkey: viSshKey,
     },
     en: {
       common: enCommon,
-   
+      sshkey: enSshKey,
     },
   },
 
