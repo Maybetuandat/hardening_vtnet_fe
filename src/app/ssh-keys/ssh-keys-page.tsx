@@ -1,17 +1,19 @@
-// src/app/ssh-keys/ssh-keys-page.tsx
 import { useState } from "react";
 import HeaderSshKeyManagement from "@/components/ssh-keys/ssh-key-header";
-import { SshKeyList } from "@/components/ssh-keys/ssh-key-list";
-import { SshKeyFormDialog } from "@/components/ssh-keys/ssh-key-form-dialog";
+
 import { SshKeyDeleteDialog } from "@/components/ssh-keys/ssh-key-delete-dialog";
 import FilterBar from "@/components/ui/filter-bar";
-import { SshKeyType, SshKey } from "@/types/ssh-key";
+
 import { useSshKeys } from "@/hooks/use-ssh-keys";
+import { SshKeyFormDialog } from "@/components/ssh-keys/ssh-key-form-dialog";
+import { SshKeyList } from "@/components/ssh-keys/ssh-key-list";
+import { SshKey, SshKeyType } from "@/types/ssh-key";
+import React from "react";
 
 export default function SshKeyPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState("all");
-  const [sshKeyType, setSshKeyType] = useState(SshKeyType.DSA);
+  const [status, setStatus] = useState("status");
+  const [sshKeyType, setSshKeyType] = useState<SshKeyType | "all">("all");
 
   // Dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -30,21 +32,32 @@ export default function SshKeyPage() {
     getSshKeyById,
   } = useSshKeys();
 
-  // Filter logic
-  const filteredSshKeys = sshKeys.filter((sshKey) => {
-    const matchesSearch =
-      sshKey.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sshKey.description?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter logic - Add safety check for sshKeys
+  const filteredSshKeys = React.useMemo(() => {
+    if (!sshKeys || !Array.isArray(sshKeys)) {
+      return [];
+    }
 
-    const matchesStatus =
-      status === "all" ||
-      (status === "active" && sshKey.is_active) ||
-      (status === "inactive" && !sshKey.is_active);
+    return sshKeys.filter((sshKey) => {
+      // Search filter - nếu searchTerm rỗng thì bỏ qua filter này
+      const matchesSearch =
+        searchTerm.trim() === "" ||
+        sshKey.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sshKey.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesType = sshKey.key_type === sshKeyType;
+      // Status filter - nếu status là "all" thì bỏ qua filter này
+      const matchesStatus =
+        status === "status" ||
+        (status === "active" && sshKey.is_active) ||
+        (status === "inactive" && !sshKey.is_active);
 
-    return matchesSearch && matchesStatus && matchesType;
-  });
+      // Type filter - nếu sshKeyType là "all" thì bỏ qua filter này
+      const matchesType =
+        sshKeyType === "all" || sshKey.key_type === sshKeyType;
+
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [sshKeys, searchTerm, status, sshKeyType]);
 
   // Handlers
   const handleAdd = () => {
@@ -92,7 +105,7 @@ export default function SshKeyPage() {
             value: status,
             onChange: setStatus,
             options: [
-              { value: "all", label: "All" },
+              { value: "status", label: "Status" },
               { value: "active", label: "Active" },
               { value: "inactive", label: "Inactive" },
             ],
@@ -103,6 +116,7 @@ export default function SshKeyPage() {
             value: sshKeyType,
             onChange: (value) => setSshKeyType(value as SshKeyType),
             options: [
+              { value: "all", label: "All" },
               { value: SshKeyType.RSA, label: "RSA" },
               { value: SshKeyType.ED25519, label: "Ed25519" },
               { value: SshKeyType.ECDSA, label: "ECDSA" },

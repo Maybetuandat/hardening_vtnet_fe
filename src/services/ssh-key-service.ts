@@ -1,28 +1,25 @@
+// src/services/ssh-key-service.ts
 import { api } from "@/lib/api";
 import { SshKey, SshKeyCreate, SshKeyUpdate } from "@/types/ssh-key";
 
 export const sshKeyService = {
   async getAll(): Promise<SshKey[]> {
-    const response = await api.get("/ssh-keys");
-    return response.data;
+    return api.get<SshKey[]>("/ssh-keys"); // ✅ Direct return, no .data
   },
 
   async getById(id: number): Promise<SshKey> {
-    const response = await api.get(`/ssh-keys/${id}`);
-    return response.data;
+    return api.get<SshKey>(`/ssh-keys/${id}`); // ✅ Direct return, no .data
   },
 
   async create(data: SshKeyCreate): Promise<SshKey> {
-    const response = await api.post("/ssh-keys", data);
-    return response.data;
+    return api.post<SshKey>("/ssh-keys", data); // ✅ Direct return, no .data
   },
 
   async update(id: number, data: SshKeyUpdate): Promise<SshKey> {
-    const response = await api.patch(`/ssh-keys/${id}`, data);
-    return response.data;
+    return api.patch<SshKey>(`/ssh-keys/${id}`, data); // ✅ Direct return, no .data
   },
 
   async delete(id: number): Promise<void> {
-    await api.delete(`/ssh-keys/${id}`);
+    return api.delete<void>(`/ssh-keys/${id}`); // ✅ Direct return, no .data
   },
 };

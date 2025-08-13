@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -35,42 +29,25 @@ import {
   Check,
   AlertTriangle,
   RefreshCw,
-  Search,
-  Filter,
 } from "lucide-react";
 import { SshKey, SshKeyType } from "@/types/ssh-key";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { formatDistanceToNow } from "date-fns";
 
 interface SshKeyListProps {
   sshKeys: SshKey[];
   loading: boolean;
   error: string | null;
-  onAdd: () => void;
   onEdit: (sshKey: SshKey) => void;
   onDelete: (sshKey: SshKey) => void;
-  onRefresh: () => void;
 }
 
 export const SshKeyList: React.FC<SshKeyListProps> = ({
   sshKeys,
   loading,
   error,
-  onAdd,
   onEdit,
   onDelete,
-  onRefresh,
 }) => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [filterType, setFilterType] = React.useState<string>("all");
-  const [filterStatus, setFilterStatus] = React.useState<string>("all");
   const [copiedFingerprint, setCopiedFingerprint] = React.useState<
     string | null
   >(null);
@@ -99,23 +76,6 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
         return "bg-gray-500";
     }
   };
-
-  const filteredSshKeys = React.useMemo(() => {
-    return sshKeys.filter((key) => {
-      const matchesSearch =
-        key.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        key.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        key.fingerprint.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesType = filterType === "all" || key.key_type === filterType;
-      const matchesStatus =
-        filterStatus === "all" ||
-        (filterStatus === "active" && key.is_active) ||
-        (filterStatus === "inactive" && !key.is_active);
-
-      return matchesSearch && matchesType && matchesStatus;
-    });
-  }, [sshKeys, searchTerm, filterType, filterStatus]);
 
   const formatDate = (dateString: string) => {
     try {
@@ -150,21 +110,11 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                 <p className="text-muted-foreground">Loading SSH keys...</p>
               </div>
             </div>
-          ) : filteredSshKeys.length === 0 ? (
+          ) : sshKeys.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <Key className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground mb-2">
-                  {sshKeys.length === 0
-                    ? "No SSH keys found"
-                    : "No SSH keys match your filters"}
-                </p>
-                {sshKeys.length === 0 && (
-                  <Button onClick={onAdd} variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add your first SSH key
-                  </Button>
-                )}
+                <p className="text-muted-foreground mb-2">No SSH keys found</p>
               </div>
             </div>
           ) : (
@@ -181,7 +131,7 @@ export const SshKeyList: React.FC<SshKeyListProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSshKeys.map((sshKey) => (
+                  {sshKeys.map((sshKey) => (
                     <TableRow key={sshKey.id}>
                       <TableCell>
                         <div>

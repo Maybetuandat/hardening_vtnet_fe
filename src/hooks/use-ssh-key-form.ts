@@ -1,6 +1,6 @@
-// src/hooks/use-ssh-key-form.ts
-import { useState, useCallback } from 'react';
-import { SshKeyFormData, SshKeyType } from '@/types/ssh-key';
+// src/hooks/use-ssh-key-form.ts - SIMPLIFIED VERSION
+import { useState, useCallback } from "react";
+import { SshKeyFormData, SshKeyType } from "@/types/ssh-key";
 
 interface UseSshKeyFormReturn {
   formData: SshKeyFormData;
@@ -12,94 +12,78 @@ interface UseSshKeyFormReturn {
 }
 
 const initialFormData: SshKeyFormData = {
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   key_type: SshKeyType.RSA,
-  public_key: '',
-  private_key: '',
+  public_key: "",
+  private_key: "",
   is_active: true,
 };
 
-export const useSshKeyForm = (initialData?: Partial<SshKeyFormData>): UseSshKeyFormReturn => {
+export const useSshKeyForm = (
+  initialData?: Partial<SshKeyFormData>
+): UseSshKeyFormReturn => {
   const [formData, setFormDataState] = useState<SshKeyFormData>({
     ...initialFormData,
     ...initialData,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // ✅ Memoize setFormData để tránh re-render
   const setFormData = useCallback((data: Partial<SshKeyFormData>) => {
-    setFormDataState(prev => ({ ...prev, ...data }));
+    setFormDataState((prev) => ({ ...prev, ...data }));
     // Clear errors for updated fields
-    setErrors(prevErrors => {
+    setErrors((prevErrors) => {
       const clearedErrors = { ...prevErrors };
-      Object.keys(data).forEach(key => {
+      Object.keys(data).forEach((key) => {
         delete clearedErrors[key];
       });
       return clearedErrors;
     });
   }, []); // Empty dependency
 
-  // ✅ Memoize updateField
-  const updateField = useCallback((field: keyof SshKeyFormData, value: any) => {
-    setFormData({ [field]: value });
-  }, [setFormData]); // Depend on stable setFormData
+  //  Memoize updateField
+  const updateField = useCallback(
+    (field: keyof SshKeyFormData, value: any) => {
+      setFormData({ [field]: value });
+    },
+    [setFormData]
+  ); // Depend on stable setFormData
 
-  // ✅ Memoize validateForm
+  // Simplified validateForm - chỉ validate format và required
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
     // Validate name
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     } else if (formData.name.length > 100) {
-      newErrors.name = 'Name must be less than 100 characters';
+      newErrors.name = "Name must be less than 100 characters";
     }
 
-    // Validate public key
+    // Validate public key - chỉ check format cơ bản và required
     if (!formData.public_key.trim()) {
-      newErrors.public_key = 'Public key is required';
+      newErrors.public_key = "Public key is required";
     } else {
-      const sshKeyPattern = /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-|ssh-dss)\s+[A-Za-z0-9+/]+[=]{0,2}(\s+.*)?$/;
+      // Basic SSH public key format check
+      const sshKeyPattern =
+        /^(ssh-rsa|ssh-ed25519|ecdsa-sha2-[\w-]+|ssh-dss)\s+[A-Za-z0-9+/]+=*(\s+.*)?$/;
       if (!sshKeyPattern.test(formData.public_key.trim())) {
-        newErrors.public_key = 'Invalid SSH public key format';
+        newErrors.public_key = "Invalid SSH public key format";
       }
     }
 
-    // Validate private key
+    // Validate private key - chỉ check format cơ bản và required
     if (!formData.private_key.trim()) {
-      newErrors.private_key = 'Private key is required';
+      newErrors.private_key = "Private key is required";
     } else {
       const privateKey = formData.private_key.trim();
-      if (!privateKey.startsWith('-----BEGIN') || !privateKey.endsWith('-----')) {
-        newErrors.private_key = 'Invalid private key format';
-      } else {
-        const validKeyTypes = ['RSA PRIVATE KEY', 'OPENSSH PRIVATE KEY', 'EC PRIVATE KEY', 'DSA PRIVATE KEY'];
-        const hasValidType = validKeyTypes.some(keyType => privateKey.includes(keyType));
-        if (!hasValidType) {
-          newErrors.private_key = 'Invalid private key type';
-        }
-      }
-    }
-
-    // Validate key pair match
-    if (formData.public_key && formData.private_key) {
-      const publicKeyType = formData.public_key.split(' ')[0];
-      const privateKey = formData.private_key;
-
-      let isMatch = false;
-      if (publicKeyType === 'ssh-rsa' && privateKey.includes('RSA')) {
-        isMatch = true;
-      } else if (publicKeyType === 'ssh-ed25519' && privateKey.includes('OPENSSH')) {
-        isMatch = true;
-      } else if (publicKeyType.startsWith('ecdsa-') && privateKey.includes('EC')) {
-        isMatch = true;
-      } else if (publicKeyType === 'ssh-dss' && privateKey.includes('DSA')) {
-        isMatch = true;
-      }
-
-      if (!isMatch) {
-        newErrors.key_pair = 'Public and private keys do not match';
+      // Chỉ check basic format
+      if (
+        !privateKey.startsWith("-----BEGIN") ||
+        !privateKey.endsWith("-----")
+      ) {
+        newErrors.private_key =
+          "Invalid private key format - must start with -----BEGIN and end with -----";
       }
     }
 
@@ -107,7 +91,7 @@ export const useSshKeyForm = (initialData?: Partial<SshKeyFormData>): UseSshKeyF
     return Object.keys(newErrors).length === 0;
   }, [formData]); // Depend on formData
 
-  // ✅ Memoize resetForm
+  //  Memoize resetForm
   const resetForm = useCallback(() => {
     setFormDataState(initialFormData);
     setErrors({});

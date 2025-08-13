@@ -1,3 +1,4 @@
+// src/hooks/use-ssh-keys.ts - ENHANCED VERSION
 import { useState, useEffect } from "react";
 import { SshKey, SshKeyCreate, SshKeyUpdate } from "@/types/ssh-key";
 import { sshKeyService } from "@/services/ssh-key-service";
@@ -8,40 +9,79 @@ export function useSshKeys() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchSshKeys = async () => {
+    console.log("🔄 Fetching SSH keys..."); // Debug log
     setLoading(true);
     setError(null);
+
     try {
       const data = await sshKeyService.getAll();
-      setSshKeys(data);
+      console.log("✅ SSH Keys received:", data); // Debug log
+      console.log("📊 Data type:", typeof data, Array.isArray(data)); // Debug log
+
+      if (Array.isArray(data)) {
+        setSshKeys(data);
+      } else {
+        console.error("❌ Data is not an array:", data);
+        setError("Invalid data format received");
+      }
     } catch (err) {
+      console.error("❌ Error fetching SSH keys:", err); // Debug log
       setError("Failed to fetch SSH keys");
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   const createSshKey = async (data: SshKeyCreate) => {
-    const newSshKey = await sshKeyService.create(data);
-    setSshKeys((prev) => [...prev, newSshKey]);
-    return newSshKey;
+    try {
+      console.log("➕ Creating SSH key:", data);
+      const newSshKey = await sshKeyService.create(data);
+      console.log("✅ SSH key created:", newSshKey);
+      setSshKeys((prev) => [...prev, newSshKey]);
+      return newSshKey;
+    } catch (err) {
+      console.error("❌ Error creating SSH key:", err);
+      throw err;
+    }
   };
 
   const updateSshKey = async (id: number, data: SshKeyUpdate) => {
-    const updatedSshKey = await sshKeyService.update(id, data);
-    setSshKeys((prev) =>
-      prev.map((key) => (key.id === id ? updatedSshKey : key))
-    );
-    return updatedSshKey;
+    try {
+      console.log("✏️ Updating SSH key:", id, data);
+      const updatedSshKey = await sshKeyService.update(id, data);
+      console.log("✅ SSH key updated:", updatedSshKey);
+      setSshKeys((prev) =>
+        prev.map((key) => (key.id === id ? updatedSshKey : key))
+      );
+      return updatedSshKey;
+    } catch (err) {
+      console.error("❌ Error updating SSH key:", err);
+      throw err;
+    }
   };
 
   const deleteSshKey = async (id: number) => {
-    await sshKeyService.delete(id);
-    setSshKeys((prev) => prev.filter((key) => key.id !== id));
+    try {
+      console.log("🗑️ Deleting SSH key:", id);
+      await sshKeyService.delete(id);
+      console.log("✅ SSH key deleted");
+      setSshKeys((prev) => prev.filter((key) => key.id !== id));
+    } catch (err) {
+      console.error("❌ Error deleting SSH key:", err);
+      throw err;
+    }
   };
 
   const getSshKeyById = async (id: number) => {
-    return await sshKeyService.getById(id);
+    try {
+      console.log("🔍 Getting SSH key by ID:", id);
+      const sshKey = await sshKeyService.getById(id);
+      console.log("✅ SSH key found:", sshKey);
+      return sshKey;
+    } catch (err) {
+      console.error("❌ Error getting SSH key by ID:", err);
+      throw err;
+    }
   };
 
   useEffect(() => {

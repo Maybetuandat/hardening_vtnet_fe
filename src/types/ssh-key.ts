@@ -1,19 +1,19 @@
-export enum SshKeyType{
-    RSA = "rsa",
-    ED25519="ed25519",
-    ECDSA="ecdsa",
-    DSA="dsa"
+export enum SshKeyType {
+  RSA = "rsa",
+  ED25519 = "ed25519",
+  ECDSA = "ecdsa",
+  DSA = "dsa",
 }
-export interface SshKey{
-    id : number,
-    name: string, 
-    description ?:  string,
-    key_type: SshKeyType,
-    public_key: string,
-    fingerprint: string,
-    is_active: boolean,
-    created_at: string,
-    updated_at: string
+export interface SshKey {
+  id: number;
+  name: string;
+  description?: string;
+  key_type: SshKeyType;
+  public_key: string;
+  fingerprint: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 export interface SshKeyCreate {
   name: string;
