@@ -1,167 +1,61 @@
-// src/hooks/use-ssh-keys.ts
+import { useState, useEffect } from "react";
 import { SshKey, SshKeyCreate, SshKeyUpdate } from "@/types/ssh-key";
-import { useEffect, useState, useCallback } from "react";
+import { sshKeyService } from "@/services/ssh-key-service";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+export function useSshKeys() {
+  const [sshKeys, setSshKeys] = useState<SshKey[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-interface useSshKeyReturn {
-    sshKeys: SshKey[];
-    loading: boolean;
-    error: string | null;
-    fetchSshKeys: () => Promise<void>;
-    createSshKey: (data: SshKeyCreate) => Promise<SshKey>;
-    updateSshKey: (id: number, data: SshKeyUpdate) => Promise<SshKey>;
-    deleteSshKey: (id: number) => Promise<void>;
-    getSshKeyById: (id: number) => Promise<SshKey>;
+  const fetchSshKeys = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await sshKeyService.getAll();
+      setSshKeys(data);
+    } catch (err) {
+      setError("Failed to fetch SSH keys");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createSshKey = async (data: SshKeyCreate) => {
+    const newSshKey = await sshKeyService.create(data);
+    setSshKeys((prev) => [...prev, newSshKey]);
+    return newSshKey;
+  };
+
+  const updateSshKey = async (id: number, data: SshKeyUpdate) => {
+    const updatedSshKey = await sshKeyService.update(id, data);
+    setSshKeys((prev) =>
+      prev.map((key) => (key.id === id ? updatedSshKey : key))
+    );
+    return updatedSshKey;
+  };
+
+  const deleteSshKey = async (id: number) => {
+    await sshKeyService.delete(id);
+    setSshKeys((prev) => prev.filter((key) => key.id !== id));
+  };
+
+  const getSshKeyById = async (id: number) => {
+    return await sshKeyService.getById(id);
+  };
+
+  useEffect(() => {
+    fetchSshKeys();
+  }, []);
+
+  return {
+    sshKeys,
+    loading,
+    error,
+    fetchSshKeys,
+    createSshKey,
+    updateSshKey,
+    deleteSshKey,
+    getSshKeyById,
+  };
 }
-
-export const useSshKeys = (): useSshKeyReturn => {
-    const [sshKeys, setSshKeys] = useState<SshKey[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    
-    // ✅ Memoize fetchSshKeys để tránh re-render
-    const fetchSshKeys = useCallback(async (): Promise<void> => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/ssh-keys`);
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data: SshKey[] = await response.json();
-            setSshKeys(data);
-            console.log("SSH Keys fetched successfully:", data);
-        }
-        catch (err) {
-            setError("Failed to fetch SSH keys");
-            console.error("Error fetching SSH keys:", err);
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Empty dependency - function không thay đổi
-
-    // ✅ Memoize createSshKey
-    const createSshKey = useCallback(async (data: SshKeyCreate): Promise<SshKey> => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/ssh-keys`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to create SSH key');
-            }
-
-            const newSshKey: SshKey = await response.json();
-            setSshKeys(prev => [newSshKey, ...prev]);
-            return newSshKey;
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-            setError(`Failed to create SSH key: ${errorMessage}`);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Empty dependency
-
-    // ✅ Memoize updateSshKey
-    const updateSshKey = useCallback(async (id: number, data: SshKeyUpdate): Promise<SshKey> => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/ssh-keys/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to update SSH key');
-            }
-
-            const updatedSshKey: SshKey = await response.json();
-            setSshKeys(prev => 
-                prev.map(key => key.id === id ? updatedSshKey : key)
-            );
-            return updatedSshKey;
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-            setError(`Failed to update SSH key: ${errorMessage}`);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Empty dependency
-
-    // ✅ Memoize deleteSshKey
-    const deleteSshKey = useCallback(async (id: number): Promise<void> => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/ssh-keys/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to delete SSH key');
-            }
-
-            setSshKeys(prev => prev.filter(key => key.id !== id));
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-            setError(`Failed to delete SSH key: ${errorMessage}`);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Empty dependency
-
-    // ✅ Memoize getSshKeyById - ĐÂY LÀ VẤN ĐỀ CHÍNH
-    const getSshKeyById = useCallback(async (id: number): Promise<SshKey> => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/ssh-keys/${id}`);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to fetch SSH key');
-            }
-            const sshKey: SshKey = await response.json();
-            return sshKey;
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-            setError(`Failed to fetch SSH key: ${errorMessage}`);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []); // Empty dependency để tránh infinite loop
-
-    // Fetch initial data
-    useEffect(() => {
-        fetchSshKeys();
-    }, [fetchSshKeys]); // Giờ fetchSshKeys đã stable
-
-    return {
-        sshKeys,
-        loading,
-        error,
-        fetchSshKeys,
-        createSshKey,
-        updateSshKey,
-        deleteSshKey,
-        getSshKeyById,
-    };
-};
