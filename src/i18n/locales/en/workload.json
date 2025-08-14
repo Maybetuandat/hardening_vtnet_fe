@@ -1,0 +1,62 @@
+{
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "clear": "Clear",
+    "close": "Close",
+    "update": "Update"
+  },
+  "workloads": {
+    "title": "Workloads",
+    "subtitle": "Manage infrastructure workloads and deployment configurations",
+    "loading": "Loading workloads...",
+    "addWorkload": "Add Workload",
+    "refresh": "Refresh",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All",
+    "deleteWorkload": "Delete Workload",
+    "confirmDelete": "Are you sure you want to delete this workload?",
+    "deleteWarning": "This action cannot be undone. All associated servers and configurations will be removed.",
+    "workloadCreated": "Workload created successfully",
+    "workloadUpdated": "Workload updated successfully",
+    "workloadDeleted": "Workload deleted successfully",
+    "refreshed": "Workloads refreshed",
+    "form": {
+      "createWorkload": "Create Workload",
+      "editWorkload": "Edit Workload",
+      "basicInformation": "Basic Information",
+      "name": "Name",
+      "namePlaceholder": "production-oracle-cluster",
+      "nameHelp": "Unique identifier for this workload",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "Production Oracle Database Cluster",
+      "displayNameHelp": "Friendly name shown in the interface",
+      "description": "Description",
+      "descriptionPlaceholder": "Oracle database cluster for production environment",
+      "workloadType": "Workload Type",
+      "isActive": "Active",
+      "activeHelp": "Enable this workload for deployment"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name must be less than 100 characters",
+      "typeRequired": "Workload type is required",
+      "displayNameTooLong": "Display name must be less than 150 characters"
+    },
+    "empty": {
+      "noWorkloads": "No workloads found",
+      "addFirst": "Create your first workload to get started"
+    }
+  }
+}

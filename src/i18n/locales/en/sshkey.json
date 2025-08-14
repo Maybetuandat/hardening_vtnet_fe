@@ -1,9 +1,19 @@
 {
   "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
     "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
     "delete": "Delete",
-    "warning": "Warning",
-    "actionFailed": "Action failed"
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "clear": "Clear",
+    "close": "Close",
+    "update": "Update"
   },
   "sshKeys": {
     "title": "SSH Keys",

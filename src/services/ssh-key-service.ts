@@ -1,4 +1,3 @@
-// src/services/ssh-key-service.ts
 import { api } from "@/lib/api";
 import { SshKey, SshKeyCreate, SshKeyUpdate } from "@/types/ssh-key";
 

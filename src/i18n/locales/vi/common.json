@@ -1,8 +1,11 @@
 {
   "navigation": {
     "home": "Trang chủ",
-     "labs": "Bài thực hành",
-      "feedback": "Phản hồi"
+    "labs": "Bài thực hành",
+    "feedback": "Phản hồi",
+    "workloads": "Máy chủ đặc thù",
+    "servers": "Máy chủ",
+    "sshKeys": "Khóa SSH"
   },
   "common": {
     "search": "Tìm kiếm",
@@ -53,10 +56,10 @@
     "openSettings": "Mở cài đặt",
     "customizePreferences": "Tùy chỉnh các tùy chọn của bạn"
   },
-    "sidebar": {
+  "sidebar": {
     "account": "Tài khoản",
     "settings": "Cài đặt",
-  
+
     "logout": "Đăng xuất",
     "light": "Sáng",
     "dark": "Tối",
@@ -67,15 +70,12 @@
     "seeYouSoon": "Hẹn gặp lại bạn!",
     "localSessionCleared": "Đã xóa phiên đăng nhập cục bộ"
   },
-  "dashboard":
-   {
+  "dashboard": {
     "title": "Bảng điều khiển hệ thống",
     "subtitle": "Giám sát và quản lý tuân thủ bảo mật trên toàn bộ hạ tầng của bạn",
     "actions": {
       "export": "Xuất báo cáo",
       "run": "Quét"
     }
-
-   }
-  
+  }
 }

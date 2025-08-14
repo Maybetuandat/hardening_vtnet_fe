@@ -2,11 +2,11 @@ import * as React from "react";
 import {
   HelpCircleIcon,
   Boxes,
-  
   LayoutDashboardIcon,
-  
-  
   Key,
+  Server,
+  Package,
+  Shield,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -39,15 +39,27 @@ export function AppSidebar({
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/" || location.pathname === "/home",
       },
-     
+
       {
-        title: "SSH Keys",
+        title: t("navigation.workloads"),
+        url: "/workloads",
+        icon: Package,
+        isActive: location.pathname.startsWith("/workloads"),
+      },
+      {
+        title: t("navigation.sshKeys"),
         url: "/ssh-keys",
         icon: Key,
-        isActive: location.pathname === "/ssh-keys" || location.pathname.startsWith("/ssh-keys"),
+        isActive: location.pathname.startsWith("/ssh-keys"),
       },
-      
-    
+      {
+        title: "Security Standards",
+        url: "/security-standards",
+        icon: Shield,
+        isActive:
+          location.pathname === "/security-standards" ||
+          location.pathname.startsWith("/security-standards"),
+      },
     ],
     navSecondary: [
       {
@@ -84,6 +96,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent className="bg-sidebar">
         <NavMain items={data.navMain} />
+
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter className="bg-sidebar border-t border-sidebar-border">

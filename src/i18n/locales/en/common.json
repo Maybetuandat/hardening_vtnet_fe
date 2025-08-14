@@ -2,7 +2,10 @@
   "navigation": {
     "home": "Dashboard",
     "labs": "Labs",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "workloads": "Workloads",
+    "servers": "Servers",
+    "sshKeys": "SSH Keys"
   },
   "common": {
     "search": "Search",
@@ -20,7 +23,7 @@
     "close": "Close",
     "update": "Update"
   },
-   "settings": {
+  "settings": {
     "title": "Settings",
     "description": "Customize your application appearance and language",
     "appearance": {
@@ -53,10 +56,10 @@
     "openSettings": "Open settings",
     "customizePreferences": "Customize your preferences"
   },
-   "sidebar": {
+  "sidebar": {
     "account": "Account",
     "settings": "Settings",
-  
+
     "logout": "Logout",
     "light": "Light",
     "dark": "Dark",
@@ -67,16 +70,12 @@
     "seeYouSoon": "See you soon!",
     "localSessionCleared": "Local session cleared"
   },
-  "dashboard":
-  {
-    "title":"System Hardening Dashboard",
-    "subtitle":" Monitor and manage security compliance across your infrastructure",
-    "actions":{
-      "export":"Export Report",
+  "dashboard": {
+    "title": "System Hardening Dashboard",
+    "subtitle": " Monitor and manage security compliance across your infrastructure",
+    "actions": {
+      "export": "Export Report",
       "run": "Scan"
     }
   }
-   
-  
-  
 }

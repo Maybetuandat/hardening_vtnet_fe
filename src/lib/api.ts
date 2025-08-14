@@ -1,6 +1,4 @@
-// src/lib/api.ts - FIXED VERSION
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class ApiClient {
   private baseURL: string;
@@ -15,7 +13,7 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    console.log("🔗 API Request:", url); // Debug log
+    console.log(" API Request:", url); // Debug log
 
     const config: RequestInit = {
       headers: {
@@ -28,7 +26,7 @@ class ApiClient {
     try {
       const response = await fetch(url, config);
 
-      console.log("📊 Response status:", response.status); // Debug log
+      console.log(" Response status:", response.status); // Debug log
 
       // Handle no content responses (like DELETE)
       if (response.status === 204) {
@@ -41,11 +39,11 @@ class ApiClient {
       }
 
       const data = await response.json();
-      console.log("📦 Response data:", data); // Debug log
+      console.log(" Response data:", data); // Debug log
 
       return data;
     } catch (error) {
-      console.error("❌ API Error:", error); // Debug log
+      console.error(" API Error:", error); // Debug log
       if (error instanceof Error) {
         throw error;
       }

@@ -1,0 +1,62 @@
+{
+  "common": {
+    "search": "Tìm kiếm",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "clear": "Xóa",
+    "close": "Đóng",
+    "update": "Cập nhật"
+  },
+  "workloads": {
+    "title": "Workloads",
+    "subtitle": "Quản lý workload hạ tầng và cấu hình triển khai",
+    "loading": "Đang tải workloads...",
+    "addWorkload": "Thêm Workload",
+    "refresh": "Làm mới",
+    "status": "Trạng thái",
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "all": "Tất cả",
+    "deleteWorkload": "Xóa Workload",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa workload này?",
+    "deleteWarning": "Hành động này không thể hoàn tác. Tất cả server và cấu hình liên quan sẽ bị xóa.",
+    "workloadCreated": "Tạo workload thành công",
+    "workloadUpdated": "Cập nhật workload thành công",
+    "workloadDeleted": "Xóa workload thành công",
+    "refreshed": "Đã làm mới workloads",
+    "form": {
+      "createWorkload": "Tạo Workload",
+      "editWorkload": "Chỉnh sửa Workload",
+      "basicInformation": "Thông tin cơ bản",
+      "name": "Tên",
+      "namePlaceholder": "production-oracle-cluster",
+      "nameHelp": "Định danh duy nhất cho workload này",
+      "displayName": "Tên hiển thị",
+      "displayNamePlaceholder": "Cụm Oracle Database Production",
+      "displayNameHelp": "Tên thân thiện hiển thị trong giao diện",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Cụm cơ sở dữ liệu Oracle cho môi trường production",
+      "workloadType": "Loại Workload",
+      "isActive": "Hoạt động",
+      "activeHelp": "Kích hoạt workload này để triển khai"
+    },
+    "validation": {
+      "nameRequired": "Tên là bắt buộc",
+      "nameTooLong": "Tên phải ít hơn 100 ký tự",
+      "typeRequired": "Loại workload là bắt buộc",
+      "displayNameTooLong": "Tên hiển thị phải ít hơn 150 ký tự"
+    },
+    "empty": {
+      "noWorkloads": "Không tìm thấy workload nào",
+      "addFirst": "Tạo workload đầu tiên để bắt đầu"
+    }
+  }
+}

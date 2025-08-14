@@ -1,9 +1,19 @@
 {
   "common": {
+    "search": "Tìm kiếm",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "retry": "Thử lại",
     "cancel": "Hủy",
+    "save": "Lưu",
+    "edit": "Chỉnh sửa",
     "delete": "Xóa",
-    "warning": "Cảnh báo",
-    "actionFailed": "Thao tác thất bại"
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "clear": "Xóa",
+    "close": "Đóng",
+    "update": "Cập nhật"
   },
   "sshKeys": {
     "title": "SSH Keys",
