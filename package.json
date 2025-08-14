@@ -53,6 +53,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.0.4",
+    "framer-motion": "^12.23.12",
     "i18next": "^25.2.1",
     "input-otp": "^1.2.4",
     "jwt-decode": "^4.0.0",

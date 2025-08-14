@@ -47,6 +47,12 @@ export function AppSidebar({
         isActive: location.pathname.startsWith("/workloads"),
       },
       {
+        title: t("navigation.servers"),
+        url: "/servers",
+        icon: Server,
+        isActive: location.pathname.startsWith("/servers"),
+      },
+      {
         title: t("navigation.sshKeys"),
         url: "/ssh-keys",
         icon: Key,

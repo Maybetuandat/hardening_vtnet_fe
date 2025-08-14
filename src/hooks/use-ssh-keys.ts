@@ -1,4 +1,3 @@
-// src/hooks/use-ssh-keys.ts - ENHANCED VERSION
 import { useState, useEffect } from "react";
 import { SshKey, SshKeyCreate, SshKeyUpdate } from "@/types/ssh-key";
 import { sshKeyService } from "@/services/ssh-key-service";

@@ -14,6 +14,7 @@ interface WorkloadListProps {
   onView: (workload: Workload) => void;
   onDeploy: (workload: Workload) => void;
   onRetry?: () => void;
+  getNumberOfServersByWorkload: (workloadId: number) => Promise<number>;
 }
 
 export function WorkloadList({
@@ -25,6 +26,7 @@ export function WorkloadList({
   onView,
   onDeploy,
   onRetry,
+  getNumberOfServersByWorkload,
 }: WorkloadListProps) {
   const { t } = useTranslation("workload");
 
@@ -86,6 +88,7 @@ export function WorkloadList({
           onDelete={onDelete}
           onView={onView}
           onDeploy={onDeploy}
+          getNumberOfServersByWorkload={getNumberOfServersByWorkload}
         />
       ))}
     </div>

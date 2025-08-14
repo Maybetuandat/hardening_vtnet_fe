@@ -9,6 +9,8 @@ import SystemHardeningDashboard from "./app/dashboard";
 import SshKeysPage from "./app/sshkey/ssh-keys-page";
 import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
+import SecurityStandardPage from "./app/security-standard/security-standard";
+import NotFoundPage from "./app/404/not-found-page";
 
 function App() {
   return (
@@ -41,6 +43,7 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
           path="/workloads"
           element={
@@ -49,14 +52,26 @@ function App() {
             </MainLayout>
           }
         />
+
         <Route
-          path="/security-standards"
+          path="/servers"
           element={
             <MainLayout>
               <ServersPage />
             </MainLayout>
           }
         />
+
+        <Route
+          path="/security-standards"
+          element={
+            <MainLayout>
+              <SecurityStandardPage />
+            </MainLayout>
+          }
+        />
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

@@ -1,3 +1,3 @@
 git add .
-git commit -m "finish ui for workloads"
+git commit -m "update ui for servers"
 git push origin main 

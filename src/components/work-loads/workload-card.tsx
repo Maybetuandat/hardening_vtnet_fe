@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Workload, WorkloadType } from "@/types/workload";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import React from "react";
 
 interface WorkloadCardProps {
   workload: Workload;
@@ -20,6 +22,7 @@ interface WorkloadCardProps {
   onDelete: (workload: Workload) => void;
   onView: (workload: Workload) => void;
   onDeploy: (workload: Workload) => void;
+  getNumberOfServersByWorkload: (workloadId: number) => Promise<number>;
 }
 
 const getWorkloadIcon = (type: WorkloadType) => {
@@ -82,27 +85,27 @@ const getComplianceStandard = (type: WorkloadType) => {
   }
 };
 
-const getServerCount = (workload: Workload) => {
-  // Mock data - trong thực tế sẽ lấy từ API
-  const counts = {
-    [WorkloadType.OS]: Math.floor(Math.random() * 5) + 1,
-    [WorkloadType.DATABASE]: 1,
-    [WorkloadType.APP]: Math.floor(Math.random() * 4) + 2,
-    [WorkloadType.BIG_DATA]: Math.floor(Math.random() * 3) + 2,
-  };
-  return counts[workload.workload_type] || 1;
-};
-
 export default function WorkloadCard({
   workload,
   onEdit,
   onDelete,
   onView,
   onDeploy,
+  getNumberOfServersByWorkload,
 }: WorkloadCardProps) {
   const { t } = useTranslation("workload");
-  const serverCount = getServerCount(workload);
+  const [serverCount, setServerCount] = useState<number | null>(null);
 
+  React.useEffect(() => {
+    let isMounted = true;
+    getNumberOfServersByWorkload(workload.id).then((count) => {
+      if (isMounted) setServerCount(count);
+    });
+    console.log(workload.id + " " + serverCount);
+    return () => {
+      isMounted = false;
+    };
+  }, [workload.id, getNumberOfServersByWorkload]);
   return (
     <Card className="h-full hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -129,7 +132,7 @@ export default function WorkloadCard({
 
           <Badge
             variant={workload.is_active ? "default" : "secondary"}
-            className={workload.is_active ? "bg-green-500" : "bg-gray-500"}
+            className={workload.is_active ? "bg-primary" : "bg-gray-500"}
           >
             {workload.is_active ? "active" : "inactive"}
           </Badge>
@@ -177,7 +180,7 @@ export default function WorkloadCard({
           </Button>
 
           <Button
-            className="flex items-center justify-center bg-cyan-500 hover:bg-cyan-600"
+            className="flex items-center justify-center bg-primary"
             size="sm"
             onClick={() => onDeploy(workload)}
           >

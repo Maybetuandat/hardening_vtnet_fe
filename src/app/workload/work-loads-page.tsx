@@ -35,6 +35,7 @@ export default function WorkloadsPage() {
     createWorkload,
     updateWorkload,
     deleteWorkload,
+    getNumberOfServersByWorkload,
   } = useWorkloads();
 
   // Filter workloads
@@ -175,6 +176,7 @@ export default function WorkloadsPage() {
         onView={handleView}
         onDeploy={handleDeploy}
         onRetry={handleRefresh}
+        getNumberOfServersByWorkload={getNumberOfServersByWorkload}
       />
 
       <WorkloadFormDialog
