@@ -39,7 +39,6 @@ export default function ServersPage() {
     updateServer,
     deleteServer,
     getServerById,
-    getNumberOfServersByWorkload,
   } = useServers();
 
   // Filter servers

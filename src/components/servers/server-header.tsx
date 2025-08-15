@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Server, RefreshCw } from "lucide-react";
+import { Plus, Server, RefreshCw, Upload, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ServerHeaderProps {
@@ -48,7 +48,19 @@ const ServerHeader: React.FC<ServerHeaderProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <Button>Thêm nhiều server</Button>
+        <div className="flex items-center space-x-2">
+          {/* Upload Excel Button */}
+          <Button variant="outline" className="flex items-center space-x-2">
+            <Upload className="h-4 w-4" />
+            <span>Tải nhiều server</span>
+          </Button>
+
+          {/* Download Template Button */}
+          <Button variant="outline" className="flex items-center space-x-2">
+            <Download className="h-4 w-4" />
+            <span>Tải Template mẫu</span>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

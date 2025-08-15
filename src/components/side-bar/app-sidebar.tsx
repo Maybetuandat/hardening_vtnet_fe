@@ -52,15 +52,6 @@ export function AppSidebar({
         icon: Server,
         isActive: location.pathname.startsWith("/servers"),
       },
-
-      {
-        title: "Security Standards",
-        url: "/security-standards",
-        icon: Shield,
-        isActive:
-          location.pathname === "/security-standards" ||
-          location.pathname.startsWith("/security-standards"),
-      },
     ],
     navSecondary: [
       {

@@ -167,7 +167,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                     <TableHead>Tài nguyên</TableHead>
                     <TableHead>Môi trường</TableHead>
                     <TableHead>Trạng thái</TableHead>
-
+                    <TableHead>Workload</TableHead>
                     <TableHead>Cập nhật</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
@@ -259,6 +259,11 @@ export const ServerList: React.FC<ServerListProps> = ({
                         </Badge>
                       </TableCell>
 
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {"Workload " + server.id}
+                        </span>
+                      </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
                           {formatDate(server.updated_at)}

@@ -52,15 +52,6 @@ function App() {
           }
         />
 
-        <Route
-          path="/security-standards"
-          element={
-            <MainLayout>
-              <SecurityStandardPage />
-            </MainLayout>
-          }
-        />
-
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
