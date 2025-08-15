@@ -6,9 +6,6 @@ import viCommon from "./locales/vi/common.json";
 
 import enCommon from "./locales/en/common.json";
 
-import enSshKey from "./locales/en/sshkey.json";
-import viSshKey from "./locales/vi/sshkey.json";
-
 import enWorkload from "./locales/en/workload.json";
 import viWorkload from "./locales/vi/workload.json";
 // Configuration
@@ -25,12 +22,12 @@ i18n.use(initReactI18next).init({
   resources: {
     vi: {
       common: viCommon,
-      sshkey: viSshKey,
+
       workload: viWorkload,
     },
     en: {
       common: enCommon,
-      sshkey: enSshKey,
+
       workload: enWorkload,
     },
   },

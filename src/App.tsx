@@ -6,7 +6,6 @@ import "./i18n";
 
 import HomePage from "./app/dashboard";
 import SystemHardeningDashboard from "./app/dashboard";
-import SshKeysPage from "./app/sshkey/ssh-keys-page";
 import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
 import SecurityStandardPage from "./app/security-standard/security-standard";
@@ -31,15 +30,6 @@ function App() {
           element={
             <MainLayout>
               <HomePage />
-            </MainLayout>
-          }
-        />
-
-        <Route
-          path="/ssh-keys"
-          element={
-            <MainLayout>
-              <SshKeysPage />
             </MainLayout>
           }
         />

@@ -52,12 +52,7 @@ export function AppSidebar({
         icon: Server,
         isActive: location.pathname.startsWith("/servers"),
       },
-      {
-        title: t("navigation.sshKeys"),
-        url: "/ssh-keys",
-        icon: Key,
-        isActive: location.pathname.startsWith("/ssh-keys"),
-      },
+
       {
         title: "Security Standards",
         url: "/security-standards",
