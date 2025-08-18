@@ -5,6 +5,7 @@ import { Server, Database, Globe, BarChart3, Edit, Trash2 } from "lucide-react";
 import { Workload, WorkloadType } from "@/types/workload";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 
 interface WorkloadCardProps {
@@ -78,97 +79,158 @@ export default function WorkloadCard({
   workload,
   onEdit,
   onDelete,
-
   getNumberOfServersByWorkload,
 }: WorkloadCardProps) {
   const { t } = useTranslation("workload");
+  const navigate = useNavigate();
   const [serverCount, setServerCount] = useState<number | null>(null);
 
   React.useEffect(() => {
-    let isMounted = true;
-    getNumberOfServersByWorkload(workload.id).then((count) => {
-      if (isMounted) setServerCount(count);
-    });
-    console.log(workload.id + " " + serverCount);
-    return () => {
-      isMounted = false;
+    const fetchServerCount = async () => {
+      try {
+        const count = await getNumberOfServersByWorkload(workload.id);
+        setServerCount(count);
+      } catch (error) {
+        console.error("Error fetching server count:", error);
+        setServerCount(0);
+      }
     };
+
+    fetchServerCount();
   }, [workload.id, getNumberOfServersByWorkload]);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation when clicking on action buttons
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    navigate(`/workload/${workload.id}`);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit(workload);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(workload);
+  };
+
   return (
-    <Card className="h-full hover:shadow-md transition-shadow">
+    <Card
+      className="group hover:shadow-md transition-all duration-200 cursor-pointer hover:border-primary/50"
+      onClick={handleCardClick}
+    >
       <CardContent className="p-6">
-        {/* Header with icon and type */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-muted rounded-lg">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-4 flex-1">
+            {/* Icon */}
+            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
               {getWorkloadIcon(workload.workload_type)}
             </div>
-            <div>
-              <h3 className="font-semibold text-lg leading-tight">
-                {workload.display_name || workload.name}
-              </h3>
-              <Badge
-                variant="secondary"
-                className={`mt-1 ${getWorkloadTypeColor(
-                  workload.workload_type
-                )}`}
-              >
-                {getWorkloadTypeLabel(workload.workload_type)}
-              </Badge>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-2 mb-2">
+                <h3 className="font-semibold text-lg truncate group-hover:text-primary transition-colors">
+                  {workload.display_name || workload.name}
+                </h3>
+                <Badge
+                  variant={workload.is_active ? "default" : "secondary"}
+                  className="shrink-0"
+                >
+                  {workload.is_active
+                    ? t("workloads.active")
+                    : t("workloads.inactive")}
+                </Badge>
+              </div>
+
+              {/* Name (if different from display_name) */}
+              {workload.display_name &&
+                workload.display_name !== workload.name && (
+                  <p className="text-sm text-muted-foreground font-mono mb-2">
+                    {workload.name}
+                  </p>
+                )}
+
+              {/* Description */}
+              {workload.description && (
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  {workload.description}
+                </p>
+              )}
+
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-1">
+                  <Badge
+                    variant="outline"
+                    className={getWorkloadTypeColor(workload.workload_type)}
+                  >
+                    {getWorkloadTypeLabel(workload.workload_type)}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center space-x-1">
+                  <Server className="h-4 w-4" />
+                  <span>
+                    {serverCount !== null
+                      ? `${serverCount} servers`
+                      : "Loading..."}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs">
+                    {getComplianceStandard(workload.workload_type)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Timestamps */}
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>
+                    Created:{" "}
+                    {new Date(workload.created_at).toLocaleDateString()}
+                  </span>
+                  <span>
+                    Updated:{" "}
+                    {new Date(workload.updated_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <Badge
-            variant={workload.is_active ? "default" : "secondary"}
-            className={workload.is_active ? "bg-primary" : "bg-gray-500"}
-          >
-            {workload.is_active ? "active" : "inactive"}
-          </Badge>
-        </div>
-
-        {/* Description */}
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-          {workload.description || "No description provided"}
-        </p>
-
-        {/* Stats */}
-        <div className="space-y-2 mb-6">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Servers:</span>
-            <span className="font-medium">{serverCount} servers</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Compliance:</span>
-            <span className="font-medium">
-              {getComplianceStandard(workload.workload_type)}
-            </span>
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleEdit}
+              className="flex items-center space-x-1"
+            >
+              <Edit className="h-3 w-3" />
+              <span className="sr-only">Edit</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDelete}
+              className="flex items-center space-x-1 text-red-600 hover:text-red-700 hover:border-red-300"
+            >
+              <Trash2 className="h-3 w-3" />
+              <span className="sr-only">Delete</span>
+            </Button>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(workload)}
-            className="flex items-center justify-center"
-          >
-            <Edit className="h-4 w-4" />
-            <span className="sr-only">Edit</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(workload)}
-            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </Button>
+        {/* Click hint */}
+        <div className="mt-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+          Click to view details
         </div>
-
-        {/* Delete button separately */}
       </CardContent>
     </Card>
   );
