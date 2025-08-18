@@ -180,25 +180,17 @@ export default function WorkloadCard({
           </Button>
 
           <Button
-            className="flex items-center justify-center bg-primary"
+            variant="outline"
             size="sm"
-            onClick={() => onDeploy(workload)}
+            onClick={() => onDelete(workload)}
+            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            <Play className="h-4 w-4" />
-            <span className="sr-only">Deploy</span>
+            <Trash2 className="h-4 w-4" />
+            Delete
           </Button>
         </div>
 
         {/* Delete button separately */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onDelete(workload)}
-          className="w-full mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
-        </Button>
       </CardContent>
     </Card>
   );
