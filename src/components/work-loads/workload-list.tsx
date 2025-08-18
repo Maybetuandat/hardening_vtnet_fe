@@ -11,8 +11,6 @@ interface WorkloadListProps {
   error: string | null;
   onEdit: (workload: Workload) => void;
   onDelete: (workload: Workload) => void;
-  onView: (workload: Workload) => void;
-  onDeploy: (workload: Workload) => void;
   onRetry?: () => void;
   getNumberOfServersByWorkload: (workloadId: number) => Promise<number>;
 }
@@ -23,8 +21,7 @@ export function WorkloadList({
   error,
   onEdit,
   onDelete,
-  onView,
-  onDeploy,
+
   onRetry,
   getNumberOfServersByWorkload,
 }: WorkloadListProps) {
@@ -86,8 +83,6 @@ export function WorkloadList({
           workload={workload}
           onEdit={onEdit}
           onDelete={onDelete}
-          onView={onView}
-          onDeploy={onDeploy}
           getNumberOfServersByWorkload={getNumberOfServersByWorkload}
         />
       ))}

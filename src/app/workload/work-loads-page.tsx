@@ -8,7 +8,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { WorkloadDeleteDialog } from "@/components/work-loads/workload-delete-dialog";
-import { WorkloadFormDialog } from "@/components/work-loads/workload-form-dialog";
+
 import WorkloadHeader from "@/components/work-loads/workload-header";
 import { WorkloadList } from "@/components/work-loads/workload-list";
 
@@ -79,16 +79,6 @@ export default function WorkloadsPage() {
   const handleDelete = useCallback((workload: Workload) => {
     setDeletingWorkload(workload);
     setDeleteDialogOpen(true);
-  }, []);
-
-  const handleView = useCallback((workload: Workload) => {
-    // TODO: Implement view workload details
-    toast.info(`Viewing ${workload.name} (Feature coming soon)`);
-  }, []);
-
-  const handleDeploy = useCallback((workload: Workload) => {
-    // TODO: Implement deploy workload
-    toast.info(`Deploying ${workload.name} (Feature coming soon)`);
   }, []);
 
   const handleFormDialogClose = useCallback(() => {
@@ -173,20 +163,8 @@ export default function WorkloadsPage() {
         error={error}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleView}
-        onDeploy={handleDeploy}
         onRetry={handleRefresh}
         getNumberOfServersByWorkload={getNumberOfServersByWorkload}
-      />
-
-      <WorkloadFormDialog
-        open={formDialogOpen}
-        onOpenChange={setFormDialogOpen}
-        onClose={handleFormDialogClose}
-        editingWorkload={editingWorkload}
-        createWorkload={createWorkload}
-        updateWorkload={updateWorkload}
-        onSuccess={handleOperationSuccess}
       />
 
       <WorkloadDeleteDialog

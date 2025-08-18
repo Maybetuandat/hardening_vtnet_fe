@@ -1,16 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Server,
-  Database,
-  Globe,
-  BarChart3,
-  Edit,
-  Trash2,
-  Eye,
-  Play,
-} from "lucide-react";
+import { Server, Database, Globe, BarChart3, Edit, Trash2 } from "lucide-react";
 import { Workload, WorkloadType } from "@/types/workload";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -20,8 +11,6 @@ interface WorkloadCardProps {
   workload: Workload;
   onEdit: (workload: Workload) => void;
   onDelete: (workload: Workload) => void;
-  onView: (workload: Workload) => void;
-  onDeploy: (workload: Workload) => void;
   getNumberOfServersByWorkload: (workloadId: number) => Promise<number>;
 }
 
@@ -89,8 +78,7 @@ export default function WorkloadCard({
   workload,
   onEdit,
   onDelete,
-  onView,
-  onDeploy,
+
   getNumberOfServersByWorkload,
 }: WorkloadCardProps) {
   const { t } = useTranslation("workload");
@@ -158,17 +146,7 @@ export default function WorkloadCard({
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(workload)}
-            className="flex items-center justify-center"
-          >
-            <Eye className="h-4 w-4" />
-            <span className="sr-only">View</span>
-          </Button>
-
+        <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
             size="sm"
