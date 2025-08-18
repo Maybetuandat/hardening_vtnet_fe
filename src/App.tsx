@@ -10,6 +10,7 @@ import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
 import SecurityStandardPage from "./app/security-standard/security-standard";
 import NotFoundPage from "./app/404/not-found-page";
+import AddWorkloadPage from "./app/workload/add-workload-page";
 
 function App() {
   return (
@@ -43,6 +44,14 @@ function App() {
           }
         />
 
+        <Route
+          path="/workload/add"
+          element={
+            <MainLayout>
+              <AddWorkloadPage />
+            </MainLayout>
+          }
+        />
         <Route
           path="/servers"
           element={

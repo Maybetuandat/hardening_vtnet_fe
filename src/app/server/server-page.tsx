@@ -147,27 +147,14 @@ export default function ServersPage() {
             value: environment,
             onChange: setEnvironment,
             options: [
-              { value: "environment", label: "Tất cả môi trường" },
-              { value: ServerEnvironment.PRODUCTION, label: "Production" },
-              { value: ServerEnvironment.STAGING, label: "Staging" },
-              { value: ServerEnvironment.DEVELOPMENT, label: "Development" },
-              { value: ServerEnvironment.TESTING, label: "Testing" },
+              { value: "environment", label: "Tất cả Workload" },
+              { value: ServerEnvironment.PRODUCTION, label: "Workload1" },
+              { value: ServerEnvironment.STAGING, label: "Workload2" },
+              { value: ServerEnvironment.DEVELOPMENT, label: "Workload3" },
+              { value: ServerEnvironment.TESTING, label: "Workload4" },
             ],
             placeholder: "Môi trường",
             widthClass: "w-36",
-          },
-          {
-            value: osType,
-            onChange: (value) => setOSType(value as ServerOSType | "all"),
-            options: [
-              { value: "all", label: "Tất cả OS" },
-              { value: ServerOSType.LINUX, label: "Linux" },
-              { value: ServerOSType.WINDOWS, label: "Windows" },
-              { value: ServerOSType.UNIX, label: "Unix" },
-              { value: ServerOSType.MACOS, label: "MacOS" },
-            ],
-            placeholder: "Hệ điều hành",
-            widthClass: "w-32",
           },
         ]}
       />

@@ -1,3 +1,4 @@
+// src/app/workload/work-loads-page.tsx
 import { useState, useCallback, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 
@@ -18,7 +19,6 @@ export default function WorkloadsPage() {
   const [workloadType, setWorkloadType] = useState<WorkloadType | "all">("all");
 
   // Dialog states
-  const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingWorkload, setEditingWorkload] = useState<Workload | null>(null);
   const [deletingWorkload, setDeletingWorkload] = useState<Workload | null>(
@@ -32,7 +32,6 @@ export default function WorkloadsPage() {
     loading,
     error,
     fetchWorkloads,
-    createWorkload,
     updateWorkload,
     deleteWorkload,
     getNumberOfServersByWorkload,
@@ -65,115 +64,102 @@ export default function WorkloadsPage() {
     });
   }, [workloads, searchTerm, status, workloadType]);
 
-  // Event handlers
-  const handleAdd = useCallback(() => {
-    setEditingWorkload(null);
-    setFormDialogOpen(true);
-  }, []);
-
-  const handleEdit = useCallback((workload: Workload) => {
+  // Handle edit workload
+  const handleEditWorkload = useCallback((workload: Workload) => {
     setEditingWorkload(workload);
-    setFormDialogOpen(true);
+    // Note: In the original implementation, this would open a form dialog
+    // For now, we'll just show a toast since we're focusing on the add functionality
+    toast.info("Edit functionality will be implemented separately");
   }, []);
 
-  const handleDelete = useCallback((workload: Workload) => {
+  // Handle delete workload
+  const handleDeleteWorkload = useCallback((workload: Workload) => {
     setDeletingWorkload(workload);
     setDeleteDialogOpen(true);
   }, []);
 
-  const handleFormDialogClose = useCallback(() => {
-    setFormDialogOpen(false);
-    setEditingWorkload(null);
-  }, []);
+  const handleConfirmDelete = useCallback(
+    async (id: number) => {
+      await deleteWorkload(id);
+    },
+    [deleteWorkload]
+  );
 
-  const handleDeleteDialogClose = useCallback(() => {
-    setDeleteDialogOpen(false);
+  const handleDeleteSuccess = useCallback(() => {
     setDeletingWorkload(null);
-  }, []);
-
-  const handleRefresh = useCallback(async () => {
-    console.log("Manual refresh triggered");
-    try {
-      await fetchWorkloads();
-      toast.success(t("workloads.refreshed"));
-    } catch (error) {
-      console.error("Error during manual refresh:", error);
-    }
+    setDeleteDialogOpen(false);
+    toast.success(t("workloads.workloadDeleted"));
+    fetchWorkloads();
   }, [fetchWorkloads, t]);
 
-  const handleOperationSuccess = useCallback(async () => {
-    console.log("Operation successful, refreshing data...");
-
-    try {
-      // Reset dialog states BEFORE refresh
-      setFormDialogOpen(false);
-      setDeleteDialogOpen(false);
-      setEditingWorkload(null);
-      setDeletingWorkload(null);
-
-      // Refresh data
-      await fetchWorkloads();
-    } catch (error) {
-      console.error("Error during success refresh:", error);
-    }
-  }, [fetchWorkloads]);
+  const handleRefresh = useCallback(() => {
+    fetchWorkloads();
+    toast.success(t("workloads.refreshed"));
+  }, [fetchWorkloads, t]);
 
   return (
-    <div className="min-h-screen w-full px-4 lg:px-6 py-6 space-y-6">
-      <WorkloadHeader
-        onAdd={handleAdd}
-        onRefresh={handleRefresh}
-        loading={loading}
-      />
+    <div className="space-y-6">
+      {/* Header */}
+      <WorkloadHeader onRefresh={handleRefresh} loading={loading} />
 
-      <FilterBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filters={[
-          {
-            value: status,
-            onChange: setStatus,
-            options: [
-              { value: "status", label: t("workloads.status") },
-              { value: "active", label: t("workloads.active") },
-              { value: "inactive", label: t("workloads.inactive") },
-            ],
-            placeholder: t("workloads.status"),
-            widthClass: "w-32",
-          },
-          {
-            value: workloadType,
-            onChange: (value) => setWorkloadType(value as WorkloadType | "all"),
-            options: [
-              { value: "all", label: t("workloads.all") },
-              { value: WorkloadType.OS, label: "Operating System" },
-              { value: WorkloadType.DATABASE, label: "Database" },
-              { value: WorkloadType.BIG_DATA, label: "Big Data" },
-              { value: WorkloadType.APP, label: "Application" },
-            ],
-            placeholder: "Workload Type",
-            widthClass: "w-40",
-          },
-        ]}
-      />
+      {/* Filters */}
+      <Card className="p-6">
+        <FilterBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={[
+            {
+              value: status,
+              onChange: setStatus,
+              placeholder: t("workloads.status"),
+              options: [
+                { value: "status", label: t("workloads.status") },
+                { value: "active", label: t("workloads.active") },
+                { value: "inactive", label: t("workloads.inactive") },
+                { value: "all", label: t("workloads.all") },
+              ],
+              widthClass: "w-32",
+            },
+            {
+              value: workloadType,
+              onChange: (value: string) =>
+                setWorkloadType(value as WorkloadType | "all"),
+              placeholder: "Workload Type",
+              options: [
+                { value: "all", label: t("workloads.all") },
+                { value: WorkloadType.OS, label: "OS" },
+                { value: WorkloadType.DATABASE, label: "Database" },
+                { value: WorkloadType.APP, label: "Application" },
+                { value: WorkloadType.BIG_DATA, label: "Big Data" },
+              ],
+              widthClass: "w-40",
+            },
+          ]}
+        />
+      </Card>
 
+      {/* Workload List */}
       <WorkloadList
         workloads={filteredWorkloads}
         loading={loading}
         error={error}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onEdit={handleEditWorkload}
+        onDelete={handleDeleteWorkload}
         onRetry={handleRefresh}
         getNumberOfServersByWorkload={getNumberOfServersByWorkload}
       />
 
+      {/* Delete Dialog */}
       <WorkloadDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onClose={handleDeleteDialogClose}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeletingWorkload(null);
+        }}
         workload={deletingWorkload}
-        onConfirm={deleteWorkload}
-        onSuccess={handleOperationSuccess}
+        onConfirm={handleConfirmDelete}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   );

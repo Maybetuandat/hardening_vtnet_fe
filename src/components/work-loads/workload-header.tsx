@@ -1,20 +1,25 @@
+// src/components/work-loads/workload-header.tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, RefreshCw, Boxes } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 interface WorkloadHeaderProps {
-  onAdd: () => void;
   onRefresh: () => void;
   loading?: boolean;
 }
 
 export default function WorkloadHeader({
-  onAdd,
   onRefresh,
   loading = false,
 }: WorkloadHeaderProps) {
   const { t } = useTranslation("workload");
+  const navigate = useNavigate();
+
+  const handleAddWorkload = () => {
+    navigate("/workload/add");
+  };
 
   return (
     <Card>
@@ -49,7 +54,7 @@ export default function WorkloadHeader({
             </Button>
 
             <Button
-              onClick={onAdd}
+              onClick={handleAddWorkload}
               size="sm"
               className="flex items-center space-x-2"
             >
