@@ -1,4 +1,4 @@
-// src/app/server/server-page.tsx - Simplified version
+// src/app/server/server-page.tsx - Updated with dialog events
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
@@ -9,6 +9,8 @@ import FilterBar from "@/components/ui/filter-bar";
 
 import { ServerHeader } from "@/components/servers/server-header";
 import { ServerList } from "@/components/servers/server-list";
+import { ServerFormDialog } from "@/components/servers/server-form-dialog";
+import { ServerDeleteDialog } from "@/components/servers/server-delete-dialog";
 import { Pagination } from "@/components/ui/pagination";
 
 export default function ServersPage() {
@@ -21,11 +23,21 @@ export default function ServersPage() {
     currentPage,
     pageSize,
     searchServers,
+    createServer,
+    updateServer,
+    deleteServer,
+    getServerById,
   } = useServers();
 
   // Local state for UI
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState("status"); // Default filter value
+
+  // Dialog states
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editingServer, setEditingServer] = useState<Server | null>(null);
+  const [deletingServer, setDeletingServer] = useState<Server | null>(null);
 
   // Debounced search effect
   useEffect(() => {
@@ -74,6 +86,55 @@ export default function ServersPage() {
     },
     [searchServers, searchTerm, status]
   );
+
+  // Dialog event handlers
+  const handleEditServer = useCallback((server: Server) => {
+    setEditingServer(server);
+    setFormDialogOpen(true);
+  }, []);
+
+  const handleDeleteServer = useCallback((server: Server) => {
+    setDeletingServer(server);
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleFormDialogClose = useCallback(() => {
+    setFormDialogOpen(false);
+    setEditingServer(null);
+  }, []);
+
+  const handleDeleteDialogClose = useCallback(() => {
+    setDeleteDialogOpen(false);
+    setDeletingServer(null);
+  }, []);
+
+  const handleFormSuccess = useCallback(
+    (message: string) => {
+      toast.success(message);
+      handleRefresh(); // Refresh the list after successful operation
+    },
+    [handleRefresh]
+  );
+
+  const handleDeleteSuccess = useCallback(
+    (message: string) => {
+      toast.success(message);
+      handleRefresh(); // Refresh the list after successful deletion
+    },
+    [handleRefresh]
+  );
+
+  const handleConfirmDelete = useCallback(
+    async (id: number) => {
+      await deleteServer(id);
+    },
+    [deleteServer]
+  );
+
+  const handleViewHardeningHistory = useCallback((server: Server) => {
+    // TODO: Implement view hardening history functionality
+    toast.info(`Xem lịch sử hardening cho server: ${server.hostname}`);
+  }, []);
 
   const handleUploadServers = useCallback(() => {
     // TODO: Implement upload servers functionality
@@ -127,12 +188,20 @@ export default function ServersPage() {
       </Card>
 
       {/* Server List */}
-      <ServerList servers={servers} loading={loading} error={error} />
+      <ServerList
+        key={`server-list-${Date.now()}`}
+        servers={servers}
+        loading={loading}
+        error={error}
+        onEdit={handleEditServer}
+        onDelete={handleDeleteServer}
+        onViewHardeningHistory={handleViewHardeningHistory}
+      />
 
       {/* Pagination */}
       {!loading && !error && totalPages > 1 && (
         <Pagination
-          currentPage={currentPage} // Sử dụng 1-based indexing
+          currentPage={currentPage}
           totalPages={totalPages}
           totalElements={totalServers}
           pageSize={pageSize}
@@ -144,6 +213,27 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
+
+      {/* Form Dialog for Create/Edit */}
+      <ServerFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        onClose={handleFormDialogClose}
+        editingServer={editingServer}
+        updateServer={updateServer}
+        getServerById={getServerById}
+        onSuccess={handleFormSuccess}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ServerDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        server={deletingServer}
+        onConfirm={handleConfirmDelete}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 }
