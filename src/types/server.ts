@@ -1,68 +1,40 @@
 export interface Server {
   id: number;
-  name: string;
   hostname: string;
   ip_address: string;
-  workload_id: number;
-  server_role?: string;
-  os_type: string;
-  os_name?: string;
   os_version?: string;
-  cpu_cores?: number;
-  memory_gb?: number;
-  environment: string;
-  status: string;
-  compliance_score?: number;
   ssh_port: number;
-  ssh_key_id?: number;
-  is_active: boolean;
+  ssh_user?: string;
+  status?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface ServerCreate {
-  name: string;
   hostname: string;
   ip_address: string;
-  workload_id: number;
-  server_role?: string;
-  os_type: string;
-  os_name?: string;
-  os_version?: string;
-  cpu_cores?: number;
-  memory_gb?: number;
-  environment: string;
-  status: string;
-  compliance_score?: number;
-  ssh_port?: number;
-  ssh_key_id?: number;
-  is_active?: boolean;
+  os_version: string;
+  ssh_port: number;
+  ssh_user: string;
+  ssh_password: string;
 }
 
 export interface ServerUpdate {
-  name?: string;
   hostname?: string;
   ip_address?: string;
-  workload_id?: number;
-  server_role?: string;
-  os_type?: string;
-  os_name?: string;
   os_version?: string;
-  cpu_cores?: number;
-  memory_gb?: number;
-  environment?: string;
-  status?: string;
-  compliance_score?: number;
   ssh_port?: number;
-  ssh_key_id?: number;
-  is_active?: boolean;
+  ssh_user?: string;
+  ssh_password?: string;
 }
 
-export enum ServerEnvironment {
-  PRODUCTION = "production",
-  STAGING = "staging",
-  DEVELOPMENT = "development",
-  TESTING = "testing",
+// Response từ API list servers
+export interface ServerListResponse {
+  servers: Server[];
+  total_servers: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 export enum ServerStatus {
@@ -71,6 +43,13 @@ export enum ServerStatus {
   MAINTENANCE = "maintenance",
   ERROR = "error",
   UNKNOWN = "unknown",
+}
+
+export enum ServerEnvironment {
+  PRODUCTION = "production",
+  STAGING = "staging",
+  DEVELOPMENT = "development",
+  TESTING = "testing",
 }
 
 export enum ServerOSType {

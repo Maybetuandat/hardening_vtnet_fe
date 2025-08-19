@@ -1,69 +1,52 @@
+// src/components/server/server-header.tsx
+
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Server, RefreshCw, Upload, Download } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { RefreshCw, Upload, Download } from "lucide-react";
 
 interface ServerHeaderProps {
-  onAddServer: () => void;
+  onUploadServers: () => void;
+  onDownloadTemplate: () => void;
   onRefresh: () => void;
-  loading?: boolean;
-  totalServers: number;
-  activeServers: number;
+  loading: boolean;
 }
 
-const ServerHeader: React.FC<ServerHeaderProps> = ({
-  onAddServer,
+export const ServerHeader: React.FC<ServerHeaderProps> = ({
+  onUploadServers,
+  onDownloadTemplate,
   onRefresh,
-  loading = false,
-  totalServers,
-  activeServers,
+  loading,
 }) => {
-  const { t } = useTranslation("server");
-
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <div className="flex items-center space-x-2">
-          <Server className="h-6 w-6 text-blue-600" />
-          <CardTitle className="text-xl font-semibold">
-            Quản lý Server
-          </CardTitle>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={loading}
-            className="flex items-center space-x-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            <span>Làm mới</span>
-          </Button>
-          <Button onClick={onAddServer} className="flex items-center space-x-2">
-            <Plus className="h-4 w-4" />
-            <span>Thêm Server</span>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center space-x-2">
-          {/* Upload Excel Button */}
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Upload className="h-4 w-4" />
-            <span>Tải nhiều server</span>
-          </Button>
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Quản lý Server</h1>
+        <p className="text-muted-foreground">
+          Quản lý và giám sát các server trong hệ thống
+        </p>
+      </div>
 
-          {/* Download Template Button */}
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Download className="h-4 w-4" />
-            <span>Tải Template mẫu</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefresh}
+          disabled={loading}
+        >
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+          />
+          Làm mới
+        </Button>
+        <Button variant="outline" size="sm" onClick={onDownloadTemplate}>
+          <Download className="mr-2 h-4 w-4" />
+          Download Template
+        </Button>
+        <Button size="sm" onClick={onUploadServers}>
+          <Upload className="mr-2 h-4 w-4" />
+          Upload Server
+        </Button>
+      </div>
+    </div>
   );
 };
-
-export default ServerHeader;

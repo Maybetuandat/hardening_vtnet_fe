@@ -1,195 +1,148 @@
-// src/app/server/servers-page.tsx
-import { useState, useCallback, useMemo } from "react";
-import ServerHeader from "@/components/servers/server-header";
-import FilterBar from "@/components/ui/filter-bar";
-import { useServers } from "@/hooks/use-servers";
-import { ServerList } from "@/components/servers/server-list";
-import { ServerFormDialog } from "@/components/servers/server-form-dialog";
-import { ServerDeleteDialog } from "@/components/servers/server-delete-dialog";
-import {
-  Server,
-  ServerEnvironment,
-  ServerStatus,
-  ServerOSType,
-} from "@/types/server";
-import React from "react";
-import { useTranslation } from "react-i18next";
+// src/app/server/server-page.tsx - Simplified version
+
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
+import { useServers } from "@/hooks/use-servers";
+import { Server, ServerStatus } from "@/types/server";
+import { Card } from "@/components/ui/card";
+import FilterBar from "@/components/ui/filter-bar";
+
+import { ServerHeader } from "@/components/servers/server-header";
+import { ServerList } from "@/components/servers/server-list";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function ServersPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState("status");
-  const [environment, setEnvironment] = useState("environment");
-  const [osType, setOSType] = useState<ServerOSType | "all">("all");
-
-  // Dialog states
-  const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editingServer, setEditingServer] = useState<Server | null>(null);
-  const [deletingServer, setDeletingServer] = useState<Server | null>(null);
-
-  const { t } = useTranslation("server");
-
   const {
     servers,
     loading,
     error,
-    fetchServers,
-    createServer,
-    updateServer,
-    deleteServer,
-    getServerById,
+    totalServers,
+    totalPages,
+    currentPage,
+    pageSize,
+    searchServers,
   } = useServers();
 
-  // Filter servers
-  const filteredServers = useMemo(() => {
-    if (!servers || !Array.isArray(servers)) {
-      return [];
-    }
+  // Local state for UI
+  const [searchTerm, setSearchTerm] = useState("");
+  const [status, setStatus] = useState("status"); // Default filter value
 
-    return servers.filter((server) => {
-      const matchesSearch =
-        searchTerm.trim() === "" ||
-        server.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        server.hostname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        server.ip_address.includes(searchTerm) ||
-        server.server_role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        server.os_name?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesStatus = status === "status" || server.status === status;
-
-      const matchesEnvironment =
-        environment === "environment" || server.environment === environment;
-
-      const matchesOSType = osType === "all" || server.os_type === osType;
-
-      return (
-        matchesSearch && matchesStatus && matchesEnvironment && matchesOSType
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchServers(
+        searchTerm,
+        status === "status" ? undefined : status,
+        1,
+        pageSize
       );
-    });
-  }, [servers, searchTerm, status, environment, osType]);
+    }, 500);
 
-  // Calculate stats
-  const totalServers = servers?.length || 0;
-  const activeServers =
-    servers?.filter((server) => server.is_active).length || 0;
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, status, pageSize, searchServers]);
 
   // Event handlers
-  const handleAddServer = useCallback(() => {
-    setEditingServer(null);
-    setFormDialogOpen(true);
-  }, []);
-
-  const handleEdit = useCallback((server: Server) => {
-    setEditingServer(server);
-    setFormDialogOpen(true);
-  }, []);
-
-  const handleDelete = useCallback((server: Server) => {
-    setDeletingServer(server);
-    setDeleteDialogOpen(true);
-  }, []);
-
-  const handleViewHardeningHistory = useCallback((server: Server) => {
-    // TODO: Implement hardening history view
-    toast.info(`Xem lịch sử hardening cho server: ${server.name}`);
-    console.log("View hardening history for server:", server);
-  }, []);
-
   const handleRefresh = useCallback(() => {
-    fetchServers();
-  }, [fetchServers]);
+    searchServers(
+      searchTerm,
+      status === "status" ? undefined : status,
+      currentPage,
+      pageSize
+    );
+  }, [searchServers, currentPage, pageSize, searchTerm, status]);
 
-  const handleFormDialogClose = useCallback(() => {
-    setFormDialogOpen(false);
-    setEditingServer(null);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      searchServers(
+        searchTerm,
+        status === "status" ? undefined : status,
+        page + 1,
+        pageSize
+      );
+    },
+    [searchServers, searchTerm, status, pageSize]
+  );
+
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      searchServers(
+        searchTerm,
+        status === "status" ? undefined : status,
+        1,
+        newPageSize
+      );
+    },
+    [searchServers, searchTerm, status]
+  );
+
+  const handleUploadServers = useCallback(() => {
+    // TODO: Implement upload servers functionality
+    toast.info("Chức năng upload server sẽ được triển khai sau");
   }, []);
 
-  const handleDeleteDialogClose = useCallback(() => {
-    setDeleteDialogOpen(false);
-    setDeletingServer(null);
+  const handleDownloadTemplate = useCallback(() => {
+    // TODO: Implement download template functionality
+    toast.info("Chức năng download template sẽ được triển khai sau");
   }, []);
 
-  const handleOperationSuccess = useCallback(() => {
-    toast.success("Thao tác thành công!");
-    fetchServers();
-  }, [fetchServers]);
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      {/* Header with Upload/Download buttons */}
       <ServerHeader
-        onAddServer={handleAddServer}
+        onUploadServers={handleUploadServers}
+        onDownloadTemplate={handleDownloadTemplate}
         onRefresh={handleRefresh}
         loading={loading}
-        totalServers={totalServers}
-        activeServers={activeServers}
       />
 
-      <FilterBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filters={[
-          {
-            value: status,
-            onChange: setStatus,
-            options: [
-              { value: "status", label: "Tất cả trạng thái" },
-              { value: ServerStatus.ONLINE, label: "Online" },
-              { value: ServerStatus.OFFLINE, label: "Offline" },
-              { value: ServerStatus.MAINTENANCE, label: "Bảo trì" },
-              { value: ServerStatus.ERROR, label: "Lỗi" },
-              { value: ServerStatus.UNKNOWN, label: "Không xác định" },
-            ],
-            placeholder: "Trạng thái",
-            widthClass: "w-36",
-          },
-          {
-            value: environment,
-            onChange: setEnvironment,
-            options: [
-              { value: "environment", label: "Tất cả Workload" },
-              { value: ServerEnvironment.PRODUCTION, label: "Workload1" },
-              { value: ServerEnvironment.STAGING, label: "Workload2" },
-              { value: ServerEnvironment.DEVELOPMENT, label: "Workload3" },
-              { value: ServerEnvironment.TESTING, label: "Workload4" },
-            ],
-            placeholder: "Môi trường",
-            widthClass: "w-36",
-          },
-        ]}
-      />
+      {/* Filter Bar */}
+      <Card className="p-4">
+        <FilterBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={[
+            {
+              value: status,
+              onChange: setStatus,
+              options: [
+                { value: "status", label: "Tất cả trạng thái" },
+                { value: ServerStatus.ONLINE, label: "Online" },
+                { value: ServerStatus.OFFLINE, label: "Offline" },
+                { value: ServerStatus.MAINTENANCE, label: "Bảo trì" },
+                { value: ServerStatus.ERROR, label: "Lỗi" },
+                { value: ServerStatus.UNKNOWN, label: "Không xác định" },
+              ],
+              placeholder: "Trạng thái",
+              widthClass: "w-36",
+            },
+          ]}
+        />
+      </Card>
 
-      <ServerList
-        key={`server-list-${servers.length}-${Date.now()}`}
-        servers={filteredServers}
-        loading={loading}
-        error={error}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onViewHardeningHistory={handleViewHardeningHistory}
-      />
+      {/* Server List */}
+      <ServerList servers={servers} loading={loading} error={error} />
 
-      {/* Server Form Dialog */}
-      <ServerFormDialog
-        open={formDialogOpen}
-        onOpenChange={setFormDialogOpen}
-        onClose={handleFormDialogClose}
-        editingServer={editingServer}
-        createServer={createServer}
-        updateServer={updateServer}
-        getServerById={getServerById}
-        onSuccess={handleOperationSuccess}
-      />
-
-      {/* Server Delete Dialog */}
-      <ServerDeleteDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        onClose={handleDeleteDialogClose}
-        server={deletingServer}
-        onConfirm={deleteServer}
-        onSuccess={handleOperationSuccess}
-      />
+      {/* Pagination */}
+      {!loading && !error && totalPages > 1 && (
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={currentPage - 1} // Convert to 0-based for component
+            totalPages={totalPages}
+            totalElements={totalServers}
+            pageSize={pageSize}
+            loading={loading}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

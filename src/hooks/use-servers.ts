@@ -1,11 +1,48 @@
+// src/hooks/use-servers.ts - Fixed version
+
 import { useState, useEffect, useCallback } from "react";
-import { Server, ServerCreate, ServerUpdate } from "@/types/server";
+import {
+  Server,
+  ServerCreate,
+  ServerUpdate,
+  ServerListResponse,
+} from "@/types/server";
 import { api } from "@/lib/api";
 
-export function useServers() {
+interface UseServersReturn {
+  servers: Server[];
+  loading: boolean;
+  error: string | null;
+  totalServers: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  fetchServers: (
+    page?: number,
+    pageSize?: number,
+    keyword?: string,
+    status?: string
+  ) => Promise<void>;
+  getServerById: (id: number) => Promise<Server>;
+  createServer: (serverData: ServerCreate) => Promise<Server>;
+  updateServer: (id: number, serverData: ServerUpdate) => Promise<Server>;
+  deleteServer: (id: number) => Promise<void>;
+  searchServers: (
+    keyword?: string,
+    status?: string,
+    page?: number,
+    pageSize?: number
+  ) => Promise<void>;
+}
+
+export function useServers(): UseServersReturn {
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalServers, setTotalServers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleError = useCallback((error: any, action: string) => {
     console.error(`Error ${action}:`, error);
@@ -13,19 +50,54 @@ export function useServers() {
     setError(message);
   }, []);
 
-  const fetchServers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await api.get<Server[]>("/servers");
-      setServers(data);
-      console.log("Fetched servers:", data);
-    } catch (err) {
-      handleError(err, "fetch servers");
-    } finally {
-      setLoading(false);
-    }
-  }, [handleError]);
+  const fetchServers = useCallback(
+    async (page = 1, size = 10, keyword?: string, status?: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        params.append("page", page.toString());
+        params.append("page_size", size.toString());
+
+        if (keyword && keyword.trim()) {
+          params.append("keyword", keyword.trim());
+        }
+
+        if (status && status !== "status") {
+          // Skip default filter value
+          params.append("status", status);
+        }
+
+        const response = await api.get<ServerListResponse>(
+          `/servers?${params.toString()}`
+        );
+
+        setServers(response.servers);
+        setTotalServers(response.total_servers);
+        setTotalPages(response.total_pages);
+        setCurrentPage(response.page);
+        setPageSize(response.page_size);
+
+        console.log("Fetched servers:", response);
+      } catch (err) {
+        handleError(err, "fetch servers");
+        setServers([]);
+        setTotalServers(0);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [handleError]
+  );
+
+  const searchServers = useCallback(
+    async (keyword?: string, status?: string, page = 1, size = 10) => {
+      await fetchServers(page, size, keyword, status);
+    },
+    [fetchServers]
+  );
 
   const getServerById = useCallback(
     async (id: number): Promise<Server> => {
@@ -48,14 +120,15 @@ export function useServers() {
     async (serverData: ServerCreate): Promise<Server> => {
       try {
         const newServer = await api.post<Server>("/servers", serverData);
-        setServers((prev) => [...prev, newServer]);
+        // Refresh server list after creation
+        await fetchServers(currentPage, pageSize);
         return newServer;
       } catch (err) {
         handleError(err, "create server");
         throw err;
       }
     },
-    [handleError]
+    [handleError, fetchServers, currentPage, pageSize]
   );
 
   const updateServer = useCallback(
@@ -65,6 +138,7 @@ export function useServers() {
           `/servers/${id}`,
           serverData
         );
+        // Update local state
         setServers((prev) =>
           prev.map((server) => (server.id === id ? updatedServer : server))
         );
@@ -80,8 +154,10 @@ export function useServers() {
   const deleteServer = useCallback(
     async (id: number): Promise<void> => {
       try {
-        await api.delete(`/api/servers/${id}`);
+        await api.delete(`/servers/${id}`);
+        // Remove from local state
         setServers((prev) => prev.filter((server) => server.id !== id));
+        setTotalServers((prev) => prev - 1);
       } catch (err) {
         handleError(err, "delete server");
         throw err;
@@ -92,17 +168,22 @@ export function useServers() {
 
   // Fetch servers on mount
   useEffect(() => {
-    fetchServers();
+    fetchServers(1, 10);
   }, [fetchServers]);
 
   return {
     servers,
     loading,
     error,
+    totalServers,
+    totalPages,
+    currentPage,
+    pageSize,
     fetchServers,
     getServerById,
     createServer,
     updateServer,
     deleteServer,
+    searchServers,
   };
 }
