@@ -1,8 +1,9 @@
-// src/components/server/server-list.tsx - Simplified version without actions
+// src/components/server/server-list.tsx - Enhanced version with actions
 
 import React from "react";
 import { Server, ServerStatus } from "@/types/server";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -12,19 +13,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Circle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Circle,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  History,
+  Copy,
+  Check,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface ServerListProps {
   servers: Server[];
   loading: boolean;
   error: string | null;
+  onEdit?: (server: Server) => void;
+  onDelete?: (server: Server) => void;
+  onViewHardeningHistory?: (server: Server) => void;
 }
 
 export const ServerList: React.FC<ServerListProps> = ({
   servers,
   loading,
   error,
+  onEdit,
+  onDelete,
+  onViewHardeningHistory,
 }) => {
+  const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
+
   const getStatusBadge = (status?: string) => {
     if (!status) {
       return (
@@ -88,6 +113,45 @@ export const ServerList: React.FC<ServerListProps> = ({
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleCopyIP = async (ipAddress: string) => {
+    try {
+      await navigator.clipboard.writeText(ipAddress);
+      setCopiedIP(ipAddress);
+      toast.success("Đã copy địa chỉ IP!");
+
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedIP(null);
+      }, 2000);
+    } catch (error) {
+      toast.error("Không thể copy địa chỉ IP");
+    }
+  };
+
+  const handleEdit = (server: Server) => {
+    if (onEdit) {
+      onEdit(server);
+    } else {
+      toast.info("Chức năng sửa server sẽ được triển khai sau");
+    }
+  };
+
+  const handleDelete = (server: Server) => {
+    if (onDelete) {
+      onDelete(server);
+    } else {
+      toast.info("Chức năng xóa server sẽ được triển khai sau");
+    }
+  };
+
+  const handleViewHardeningHistory = (server: Server) => {
+    if (onViewHardeningHistory) {
+      onViewHardeningHistory(server);
+    } else {
+      toast.info("Chức năng xem lịch sử hardening sẽ được triển khai sau");
+    }
   };
 
   if (loading) {
@@ -158,10 +222,10 @@ export const ServerList: React.FC<ServerListProps> = ({
                 <TableHead>Hostname</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>OS Version</TableHead>
-                <TableHead>SSH Port</TableHead>
-                <TableHead>SSH User</TableHead>
+                <TableHead>WorkLoad</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Ngày tạo</TableHead>
+                <TableHead className="text-right">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -170,12 +234,68 @@ export const ServerList: React.FC<ServerListProps> = ({
                   <TableCell className="font-medium">
                     {server.hostname}
                   </TableCell>
-                  <TableCell>{server.ip_address}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm">
+                        {server.ip_address}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-muted"
+                        onClick={() => handleCopyIP(server.ip_address)}
+                        title="Copy IP address"
+                      >
+                        {copiedIP === server.ip_address ? (
+                          <Check className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
                   <TableCell>{server.os_version || "Không xác định"}</TableCell>
-                  <TableCell>{server.ssh_port}</TableCell>
-                  <TableCell>{server.ssh_user || "Không xác định"}</TableCell>
+                  <TableCell>{"Không xác định"}</TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          title="Xem thêm hành động"
+                        >
+                          <span className="sr-only">Mở menu hành động</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => handleEdit(server)}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Sửa server
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleViewHardeningHistory(server)}
+                          className="cursor-pointer"
+                        >
+                          <History className="mr-2 h-4 w-4" />
+                          Lịch sử hardening
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(server)}
+                          className="cursor-pointer text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Xóa server
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

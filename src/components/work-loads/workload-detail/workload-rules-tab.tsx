@@ -1,5 +1,3 @@
-// File: src/components/work-loads/workload-detail/workload-rules-tab.tsx
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,19 +51,19 @@ export const WorkloadRulesTab: React.FC<WorkloadRulesTabProps> = ({
     setCurrentPage(1);
   }, [searchTerm, severityFilter, statusFilter, itemsPerPage]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1);
-  };
-
   const handleClearFilters = () => {
     setSearchTerm("");
     setSeverityFilter("all");
     setStatusFilter("all");
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newPageSize: number) => {
+    setItemsPerPage(newPageSize);
+    setCurrentPage(1);
   };
 
   return (
@@ -94,14 +92,16 @@ export const WorkloadRulesTab: React.FC<WorkloadRulesTabProps> = ({
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
           itemsPerPage={itemsPerPage}
-          handleItemsPerPageChange={handleItemsPerPageChange}
+          handleItemsPerPageChange={(value: string) =>
+            handleItemsPerPageChange(Number(value))
+          }
           filteredCount={filteredRules.length}
           totalCount={rules.length}
           onClearFilters={handleClearFilters}
         />
 
         {/* Rules List */}
-        <div className="space-y-4">
+        <div className="space-y-4 mt-4">
           {paginatedRules.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
@@ -115,15 +115,18 @@ export const WorkloadRulesTab: React.FC<WorkloadRulesTabProps> = ({
           )}
         </div>
 
-        {/* Pagination */}
-        {filteredRules.length > itemsPerPage && (
+        {/* Pagination - chỉ hiển thị khi có rules và nhiều hơn 1 trang */}
+        {filteredRules.length > 0 && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={filteredRules.length}
-            itemsPerPage={itemsPerPage}
+            totalElements={filteredRules.length}
+            pageSize={itemsPerPage}
             onPageChange={handlePageChange}
+            onPageSizeChange={handleItemsPerPageChange}
             showInfo={true}
+            showPageSizeSelector={true}
+            pageSizeOptions={[5, 10, 20, 30]}
           />
         )}
       </CardContent>

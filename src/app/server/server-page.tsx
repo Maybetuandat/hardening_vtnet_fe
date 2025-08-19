@@ -56,7 +56,7 @@ export default function ServersPage() {
       searchServers(
         searchTerm,
         status === "status" ? undefined : status,
-        page + 1,
+        page,
         pageSize
       );
     },
@@ -131,17 +131,18 @@ export default function ServersPage() {
 
       {/* Pagination */}
       {!loading && !error && totalPages > 1 && (
-        <div className="flex justify-center">
-          <Pagination
-            currentPage={currentPage - 1} // Convert to 0-based for component
-            totalPages={totalPages}
-            totalElements={totalServers}
-            pageSize={pageSize}
-            loading={loading}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-          />
-        </div>
+        <Pagination
+          currentPage={currentPage} // Sử dụng 1-based indexing
+          totalPages={totalPages}
+          totalElements={totalServers}
+          pageSize={pageSize}
+          loading={loading}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          showInfo={true}
+          showPageSizeSelector={true}
+          pageSizeOptions={[5, 10, 20, 50]}
+        />
       )}
     </div>
   );
