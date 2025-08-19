@@ -5,7 +5,7 @@ export interface Server {
   os_version?: string;
   ssh_port: number;
   ssh_user?: string;
-  status?: string;
+  status?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -35,26 +35,4 @@ export interface ServerListResponse {
   page: number;
   page_size: number;
   total_pages: number;
-}
-
-export enum ServerStatus {
-  ONLINE = "online",
-  OFFLINE = "offline",
-  MAINTENANCE = "maintenance",
-  ERROR = "error",
-  UNKNOWN = "unknown",
-}
-
-export enum ServerEnvironment {
-  PRODUCTION = "production",
-  STAGING = "staging",
-  DEVELOPMENT = "development",
-  TESTING = "testing",
-}
-
-export enum ServerOSType {
-  LINUX = "linux",
-  WINDOWS = "windows",
-  UNIX = "unix",
-  MACOS = "macos",
 }

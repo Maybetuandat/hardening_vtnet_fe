@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { useServers } from "@/hooks/use-servers";
-import { Server, ServerStatus } from "@/types/server";
+import { Server } from "@/types/server";
 import { Card } from "@/components/ui/card";
 import FilterBar from "@/components/ui/filter-bar";
 
@@ -23,7 +23,7 @@ export default function ServersPage() {
     currentPage,
     pageSize,
     searchServers,
-    createServer,
+
     updateServer,
     deleteServer,
     getServerById,
@@ -174,11 +174,8 @@ export default function ServersPage() {
               onChange: setStatus,
               options: [
                 { value: "status", label: "Tất cả trạng thái" },
-                { value: ServerStatus.ONLINE, label: "Online" },
-                { value: ServerStatus.OFFLINE, label: "Offline" },
-                { value: ServerStatus.MAINTENANCE, label: "Bảo trì" },
-                { value: ServerStatus.ERROR, label: "Lỗi" },
-                { value: ServerStatus.UNKNOWN, label: "Không xác định" },
+                { value: "true", label: "Hoạt động" },
+                { value: "false", label: "Không hoạt động" },
               ],
               placeholder: "Trạng thái",
               widthClass: "w-36",

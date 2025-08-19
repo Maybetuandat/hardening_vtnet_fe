@@ -1,5 +1,3 @@
-// src/hooks/use-servers.ts - Fixed version
-
 import { useState, useEffect, useCallback } from "react";
 import {
   Server,
@@ -42,7 +40,7 @@ export function useServers(): UseServersReturn {
   const [totalServers, setTotalServers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleError = useCallback((error: any, action: string) => {
     console.error(`Error ${action}:`, error);

@@ -1,7 +1,5 @@
-// src/components/server/server-list.tsx - Enhanced version with actions
-
 import React from "react";
-import { Server, ServerStatus } from "@/types/server";
+import { Server } from "@/types/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,7 +48,7 @@ export const ServerList: React.FC<ServerListProps> = ({
 }) => {
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
-  const getStatusBadge = (status?: string) => {
+  const getStatusBadge = (status?: boolean) => {
     if (!status) {
       return (
         <Badge variant="secondary" className="flex items-center gap-1">
@@ -60,48 +58,23 @@ export const ServerList: React.FC<ServerListProps> = ({
       );
     }
 
-    switch (status.toLowerCase()) {
-      case ServerStatus.ONLINE:
-        return (
-          <Badge
-            variant="default"
-            className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-100"
-          >
-            <Circle className="h-2 w-2 fill-green-500 text-green-500" />
-            Online
-          </Badge>
-        );
-      case ServerStatus.OFFLINE:
-        return (
-          <Badge variant="destructive" className="flex items-center gap-1">
-            <Circle className="h-2 w-2 fill-red-500 text-red-500" />
-            Offline
-          </Badge>
-        );
-      case ServerStatus.MAINTENANCE:
-        return (
-          <Badge
-            variant="secondary"
-            className="flex items-center gap-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-          >
-            <Circle className="h-2 w-2 fill-yellow-500 text-yellow-500" />
-            Bảo trì
-          </Badge>
-        );
-      case ServerStatus.ERROR:
-        return (
-          <Badge variant="destructive" className="flex items-center gap-1">
-            <Circle className="h-2 w-2 fill-red-500 text-red-500" />
-            Lỗi
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <Circle className="h-2 w-2 fill-gray-400 text-gray-400" />
-            {status}
-          </Badge>
-        );
+    if (status === true) {
+      return (
+        <Badge
+          variant="default"
+          className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-100"
+        >
+          <Circle className="h-2 w-2 fill-green-500 text-green-500" />
+          Online
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="destructive" className="flex items-center gap-1">
+          <Circle className="h-2 w-2 fill-red-500 text-red-500" />
+          Offline
+        </Badge>
+      );
     }
   };
 
