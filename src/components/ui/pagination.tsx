@@ -95,10 +95,10 @@ export const Pagination: React.FC<PaginationProps> = ({
     return pages;
   };
 
-  // Không hiển thị nếu chỉ có 1 trang hoặc ít hơn
-  if (totalPages <= 1) {
-    return null;
-  }
+  // // Không hiển thị nếu chỉ có 1 trang hoặc ít hơn
+  // if (totalPages <= 1) {
+  //   return null;
+  // }
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages && page !== currentPage && !loading) {
@@ -116,13 +116,6 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className={cn("mt-6 pt-4 border-t", className)}>
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Thông tin trang */}
-        {showInfo && totalElements !== undefined && (
-          <div className="text-sm text-muted-foreground">
-            Hiển thị {startIndex}-{endIndex} của {totalElements} mục
-          </div>
-        )}
-
         {/* Selector số lượng item mỗi trang */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center space-x-2">

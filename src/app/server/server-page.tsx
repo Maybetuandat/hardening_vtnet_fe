@@ -196,7 +196,7 @@ export default function ServersPage() {
       />
 
       {/* Pagination */}
-      {!loading && !error && totalPages > 1 && (
+      {!loading && !error && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

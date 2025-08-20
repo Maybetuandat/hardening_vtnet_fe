@@ -1,4 +1,3 @@
-// src/components/servers/server-form-dialog.tsx
 import React, { useEffect } from "react";
 import {
   Dialog,
@@ -19,7 +18,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Wifi, WifiOff, CheckCircle, XCircle } from "lucide-react";
+import {
+  Loader2,
+  Wifi,
+  WifiOff,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Clock,
+} from "lucide-react";
 import { Server, ServerUpdate } from "@/types/server";
 import { useServerForm } from "@/hooks/use-server-form";
 
@@ -52,6 +59,10 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
     formChanged,
     canTestConnection,
     canUpdate,
+    validatingFields,
+    validationErrors,
+    fieldValidation,
+    hasValidationErrors,
     loadServerData,
     testConnection,
     onSubmit,
@@ -73,15 +84,12 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
 
   if (!editingServer) return null;
 
+  // console.log("📝 Editing server data:", editingServer);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Chỉnh sửa Server</DialogTitle>
-          <DialogDescription>
-            Cập nhật thông tin server. Test connection sau khi thay đổi thông
-            tin để có thể cập nhật.
-          </DialogDescription>
         </DialogHeader>
 
         {loadingServerData ? (
@@ -98,11 +106,33 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="hostname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Hostname</FormLabel>
+                      <FormLabel>
+                        Hostname
+                        {validatingFields && (
+                          <Clock className="inline h-3 w-3 ml-1 animate-spin" />
+                        )}
+                        {!fieldValidation.hostname && (
+                          <XCircle className="inline h-3 w-3 ml-1 text-red-500" />
+                        )}
+                        {fieldValidation.hostname && formChanged && (
+                          <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
+                        )}
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="web-server-01" {...field} />
+                        <Input
+                          placeholder="web-server-01"
+                          {...field}
+                          className={
+                            !fieldValidation.hostname ? "border-red-500" : ""
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
+                      {!fieldValidation.hostname && (
+                        <p className="text-xs text-red-500 mt-1">
+                          Hostname đã tồn tại
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -112,11 +142,33 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="ip_address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>IP Address</FormLabel>
+                      <FormLabel>
+                        IP Address
+                        {validatingFields && (
+                          <Clock className="inline h-3 w-3 ml-1 animate-spin" />
+                        )}
+                        {!fieldValidation.ip_address && (
+                          <XCircle className="inline h-3 w-3 ml-1 text-red-500" />
+                        )}
+                        {fieldValidation.ip_address && formChanged && (
+                          <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
+                        )}
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="192.168.1.100" {...field} />
+                        <Input
+                          placeholder="192.168.1.100"
+                          {...field}
+                          className={
+                            !fieldValidation.ip_address ? "border-red-500" : ""
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
+                      {!fieldValidation.ip_address && (
+                        <p className="text-xs text-red-500 mt-1">
+                          IP Address đã tồn tại
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -172,9 +224,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="ssh_password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        SSH Password (Để trống nếu không thay đổi)
-                      </FormLabel>
+                      <FormLabel>SSH Password</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -187,6 +237,23 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   )}
                 />
               </div>
+
+              {/* Validation Errors */}
+              {hasValidationErrors && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="space-y-1">
+                      <p className="font-medium">Lỗi validation:</p>
+                      {validationErrors.map((error, index) => (
+                        <p key={index} className="text-xs">
+                          • {error}
+                        </p>
+                      ))}
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
 
               {/* Test Connection Section */}
               <div className="space-y-3 border-t pt-4">
@@ -248,11 +315,6 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                               OS: {connectionResult.os_version}
                             </p>
                           )}
-                          {connectionResult.response_time && (
-                            <p className="text-xs">
-                              Response time: {connectionResult.response_time}ms
-                            </p>
-                          )}
                           {connectionResult.error_details && (
                             <p className="text-xs text-destructive">
                               {connectionResult.error_details}
@@ -264,27 +326,39 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   </Alert>
                 )}
 
-                {/* Form change warning */}
-                {!formChanged && (
+                {/* Validation in progress */}
+                {validatingFields && (
                   <Alert>
-                    <WifiOff className="h-4 w-4" />
+                    <Clock className="h-4 w-4 animate-spin" />
                     <AlertDescription>
-                      Vui lòng thay đổi thông tin server để có thể test
-                      connection.
+                      Đang kiểm tra tính duy nhất của hostname và IP address...
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Form change with validation errors */}
+                {formChanged && hasValidationErrors && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Vui lòng sửa các lỗi validation trước khi test connection.
                     </AlertDescription>
                   </Alert>
                 )}
 
                 {/* Form change warning */}
-                {formChanged && !connectionTested && (
-                  <Alert>
-                    <WifiOff className="h-4 w-4" />
-                    <AlertDescription>
-                      Bạn đã thay đổi thông tin server. Vui lòng test connection
-                      trước khi cập nhật.
-                    </AlertDescription>
-                  </Alert>
-                )}
+                {formChanged &&
+                  !connectionTested &&
+                  !hasValidationErrors &&
+                  !validatingFields && (
+                    <Alert>
+                      <WifiOff className="h-4 w-4" />
+                      <AlertDescription>
+                        Bạn đã thay đổi thông tin server. Vui lòng test
+                        connection trước khi cập nhật.
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
                 {/* Connection test required warning */}
                 {formChanged &&
@@ -304,7 +378,10 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Hủy
                 </Button>
-                <Button type="submit" disabled={loading || !canUpdate}>
+                <Button
+                  type="submit"
+                  disabled={loading || !canUpdate || validatingFields}
+                >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Cập nhật
                 </Button>
