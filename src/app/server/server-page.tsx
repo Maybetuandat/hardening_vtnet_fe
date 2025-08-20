@@ -134,11 +134,6 @@ export default function ServersPage() {
     toast.info(`Xem lịch sử hardening cho server: ${server.hostname}`);
   }, []);
 
-  const handleUploadServers = useCallback(() => {
-    // TODO: Implement upload servers functionality
-    toast.info("Chức năng upload server sẽ được triển khai sau");
-  }, []);
-
   // Show error toast if there's an error
   useEffect(() => {
     if (error) {
@@ -149,11 +144,7 @@ export default function ServersPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       {/* Header with Upload/Download buttons */}
-      <ServerHeader
-        onUploadServers={handleUploadServers}
-        onRefresh={handleRefresh}
-        loading={loading}
-      />
+      <ServerHeader onRefresh={handleRefresh} loading={loading} />
 
       {/* Filter Bar */}
       <Card className="p-4">
@@ -202,6 +193,17 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
+
+      {/* Form Dialog for Create/Edit */}
+      <ServerFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        onClose={handleFormDialogClose}
+        editingServer={editingServer}
+        updateServer={updateServer}
+        getServerById={getServerById}
+        onSuccess={handleFormSuccess}
+      />
 
       {/* Form Dialog for Create/Edit */}
       <ServerFormDialog
