@@ -106,33 +106,14 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="hostname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        Hostname
-                        {validatingFields && (
-                          <Clock className="inline h-3 w-3 ml-1 animate-spin" />
-                        )}
-                        {!fieldValidation.hostname && (
-                          <XCircle className="inline h-3 w-3 ml-1 text-red-500" />
-                        )}
-                        {fieldValidation.hostname && formChanged && (
-                          <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
-                        )}
-                      </FormLabel>
+                      <FormLabel>Hostname</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="web-server-01"
                           {...field}
-                          className={
-                            !fieldValidation.hostname ? "border-red-500" : ""
-                          }
+                          disabled
                         />
                       </FormControl>
-                      <FormMessage />
-                      {!fieldValidation.hostname && (
-                        <p className="text-xs text-red-500 mt-1">
-                          Hostname đã tồn tại
-                        </p>
-                      )}
                     </FormItem>
                   )}
                 />

@@ -52,6 +52,7 @@ export const ServerHeader: React.FC<ServerHeaderProps> = ({
       <ServerUploadDialog
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
+        onServerAdded={onRefresh}
       />
     </>
   );

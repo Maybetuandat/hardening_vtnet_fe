@@ -7,7 +7,6 @@ import {
   Server,
   ServerConnectionResult,
   ServerUpdate,
-  ValidationResult,
 } from "@/types/server";
 import { api } from "@/lib/api";
 
@@ -66,7 +65,7 @@ export function useServerForm({
     useState<ServerFormValues | null>(null);
 
   // Validation states
-  const [validatingHostname, setValidatingHostname] = useState(false);
+
   const [validatingIpAddress, setValidatingIpAddress] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [fieldValidation, setFieldValidation] = useState<{
@@ -88,60 +87,6 @@ export function useServerForm({
       ssh_password: "",
     },
   });
-
-  // Validate hostname function
-  const validateHostname = useCallback(
-    async (hostname: string) => {
-      if (!hostname.trim() || !editingServer) return;
-
-      setValidatingHostname(true);
-      try {
-        const response = await api.get<ValidationResult>(
-          `/servers/validate/hostname/${encodeURIComponent(
-            hostname.trim()
-          )}?server_id=${editingServer.id}`
-        );
-
-        const result = response;
-
-        setFieldValidation((prev) => ({
-          ...prev,
-          hostname: result.valid,
-        }));
-
-        // Update validation errors
-        setValidationErrors((prev) => {
-          const filtered = prev.filter((error) => !error.includes("Hostname"));
-          if (!result.valid) {
-            return [...filtered, result.message];
-          }
-          return filtered;
-        });
-
-        // Reset connection test if hostname validation fails
-        if (!result.valid) {
-          setConnectionTested(false);
-          setConnectionResult(null);
-          console.log(" Hostname validation failed, resetting connection test");
-        } else {
-          console.log(" Hostname validation passed");
-        }
-      } catch (error) {
-        console.error(" Error validating hostname:", error);
-        setFieldValidation((prev) => ({
-          ...prev,
-          hostname: false,
-        }));
-        setValidationErrors((prev) => {
-          const filtered = prev.filter((error) => !error.includes("Hostname"));
-          return [...filtered, "Lỗi khi kiểm tra hostname"];
-        });
-      } finally {
-        setValidatingHostname(false);
-      }
-    },
-    [editingServer]
-  );
 
   // Validate IP address function
   const validateIpAddress = useCallback(
@@ -200,40 +145,6 @@ export function useServerForm({
     },
     [editingServer]
   );
-
-  // Watch hostname changes với debounce
-  useEffect(() => {
-    const subscription = form.watch((values, { name }) => {
-      if (name === "hostname" && initialFormValues && editingServer) {
-        const hostname = values.hostname;
-        const hostnameChanged = hostname !== initialFormValues.hostname;
-
-        if (hostnameChanged && hostname && hostname.trim()) {
-          console.log(
-            "Hostname changed, setting up validation timeout:",
-            hostname
-          );
-
-          const timeoutId = setTimeout(() => {
-            validateHostname(hostname);
-          }, 500); // Debounce 500ms
-
-          return () => {
-            console.log(" Clearing hostname validation timeout");
-            clearTimeout(timeoutId);
-          };
-        } else if (!hostnameChanged) {
-          // Reset hostname validation if back to original value
-          setFieldValidation((prev) => ({ ...prev, hostname: true }));
-          setValidationErrors((prev) =>
-            prev.filter((error) => !error.includes("Hostname"))
-          );
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, initialFormValues, editingServer, validateHostname]);
 
   // Watch IP address changes với debounce
   useEffect(() => {
@@ -475,7 +386,7 @@ export function useServerForm({
 
   // Computed values
   const hasValidationErrors = validationErrors.length > 0;
-  const validatingFields = validatingHostname || validatingIpAddress;
+  const validatingFields = validatingIpAddress;
   // co the test connection khi form thay doi va validate toan bo cac thuoc tinh
   const canTestConnection =
     formChanged && !hasValidationErrors && !validatingFields;
