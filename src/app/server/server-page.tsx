@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { useServers } from "@/hooks/use-servers";
+import { useServers } from "@/hooks/server/use-servers";
 import { Server } from "@/types/server";
 import { Card } from "@/components/ui/card";
 import FilterBar from "@/components/ui/filter-bar";
@@ -193,17 +193,6 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
-
-      {/* Form Dialog for Create/Edit */}
-      <ServerFormDialog
-        open={formDialogOpen}
-        onOpenChange={setFormDialogOpen}
-        onClose={handleFormDialogClose}
-        editingServer={editingServer}
-        updateServer={updateServer}
-        getServerById={getServerById}
-        onSuccess={handleFormSuccess}
-      />
 
       {/* Form Dialog for Create/Edit */}
       <ServerFormDialog

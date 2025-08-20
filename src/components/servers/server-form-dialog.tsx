@@ -28,7 +28,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Server, ServerUpdate } from "@/types/server";
-import { useServerForm } from "@/hooks/use-server-form";
+import { useServerForm } from "@/hooks/server/use-server-form";
 
 interface ServerFormDialogProps {
   open: boolean;
