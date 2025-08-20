@@ -1,5 +1,3 @@
-// src/app/server/server-page.tsx - Updated with dialog events
-
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { useServers } from "@/hooks/use-servers";
@@ -141,11 +139,6 @@ export default function ServersPage() {
     toast.info("Chức năng upload server sẽ được triển khai sau");
   }, []);
 
-  const handleDownloadTemplate = useCallback(() => {
-    // TODO: Implement download template functionality
-    toast.info("Chức năng download template sẽ được triển khai sau");
-  }, []);
-
   // Show error toast if there's an error
   useEffect(() => {
     if (error) {
@@ -158,7 +151,6 @@ export default function ServersPage() {
       {/* Header with Upload/Download buttons */}
       <ServerHeader
         onUploadServers={handleUploadServers}
-        onDownloadTemplate={handleDownloadTemplate}
         onRefresh={handleRefresh}
         loading={loading}
       />
