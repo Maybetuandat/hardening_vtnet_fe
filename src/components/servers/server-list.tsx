@@ -228,7 +228,9 @@ export const ServerList: React.FC<ServerListProps> = ({
                     </div>
                   </TableCell>
                   <TableCell>{server.os_version || "Không xác định"}</TableCell>
-                  <TableCell>{"Không xác định"}</TableCell>
+                  <TableCell>
+                    {server.workload_name || "Không xác định"}
+                  </TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
                   <TableCell className="text-right">

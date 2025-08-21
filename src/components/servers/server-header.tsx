@@ -1,8 +1,9 @@
+// src/components/servers/server-header.tsx (Updated version)
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Upload } from "lucide-react";
 
-import { ServerUploadDialog } from "./server-upload-dialog";
+import { ServerUploadDialogWithWorkload } from "./server-upload-dialog-with-workload";
 
 interface ServerHeaderProps {
   onRefresh: () => void;
@@ -49,7 +50,7 @@ export const ServerHeader: React.FC<ServerHeaderProps> = ({
         </div>
       </div>
 
-      <ServerUploadDialog
+      <ServerUploadDialogWithWorkload
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onServerAdded={onRefresh}

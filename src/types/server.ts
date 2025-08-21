@@ -9,6 +9,8 @@ export interface Server {
   created_at: string;
   updated_at: string;
   ssh_password: string;
+  workload_id?: number;
+  workload_name?: string;
 }
 
 export interface ServerCreate {
@@ -18,6 +20,7 @@ export interface ServerCreate {
   ssh_port: number;
   ssh_user: string;
   ssh_password: string;
+  workload_id?: number;
 }
 
 export interface ServerUpdate {
@@ -27,22 +30,43 @@ export interface ServerUpdate {
   ssh_port?: number;
   ssh_user?: string;
   ssh_password?: string;
+  workload_id?: number;
+}
+
+export interface ServerUploadItem {
+  hostname: string;
+  ip_address: string;
+  os_version: string;
+  ssh_port: number;
+  ssh_user: string;
+  ssh_password: string;
+  workload_name: string;
+}
+
+export interface ServerResponse extends Server {
+  workload?: {
+    id: number;
+    name: string;
+    description?: string;
+  };
 }
 
 // Response từ API list servers
 export interface ServerListResponse {
-  servers: Server[];
+  servers: ServerResponse[];
   total_servers: number;
   page: number;
   page_size: number;
   total_pages: number;
 }
+
 export interface ServerConnectionInfo {
   ip: string;
   ssh_user: string;
   ssh_password: string;
   ssh_port: number;
 }
+
 export interface ServerConnectionResult {
   ip: string;
   ssh_user: string;
@@ -53,15 +77,18 @@ export interface ServerConnectionResult {
   os_version?: string;
   error_details?: string;
 }
+
 export interface TestConnectionRequest {
   servers: ServerConnectionInfo[];
 }
+
 export interface TestConnectionResponse {
   results: ServerConnectionResult[];
   total_servers: number;
   successful_connections: number;
   failed_connections: number;
 }
+
 export interface ValidationResult {
   hostname: string;
   exists: boolean;
