@@ -9,6 +9,32 @@ export interface WorkloadTemplateRow {
   Ubuntu_Command: string;
   CentOS7_Command: string;
   CentOS8_Command: string;
+  [key: string]: any; // Cho phép thêm các cột OS khác
+}
+
+// Backend compatible types
+export interface WorkloadRuleCreate {
+  name: string;
+  description?: string;
+  severity: string;
+  parameters?: Record<string, any>;
+  is_active: boolean;
+}
+
+export interface WorkloadCommandCreate {
+  rule_index: number;
+  os_version: string;
+  command_text: string;
+  is_active: boolean;
+}
+
+export interface WorkloadWithRulesAndCommandsRequest {
+  workload: {
+    name: string;
+    description?: string;
+  };
+  rules: WorkloadRuleCreate[];
+  commands: WorkloadCommandCreate[];
 }
 
 export class ExcelTemplateGenerator {
@@ -22,7 +48,6 @@ export class ExcelTemplateGenerator {
         Description:
           "Giới hạn tối đa số file mà toàn bộ hệ thống Linux có thể mở cùng lúc",
         Severity: "medium",
-
         Parameters_JSON: JSON.stringify({
           default_value: "9223372036854775807",
           recommended_value: "5000000",
@@ -38,7 +63,6 @@ export class ExcelTemplateGenerator {
         Description:
           "Tham số quy định ba giá trị ngưỡng cho bộ đệm nhận của TCP socket, tính theo byte",
         Severity: "high",
-
         Parameters_JSON: JSON.stringify({
           min: 4096,
           default: 87380,
@@ -55,7 +79,6 @@ export class ExcelTemplateGenerator {
         Name: "password_policy",
         Description: "Chính sách mật khẩu cho tài khoản",
         Severity: "high",
-
         Parameters_JSON: JSON.stringify({
           rule_type: "password_policy",
           condition: "ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1",
@@ -73,7 +96,6 @@ export class ExcelTemplateGenerator {
         Name: "ssh_config",
         Description: "Cấu hình SSH bảo mật",
         Severity: "high",
-
         Parameters_JSON: JSON.stringify({
           rule_type: "security",
           condition: "PermitRootLogin=no",
@@ -85,6 +107,101 @@ export class ExcelTemplateGenerator {
         CentOS8_Command: "grep PermitRootLogin /etc/ssh/sshd_config",
       },
     ];
+  }
+
+  /**
+   * Parse dữ liệu từ Excel thành format backend
+   */
+  static parseExcelToBackendFormat(
+    excelData: any[]
+  ): WorkloadWithRulesAndCommandsRequest {
+    const rules: WorkloadRuleCreate[] = [];
+    const commands: WorkloadCommandCreate[] = [];
+
+    // Định nghĩa các cột thuộc về rule (không phải command)
+    const ruleColumns = ["Name", "Description", "Severity", "Parameters_JSON"];
+
+    excelData.forEach((row, index) => {
+      // Tạo rule từ dòng hiện tại
+      const rule: WorkloadRuleCreate = {
+        name: row.Name || "",
+        description: row.Description || "",
+        severity: (row.Severity || "medium").toLowerCase(),
+        parameters: this.parseJsonSafely(row.Parameters_JSON),
+        is_active: true, // Mặc định là true
+      };
+
+      rules.push(rule);
+
+      // Tạo commands từ các cột còn lại (không phải rule columns)
+      Object.keys(row).forEach((columnName) => {
+        // Bỏ qua các cột thuộc về rule
+        if (ruleColumns.includes(columnName)) {
+          return;
+        }
+
+        const commandText = row[columnName];
+        // Chỉ tạo command nếu có nội dung
+        if (
+          commandText &&
+          typeof commandText === "string" &&
+          commandText.trim()
+        ) {
+          // Lấy OS version từ tên cột (ví dụ: Ubuntu_Command -> Ubuntu)
+          const osVersion = this.extractOsVersionFromColumnName(columnName);
+
+          const command: WorkloadCommandCreate = {
+            rule_index: index, // Index của rule trong mảng (0-based)
+            os_version: osVersion,
+            command_text: commandText.trim(),
+            is_active: true, // Mặc định là true
+          };
+
+          commands.push(command);
+        }
+      });
+    });
+
+    return {
+      workload: {
+        name: "", // Sẽ được điền từ form
+        description: "",
+      },
+      rules,
+      commands,
+    };
+  }
+
+  /**
+   * Parse JSON safely, trả về undefined nếu không hợp lệ
+   */
+  private static parseJsonSafely(
+    jsonString: string
+  ): Record<string, any> | undefined {
+    if (!jsonString || typeof jsonString !== "string") {
+      return undefined;
+    }
+
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.warn("Invalid JSON in Parameters_JSON:", jsonString);
+      return undefined;
+    }
+  }
+
+  /**
+   * Extract OS version từ tên cột
+   * Ví dụ: "Ubuntu_Command" -> "Ubuntu", "CentOS7_Command" -> "CentOS7"
+   */
+  private static extractOsVersionFromColumnName(columnName: string): string {
+    // Loại bỏ "_Command" từ cuối tên cột
+    if (columnName.endsWith("_Command")) {
+      return columnName.replace("_Command", "");
+    }
+
+    // Nếu không có pattern "_Command", trả về tên cột gốc
+    return columnName;
   }
 
   /**
@@ -102,14 +219,13 @@ export class ExcelTemplateGenerator {
 
       // Định nghĩa độ rộng cột
       const columnWidths = [
-        { wch: 20 }, // B: Name
-        { wch: 50 }, // C: Description
-        { wch: 12 }, // D: Severity
-
-        { wch: 80 }, // F: Parameters_JSON
-        { wch: 50 }, // G: Ubuntu_Command
-        { wch: 50 }, // H: CentOS7_Command
-        { wch: 50 }, // I: CentOS8_Command
+        { wch: 20 }, // A: Name
+        { wch: 50 }, // B: Description
+        { wch: 12 }, // C: Severity
+        { wch: 80 }, // D: Parameters_JSON
+        { wch: 50 }, // E: Ubuntu_Command
+        { wch: 50 }, // F: CentOS7_Command
+        { wch: 50 }, // G: CentOS8_Command
       ];
 
       worksheet["!cols"] = columnWidths;
@@ -123,6 +239,64 @@ export class ExcelTemplateGenerator {
     } catch (error) {
       console.error("Lỗi khi tạo file Excel template:", error);
       throw new Error("Không thể tạo file template. Vui lòng thử lại.");
+    }
+  }
+
+  /**
+   * Tạo template trống (chỉ có header)
+   */
+  static downloadEmptyTemplate(
+    filename: string = "workload-rules-empty-template.xlsx"
+  ): void {
+    try {
+      // Tạo dữ liệu chỉ có header
+      const emptyData = [
+        {
+          Name: "",
+          Description: "",
+          Severity: "",
+          Parameters_JSON: "",
+          Ubuntu_Command: "",
+          CentOS7_Command: "",
+          CentOS8_Command: "",
+        },
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(emptyData);
+
+      // Định nghĩa độ rộng cột
+      const columnWidths = [
+        { wch: 20 }, // A: Name
+        { wch: 50 }, // B: Description
+        { wch: 12 }, // C: Severity
+        { wch: 80 }, // D: Parameters_JSON
+        { wch: 50 }, // E: Ubuntu_Command
+        { wch: 50 }, // F: CentOS7_Command
+        { wch: 50 }, // G: CentOS8_Command
+      ];
+
+      worksheet["!cols"] = columnWidths;
+
+      // Xóa dòng dữ liệu trống, chỉ giữ header
+      const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
+      for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+          delete worksheet[cellAddress];
+        }
+      }
+      worksheet["!ref"] = XLSX.utils.encode_range({
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: range.e.c },
+      });
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Workload_Template");
+
+      XLSX.writeFile(workbook, filename);
+    } catch (error) {
+      console.error("Lỗi khi tạo file Excel template trống:", error);
+      throw new Error("Không thể tạo file template trống. Vui lòng thử lại.");
     }
   }
 
@@ -185,6 +359,9 @@ export class ExcelTemplateGenerator {
           );
         }
       }
+
+      // Kiểm tra Is_Active (bỏ vì không còn sử dụng)
+      // Các cột command sẽ được validate riêng nếu cần
     });
 
     return {

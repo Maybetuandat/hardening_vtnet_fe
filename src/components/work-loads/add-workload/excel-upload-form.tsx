@@ -1,3 +1,4 @@
+// src/components/work-loads/add-workload/excel-upload-form.tsx
 import React, { useState, useCallback } from "react";
 import {
   Card,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   Upload,
@@ -115,7 +116,13 @@ export function ExcelUploadForm({
   const handleDownloadTemplate = async (withSampleData: boolean = true) => {
     setDownloadLoading(true);
     try {
-      ExcelTemplateGenerator.downloadTemplate("workload-rules-template.xlsx");
+      if (withSampleData) {
+        ExcelTemplateGenerator.downloadTemplate("workload-rules-template.xlsx");
+      } else {
+        ExcelTemplateGenerator.downloadEmptyTemplate(
+          "workload-rules-empty-template.xlsx"
+        );
+      }
     } catch (error) {
       console.error("Error downloading template:", error);
       // Có thể thêm toast notification ở đây
@@ -147,20 +154,34 @@ export function ExcelUploadForm({
         <CardContent className="space-y-6">
           {/* Template Download */}
           <div className="flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDownloadTemplate()}
-              disabled={downloadLoading}
-              className="flex items-center gap-2"
-            >
-              {downloadLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )}
-              Download Template
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={downloadLoading}
+                  className="flex items-center gap-2"
+                >
+                  {downloadLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                  Download Template
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleDownloadTemplate(true)}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Template with Sample Data
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownloadTemplate(false)}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Empty Template
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Upload Area */}
@@ -331,6 +352,41 @@ export function ExcelUploadForm({
               </Card>
             </div>
           )}
+
+          {/* Template Format Information */}
+          <Card className="bg-muted/20">
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Template Format:</h4>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>
+                    • <strong>Name:</strong> Rule name (required)
+                  </p>
+                  <p>
+                    • <strong>Description:</strong> Rule description (required)
+                  </p>
+                  <p>
+                    • <strong>Severity:</strong> low, medium, high, critical
+                  </p>
+                  <p>
+                    • <strong>Parameters_JSON:</strong> Valid JSON string
+                  </p>
+                  <p>
+                    • <strong>Ubuntu_Command:</strong> Command for Ubuntu
+                  </p>
+                  <p>
+                    • <strong>CentOS7_Command:</strong> Command for CentOS 7
+                  </p>
+                  <p>
+                    • <strong>CentOS8_Command:</strong> Command for CentOS 8
+                  </p>
+                  <p>
+                    • <em>You can add more OS columns as needed</em>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
 
