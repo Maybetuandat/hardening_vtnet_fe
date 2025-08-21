@@ -1,4 +1,3 @@
-// src/components/work-loads/add-workload/excel-upload-form.tsx
 import React, { useState, useCallback } from "react";
 import {
   Card,
@@ -21,16 +20,9 @@ import {
   X,
   Eye,
   Command,
-  ChevronDown,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Rule } from "@/types/rule";
+
 import { ExcelUploadResult, WorkloadCommand } from "@/types/add-workload";
 import { RulePreviewDialog } from "./rule-preview-dialog";
 import { ExcelTemplateGenerator } from "@/utils/excel-template-rule";
@@ -84,7 +76,7 @@ export function ExcelUploadForm({
       setUploadResult({
         success: false,
         rules: [],
-        errors: ["Please upload a valid Excel file (.xlsx or .xls)"],
+        errors: ["Vui lòng tải lên file Excel hợp lệ (.xlsx hoặc .xls)"],
       });
       return;
     }
@@ -100,7 +92,7 @@ export function ExcelUploadForm({
       setUploadResult({
         success: false,
         rules: [],
-        errors: ["Failed to process the file. Please try again."],
+        errors: ["Không thể xử lý file. Vui lòng thử lại."],
       });
     }
   };
@@ -113,19 +105,12 @@ export function ExcelUploadForm({
     }
   };
 
-  const handleDownloadTemplate = async (withSampleData: boolean = true) => {
+  const handleDownloadTemplate = async () => {
     setDownloadLoading(true);
     try {
-      if (withSampleData) {
-        ExcelTemplateGenerator.downloadTemplate("workload-rules-template.xlsx");
-      } else {
-        ExcelTemplateGenerator.downloadEmptyTemplate(
-          "workload-rules-empty-template.xlsx"
-        );
-      }
+      ExcelTemplateGenerator.downloadTemplate("mau-workload-rules.xlsx");
     } catch (error) {
-      console.error("Error downloading template:", error);
-      // Có thể thêm toast notification ở đây
+      console.error("Lỗi khi tải template:", error);
       alert("Không thể tải xuống template. Vui lòng thử lại.");
     } finally {
       setDownloadLoading(false);
@@ -144,44 +129,30 @@ export function ExcelUploadForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Upload Rules Configuration
+            Tải lên cấu hình Rules
           </CardTitle>
           <CardDescription>
-            Upload an Excel file containing your workload rules and commands.
-            Download the template to see the required format.
+            Tải lên file Excel chứa các quy tắc và lệnh cho workload. Tải xuống
+            template mẫu để xem định dạng yêu cầu.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Template Download */}
           <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={downloadLoading}
-                  className="flex items-center gap-2"
-                >
-                  {downloadLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
-                  Download Template
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleDownloadTemplate(true)}>
-                  <FileSpreadsheet className="mr-2 h-4 w-4" />
-                  Template with Sample Data
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDownloadTemplate(false)}>
-                  <FileSpreadsheet className="mr-2 h-4 w-4" />
-                  Empty Template
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={downloadLoading}
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-2"
+            >
+              {downloadLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              Tải xuống Template mẫu
+            </Button>
           </div>
 
           {/* Upload Area */}
@@ -211,11 +182,11 @@ export function ExcelUploadForm({
                 <div className="space-y-2">
                   <p className="text-lg font-medium">
                     {loading
-                      ? "Processing file..."
-                      : "Drop your Excel file here"}
+                      ? "Đang xử lý file..."
+                      : "Kéo thả file Excel vào đây"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    or click to browse (.xlsx, .xls files only)
+                    hoặc nhấp để chọn file (chỉ chấp nhận .xlsx, .xls)
                   </p>
                 </div>
 
@@ -229,7 +200,7 @@ export function ExcelUploadForm({
                 />
                 <label htmlFor="file-upload">
                   <Button variant="outline" disabled={loading} asChild>
-                    <span className="cursor-pointer">Browse Files</span>
+                    <span className="cursor-pointer">Chọn file</span>
                   </Button>
                 </label>
               </div>
@@ -240,8 +211,8 @@ export function ExcelUploadForm({
           {loading && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Processing {uploadedFileName}...</span>
-                <span>Please wait</span>
+                <span>Đang xử lý {uploadedFileName}...</span>
+                <span>Vui lòng chờ</span>
               </div>
               <Progress value={66} className="w-full" />
             </div>
@@ -255,11 +226,11 @@ export function ExcelUploadForm({
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-2">
-                      <p className="font-medium">File uploaded successfully!</p>
+                      <p className="font-medium">Tải file thành công!</p>
                       <div className="flex items-center gap-4">
                         <span className="text-sm">
-                          Found {rules.length} rules and {commands.length}{" "}
-                          commands
+                          Tìm thấy {rules.length} quy tắc và {commands.length}{" "}
+                          lệnh
                         </span>
                         <div className="flex gap-2">
                           <Button
@@ -269,7 +240,7 @@ export function ExcelUploadForm({
                             className="flex items-center gap-1"
                           >
                             <Eye className="h-3 w-3" />
-                            Preview Rules
+                            Xem trước
                           </Button>
                           <Button
                             variant="outline"
@@ -278,7 +249,7 @@ export function ExcelUploadForm({
                             className="flex items-center gap-1"
                           >
                             <X className="h-3 w-3" />
-                            Remove
+                            Xóa
                           </Button>
                         </div>
                       </div>
@@ -290,7 +261,7 @@ export function ExcelUploadForm({
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-2">
-                      <p className="font-medium">Upload failed</p>
+                      <p className="font-medium">Tải file thất bại</p>
                       {uploadResult.errors?.map((error, index) => (
                         <p key={index} className="text-sm">
                           {error}
@@ -307,7 +278,7 @@ export function ExcelUploadForm({
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-1">
-                      <p className="font-medium">Warnings:</p>
+                      <p className="font-medium">Cảnh báo:</p>
                       {uploadResult.warnings.map((warning, index) => (
                         <p key={index} className="text-sm">
                           {warning}
@@ -328,9 +299,9 @@ export function ExcelUploadForm({
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     <div>
-                      <p className="font-medium">{rules.length} Rules</p>
+                      <p className="font-medium">{rules.length} Quy tắc</p>
                       <p className="text-sm text-muted-foreground">
-                        Security rules loaded
+                        Quy tắc bảo mật đã tải
                       </p>
                     </div>
                   </div>
@@ -342,9 +313,9 @@ export function ExcelUploadForm({
                   <div className="flex items-center gap-2">
                     <Command className="h-4 w-4 text-blue-500" />
                     <div>
-                      <p className="font-medium">{commands.length} Commands</p>
+                      <p className="font-medium">{commands.length} Lệnh</p>
                       <p className="text-sm text-muted-foreground">
-                        Execution commands loaded
+                        Lệnh thực thi đã tải
                       </p>
                     </div>
                   </div>
@@ -352,41 +323,6 @@ export function ExcelUploadForm({
               </Card>
             </div>
           )}
-
-          {/* Template Format Information */}
-          <Card className="bg-muted/20">
-            <CardContent className="p-4">
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">Template Format:</h4>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>
-                    • <strong>Name:</strong> Rule name (required)
-                  </p>
-                  <p>
-                    • <strong>Description:</strong> Rule description (required)
-                  </p>
-                  <p>
-                    • <strong>Severity:</strong> low, medium, high, critical
-                  </p>
-                  <p>
-                    • <strong>Parameters_JSON:</strong> Valid JSON string
-                  </p>
-                  <p>
-                    • <strong>Ubuntu_Command:</strong> Command for Ubuntu
-                  </p>
-                  <p>
-                    • <strong>CentOS7_Command:</strong> Command for CentOS 7
-                  </p>
-                  <p>
-                    • <strong>CentOS8_Command:</strong> Command for CentOS 8
-                  </p>
-                  <p>
-                    • <em>You can add more OS columns as needed</em>
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </CardContent>
       </Card>
 

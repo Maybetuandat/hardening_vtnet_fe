@@ -29,15 +29,15 @@ export function useAddWorkload() {
   const steps: WorkloadStep[] = [
     {
       id: 1,
-      title: "Basic Information",
-      description: "Configure workload name and description",
+      title: "Thông tin cơ bản",
+      description: "Cấu hình tên và mô tả workload",
       isCompleted: false,
       isActive: currentStep === 0,
     },
     {
       id: 2,
       title: "Upload Rules",
-      description: "Upload Excel file with rules configuration",
+      description: "Tải lên file Excel chứa cấu hình rules",
       isCompleted: false,
       isActive: currentStep === 1,
     },
@@ -65,11 +65,11 @@ export function useAddWorkload() {
 
         return result;
       } catch (err: any) {
-        setError(err.message || "Failed to parse Excel file");
+        setError(err.message || "Không thể đọc file Excel");
         return {
           success: false,
           rules: [],
-          errors: [err.message || "Failed to parse Excel file"],
+          errors: [err.message || "Không thể đọc file Excel"],
         };
       } finally {
         setLoading(false);
@@ -118,19 +118,19 @@ export function useAddWorkload() {
           commands: commandsForApi,
         };
 
-        console.log("🚀 Creating workload with request data:", requestData);
+        console.log("🚀 Đang tạo workload với dữ liệu:", requestData);
 
         // Gọi API
         const response = await createWorkloadWithRulesAndCommands(requestData);
 
-        console.log("✅ Workload created successfully:", response);
+        console.log("✅ Tạo workload thành công:", response);
 
         // Reset form sau khi tạo thành công
         resetForm();
 
         return Promise.resolve();
       } catch (err: any) {
-        setError(err.message || "Failed to create workload");
+        setError(err.message || "Không thể tạo workload");
         throw err;
       } finally {
         setLoading(false);

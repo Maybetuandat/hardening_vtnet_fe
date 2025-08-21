@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Info } from "lucide-react";
 import { AddWorkloadFormData } from "@/types/add-workload";
-import { useTranslation } from "react-i18next";
 
 interface WorkloadBasicFormProps {
   formData: AddWorkloadFormData;
@@ -25,8 +24,6 @@ export function WorkloadBasicForm({
   onUpdateFormData,
   errors,
 }: WorkloadBasicFormProps) {
-  const { t } = useTranslation("workload");
-
   const handleFieldChange = (field: keyof AddWorkloadFormData, value: any) => {
     onUpdateFormData({ [field]: value });
   };
@@ -37,53 +34,44 @@ export function WorkloadBasicForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5" />
-            Basic Information
+            Thông tin cơ bản
           </CardTitle>
           <CardDescription>
-            Configure the basic settings for your new workload. Enter a name and
-            description to identify this workload in your system.
+            Cấu hình thông tin cơ bản cho workload mới
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Name <span className="text-red-500">*</span>
+              Tên workload <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleFieldChange("name", e.target.value)}
-              placeholder="Enter workload name (e.g., ubuntu-24-04)"
+              placeholder="Nhập tên workload (ví dụ: ubuntu-24-04)"
               className={errors?.name ? "border-red-500" : ""}
             />
             {errors?.name && (
               <p className="text-sm text-red-600">{errors.name}</p>
             )}
-            <p className="text-xs text-muted-foreground">
-              A unique identifier for this workload. Use lowercase letters,
-              numbers, and hyphens.
-            </p>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Mô tả</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleFieldChange("description", e.target.value)}
-              placeholder="Describe the purpose and scope of this workload..."
+              placeholder="Mô tả mục đích và phạm vi của workload này..."
               rows={4}
               className={errors?.description ? "border-red-500" : ""}
             />
             {errors?.description && (
               <p className="text-sm text-red-600">{errors.description}</p>
             )}
-            <p className="text-xs text-muted-foreground">
-              Provide a detailed description of what this workload covers and
-              its intended use.
-            </p>
           </div>
 
           {/* Info Card */}
@@ -92,11 +80,11 @@ export function WorkloadBasicForm({
               <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-blue-900">
-                  Next Step: Upload Rules Configuration
+                  Bước tiếp theo: Upload file cấu hình rules
                 </p>
                 <p className="text-xs text-blue-700">
-                  After completing this form, you'll upload an Excel file
-                  containing the security rules and commands for this workload.
+                  Sau khi hoàn thành form này, bạn sẽ upload file Excel chứa các
+                  quy tắc bảo mật.
                 </p>
               </div>
             </div>
