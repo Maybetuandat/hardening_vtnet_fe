@@ -2,11 +2,9 @@
 import * as XLSX from "xlsx";
 
 export interface WorkloadTemplateRow {
-  STT: number;
   Name: string;
   Description: string;
   Severity: string;
-  Category: string;
   Parameters_JSON: string;
   Ubuntu_Command: string;
   CentOS7_Command: string;
@@ -20,12 +18,11 @@ export class ExcelTemplateGenerator {
   static createSampleData(): WorkloadTemplateRow[] {
     return [
       {
-        STT: 1,
         Name: "file-max",
         Description:
           "Giới hạn tối đa số file mà toàn bộ hệ thống Linux có thể mở cùng lúc",
         Severity: "medium",
-        Category: "System",
+
         Parameters_JSON: JSON.stringify({
           default_value: "9223372036854775807",
           recommended_value: "5000000",
@@ -37,12 +34,11 @@ export class ExcelTemplateGenerator {
         CentOS8_Command: "cat /proc/sys/fs/file-max",
       },
       {
-        STT: 2,
         Name: "net.ipv4.tcp_rmem",
         Description:
           "Tham số quy định ba giá trị ngưỡng cho bộ đệm nhận của TCP socket, tính theo byte",
         Severity: "high",
-        Category: "Network",
+
         Parameters_JSON: JSON.stringify({
           min: 4096,
           default: 87380,
@@ -56,11 +52,10 @@ export class ExcelTemplateGenerator {
         CentOS8_Command: "cat /proc/sys/net/ipv4/tcp_rmem",
       },
       {
-        STT: 3,
         Name: "password_policy",
         Description: "Chính sách mật khẩu cho tài khoản",
         Severity: "high",
-        Category: "Security",
+
         Parameters_JSON: JSON.stringify({
           rule_type: "password_policy",
           condition: "ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1",
@@ -75,11 +70,10 @@ export class ExcelTemplateGenerator {
           "grep -E 'ucredit\\|lcredit\\|dcredit\\|ocredit' /etc/pam.d/system-auth /etc/security/pwquality.conf 2>/dev/null",
       },
       {
-        STT: 4,
         Name: "ssh_config",
         Description: "Cấu hình SSH bảo mật",
         Severity: "high",
-        Category: "Security",
+
         Parameters_JSON: JSON.stringify({
           rule_type: "security",
           condition: "PermitRootLogin=no",
@@ -108,11 +102,10 @@ export class ExcelTemplateGenerator {
 
       // Định nghĩa độ rộng cột
       const columnWidths = [
-        { wch: 8 }, // A: STT
         { wch: 20 }, // B: Name
         { wch: 50 }, // C: Description
         { wch: 12 }, // D: Severity
-        { wch: 15 }, // E: Category
+
         { wch: 80 }, // F: Parameters_JSON
         { wch: 50 }, // G: Ubuntu_Command
         { wch: 50 }, // H: CentOS7_Command
@@ -151,13 +144,7 @@ export class ExcelTemplateGenerator {
     }
 
     // Kiểm tra các cột bắt buộc
-    const requiredColumns = [
-      "STT",
-      "Name",
-      "Description",
-      "Severity",
-      "Category",
-    ];
+    const requiredColumns = ["Name", "Description", "Severity"];
     const firstRow = data[0];
 
     for (const column of requiredColumns) {
@@ -169,11 +156,6 @@ export class ExcelTemplateGenerator {
     // Kiểm tra từng dòng dữ liệu
     data.forEach((row, index) => {
       const rowNumber = index + 1;
-
-      // Kiểm tra STT
-      if (!row.STT || isNaN(Number(row.STT))) {
-        errors.push(`Dòng ${rowNumber}: STT phải là số`);
-      }
 
       // Kiểm tra Name
       if (!row.Name || typeof row.Name !== "string" || row.Name.trim() === "") {
