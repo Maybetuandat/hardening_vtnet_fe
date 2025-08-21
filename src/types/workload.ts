@@ -66,7 +66,15 @@ export interface CreateWorkloadRequest {
     is_active: boolean;
   }>;
 }
+export interface WorkloadCreate {
+  name: string;
+  description?: string;
+}
 
+export interface WorkloadUpdate {
+  name?: string;
+  description?: string;
+}
 export interface CreateWorkloadResponse {
   success: boolean;
   data: {

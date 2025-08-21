@@ -1,0 +1,174 @@
+// src/hooks/use-workloads.ts
+import { useState, useEffect, useCallback } from "react";
+import { api } from "@/lib/api";
+import { Workload, WorkloadCreate, WorkloadUpdate } from "@/types/workload";
+
+interface WorkLoadListResponse {
+  workloads: Workload[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export function useWorkloads() {
+  const [workloads, setWorkloads] = useState<Workload[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // Fetch workloads with search and pagination
+  const fetchWorkloads = useCallback(
+    async (keyword?: string, page: number = 1, pageSize: number = 10) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams();
+        if (keyword?.trim()) {
+          params.append("keyword", keyword.trim());
+        }
+        params.append("page", page.toString());
+        params.append("page_size", pageSize.toString());
+
+        const queryString = params.toString();
+        const url = queryString ? `/workloads?${queryString}` : "/workloads";
+
+        const response = await api.get<WorkLoadListResponse>(url);
+
+        if (response) {
+          setWorkloads(response.workloads || []);
+          setTotalItems(response.total || 0);
+          setCurrentPage(response.page || 1);
+          setTotalPages(response.total_pages || 0);
+        } else {
+          setWorkloads([]);
+          setTotalItems(0);
+          setCurrentPage(1);
+          setTotalPages(0);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch workloads");
+        setWorkloads([]);
+        setTotalItems(0);
+        setCurrentPage(1);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const getWorkloadById = useCallback(
+    async (id: number): Promise<Workload | null> => {
+      try {
+        const response = await api.get<Workload>(`/workloads/${id}`);
+        return response;
+      } catch (err: any) {
+        throw new Error(err.message || "Failed to fetch workload");
+      }
+    },
+    []
+  );
+
+  const createWorkload = useCallback(
+    async (workloadData: WorkloadCreate): Promise<void> => {
+      try {
+        const response = await api.post<Workload>("/workloads", workloadData);
+        // Refresh the list after creation
+        await fetchWorkloads();
+      } catch (err: any) {
+        throw new Error(err.message || "Failed to create workload");
+      }
+    },
+    [fetchWorkloads]
+  );
+
+  const updateWorkload = useCallback(
+    async (id: number, workloadData: WorkloadUpdate): Promise<void> => {
+      try {
+        const response = await api.put<Workload>(
+          `/workloads/${id}`,
+          workloadData
+        );
+
+        // Update local state
+        setWorkloads((prev) =>
+          prev.map((workload) => (workload.id === id ? response : workload))
+        );
+      } catch (err: any) {
+        throw new Error(err.message || "Failed to update workload");
+      }
+    },
+    []
+  );
+
+  const deleteWorkload = useCallback(
+    async (id: number): Promise<void> => {
+      try {
+        await api.delete(`/workloads/${id}`);
+
+        // Remove from local state and refresh if needed
+        setWorkloads((prev) => prev.filter((workload) => workload.id !== id));
+
+        // If current page becomes empty, fetch previous page
+        if (workloads.length === 1 && currentPage > 1) {
+          await fetchWorkloads(undefined, currentPage - 1);
+        } else {
+          // Refresh current page to update counts
+          await fetchWorkloads(undefined, currentPage);
+        }
+      } catch (err: any) {
+        throw new Error(err.message || "Failed to delete workload");
+      }
+    },
+    [workloads.length, currentPage, fetchWorkloads]
+  );
+
+  const getNumberOfServersByWorkload = useCallback(
+    async (workloadId: number): Promise<number> => {
+      try {
+        const response = await api.get<{ count: number }>(
+          `/servers/workload/${workloadId}/count`
+        );
+        return response.count;
+      } catch (err) {
+        // Return 0 if failed to get count
+        return 0;
+      }
+    },
+    []
+  );
+
+  // Search workloads
+  const searchWorkloads = useCallback(
+    async (keyword: string, page: number = 1, pageSize: number = 10) => {
+      await fetchWorkloads(keyword, page, pageSize);
+    },
+    [fetchWorkloads]
+  );
+
+  // Initial fetch on mount
+  useEffect(() => {
+    fetchWorkloads();
+  }, [fetchWorkloads]);
+
+  return {
+    workloads,
+    loading,
+    error,
+    totalItems,
+    currentPage,
+    totalPages,
+    fetchWorkloads,
+    searchWorkloads,
+    getWorkloadById,
+    createWorkload,
+    updateWorkload,
+    deleteWorkload,
+    getNumberOfServersByWorkload,
+  };
+}

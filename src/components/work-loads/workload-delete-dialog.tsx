@@ -1,3 +1,4 @@
+// src/components/work-loads/workload-delete-dialog.tsx
 import { useState } from "react";
 import {
   Dialog,
@@ -36,17 +37,17 @@ export function WorkloadDeleteDialog({
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    if (!workload) return;
+    if (!workload?.id) return;
 
     setLoading(true);
     try {
       await onConfirm(workload.id);
-      toast.success(t("workloads.workloadDeleted"));
+      toast.success("Workload đã được xóa thành công");
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error("Delete error:", error);
-      toast.error(error.message || t("common.actionFailed"));
+      toast.error(error.message || "Có lỗi xảy ra khi xóa workload");
     } finally {
       setLoading(false);
     }
@@ -60,37 +61,49 @@ export function WorkloadDeleteDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
             <Trash2 className="h-5 w-5" />
-            {t("workloads.deleteWorkload")}
+            Xóa Workload
           </DialogTitle>
-          <DialogDescription>{t("workloads.confirmDelete")}</DialogDescription>
+          <DialogDescription>
+            Bạn có chắc chắn muốn xóa workload này không?
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Workload info */}
           <div className="p-4 border rounded-lg bg-muted/50">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold">
-                {workload.display_name || workload.name}
-              </h4>
-              <Badge variant="secondary">
-                {workload.workload_type.toUpperCase()}
+              <h4 className="font-semibold">{workload.name}</h4>
+              <Badge
+                variant="outline"
+                className="bg-green-100 text-green-800 border-green-300"
+              >
+                Hoạt động
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {workload.description || "No description"}
+              {workload.description || "Không có mô tả"}
             </p>
+            {workload.created_at && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Ngày tạo:{" "}
+                {new Date(workload.created_at).toLocaleDateString("vi-VN")}
+              </p>
+            )}
           </div>
 
           {/* Warning */}
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{t("workloads.deleteWarning")}</AlertDescription>
+            <AlertDescription>
+              Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến
+              workload này sẽ bị xóa vĩnh viễn.
+            </AlertDescription>
           </Alert>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            {t("common.cancel")}
+            Hủy
           </Button>
           <Button
             variant="destructive"
@@ -98,7 +111,7 @@ export function WorkloadDeleteDialog({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t("common.delete")}
+            Xóa workload
           </Button>
         </DialogFooter>
       </DialogContent>

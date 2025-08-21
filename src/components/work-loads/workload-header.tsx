@@ -7,11 +7,13 @@ import { useNavigate } from "react-router-dom";
 
 interface WorkloadHeaderProps {
   onRefresh: () => void;
+  onAddWorkload: () => void;
   loading?: boolean;
 }
 
 export default function WorkloadHeader({
   onRefresh,
+  onAddWorkload,
   loading = false,
 }: WorkloadHeaderProps) {
   const { t } = useTranslation("workload");
