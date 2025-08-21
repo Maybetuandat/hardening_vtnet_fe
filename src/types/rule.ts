@@ -3,11 +3,10 @@ export interface Rule {
   id?: number;
   name: string;
   description?: string;
-  category: string;
+
   severity: RuleSeverity;
-  rule_type: RuleType;
-  condition: string;
-  action: string;
+  parameters: Record<string, any>;
+
   is_active: boolean;
   workload_id?: number;
   created_at?: string;
@@ -20,44 +19,9 @@ export enum RuleSeverity {
   HIGH = "high",
   CRITICAL = "critical",
 }
-
-export enum RuleType {
-  SECURITY = "security",
-  PERFORMANCE = "performance",
-  COMPLIANCE = "compliance",
-  MONITORING = "monitoring",
-}
-
-export interface RuleCreate {
+export interface WorkloadRuleCreate {
   name: string;
   description?: string;
-  category: string;
-  severity: RuleSeverity;
-  rule_type: RuleType;
-  condition: string;
-  action: string;
-  is_active?: boolean;
-  workload_id?: number;
-}
-
-export interface RuleUpdate {
-  name?: string;
-  description?: string;
-  category?: string;
-  severity?: RuleSeverity;
-  rule_type?: RuleType;
-  condition?: string;
-  action?: string;
-  is_active?: boolean;
-}
-
-export interface RuleFormData {
-  name: string;
-  description: string;
-  category: string;
-  severity: RuleSeverity;
-  rule_type: RuleType;
-  condition: string;
-  action: string;
-  is_active: boolean;
+  severity: string;
+  parameters?: Record<string, any>;
 }

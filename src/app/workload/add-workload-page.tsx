@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { StepIndicator } from "@/components/ui/step-indicator";
 import { ExcelUploadForm } from "@/components/work-loads/add-workload/excel-upload-form";
 import { WorkloadBasicForm } from "@/components/work-loads/add-workload/workload-basic-form";
-import { useAddWorkload } from "@/hooks/use-add-workload";
+import { useAddWorkload } from "@/hooks/workload/use-add-workload";
 
 export default function AddWorkloadPage() {
   const navigate = useNavigate();

@@ -1,14 +1,13 @@
-// src/hooks/use-add-workload.ts
 import { useState, useCallback } from "react";
+import { useWorkloadApi } from "@/hooks/workload/use-workload-api";
+import { useExcelParser } from "@/hooks/workload/use-excel-parser";
 import {
   AddWorkloadFormData,
   WorkloadStep,
   ExcelUploadResult,
   WorkloadWithRules,
   CreateWorkloadRequest,
-} from "@/types/add-workload";
-import { useWorkloadApi } from "@/hooks/workload/use-workload-api";
-import { useExcelParser } from "@/hooks/workload/use-excel-parser";
+} from "@/types/workload";
 
 export function useAddWorkload() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -79,7 +78,7 @@ export function useAddWorkload() {
   );
 
   /**
-   * Tạo workload với rules và commands thông qua API
+   * Tạo workload với rules và commands thông qua API - FIXED VERSION
    */
   const createWorkloadWithRules = useCallback(
     async (data: WorkloadWithRules): Promise<void> => {
@@ -87,7 +86,7 @@ export function useAddWorkload() {
       setError(null);
 
       try {
-        // Chuyển đổi dữ liệu rules từ frontend format sang backend format
+        // ✅ FIXED: Chuyển đổi đúng format theo Excel template
         const rulesForApi = data.rules.map((rule) => ({
           name: rule.name,
           description: rule.description || "",
@@ -96,12 +95,7 @@ export function useAddWorkload() {
             | "medium"
             | "high"
             | "critical",
-          parameters: {
-            category: rule.category,
-            rule_type: rule.rule_type,
-            condition: rule.condition,
-            action: rule.action,
-          },
+          parameters: rule.parameters, // ✅ Đây mới đúng! Lấy trực tiếp JSON từ Parameters_JSON
           is_active: rule.is_active,
         }));
 
@@ -118,7 +112,7 @@ export function useAddWorkload() {
           commands: commandsForApi,
         };
 
-        console.log("🚀 Đang tạo workload với dữ liệu:", requestData);
+        console.log("🚀 Đang tạo workload với dữ liệu FIXED:", requestData);
 
         // Gọi API
         const response = await createWorkloadWithRulesAndCommands(requestData);

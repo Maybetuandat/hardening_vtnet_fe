@@ -1,8 +1,9 @@
-// src/hooks/workload/use-excel-parser.ts
 import { useCallback } from "react";
 import * as XLSX from "xlsx";
-import { Rule, RuleSeverity, RuleType } from "@/types/rule";
-import { WorkloadCommand, ExcelUploadResult } from "@/types/add-workload";
+
+import { ExcelUploadResult } from "@/types/workload";
+import { Command } from "@/types/command";
+import { RuleSeverity, Rule } from "@/types/rule";
 
 export function useExcelParser() {
   /**
@@ -25,26 +26,48 @@ export function useExcelParser() {
   }, []);
 
   /**
-   * Helper function để map rule type từ Excel
+   * Parse JSON safely
    */
-  const mapRuleType = useCallback((value: any): RuleType => {
-    const str = String(value).toLowerCase();
-    switch (str) {
-      case "security":
-        return RuleType.SECURITY;
-      case "compliance":
-        return RuleType.COMPLIANCE;
-      case "performance":
-        return RuleType.PERFORMANCE;
-      case "monitoring":
-        return RuleType.MONITORING;
-      default:
-        return RuleType.SECURITY;
-    }
-  }, []);
+  const parseJsonSafely = useCallback(
+    (jsonString: string): Record<string, any> | null => {
+      if (!jsonString || typeof jsonString !== "string") {
+        return null;
+      }
+
+      try {
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.warn("Failed to parse JSON:", jsonString, error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
-   * Parse Excel file và chuyển đổi thành rules và commands
+   * Extract OS version từ tên cột (ví dụ: Ubuntu_Command -> ubuntu)
+   */
+  const extractOsVersionFromColumnName = useCallback(
+    (columnName: string): string => {
+      const cleanName = columnName.replace(/_Command$/i, "").toLowerCase();
+
+      // Map một số tên OS phổ biến
+      const osMapping: Record<string, string> = {
+        ubuntu: "ubuntu",
+        centos7: "centos7",
+        centos8: "centos8",
+        rhel7: "rhel7",
+        rhel8: "rhel8",
+        debian: "debian",
+      };
+
+      return osMapping[cleanName] || cleanName;
+    },
+    []
+  );
+
+  /**
+   * Parse Excel file theo format mới: Name | Description | Severity | Parameters_JSON | OS_Commands...
    */
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
@@ -57,75 +80,109 @@ export function useExcelParser() {
 
         console.log("📋 Available sheets:", workbook.SheetNames);
 
-        // Tìm sheet Rules và Commands
-        const rulesSheetName =
+        // Lấy sheet đầu tiên hoặc sheet có tên chứa "rule"
+        const sheetName =
           workbook.SheetNames.find((name) =>
             name.toLowerCase().includes("rule")
           ) || workbook.SheetNames[0];
-        const commandsSheetName =
-          workbook.SheetNames.find((name) =>
-            name.toLowerCase().includes("command")
-          ) || workbook.SheetNames[1];
 
-        if (!rulesSheetName) {
-          throw new Error("Không tìm thấy sheet Rules trong file Excel");
+        if (!sheetName) {
+          throw new Error("Không tìm thấy sheet nào trong file Excel");
         }
 
-        // Parse Rules sheet
-        const rulesSheet = workbook.Sheets[rulesSheetName];
-        const rulesData = XLSX.utils.sheet_to_json(rulesSheet, { header: 1 });
+        // Parse sheet thành array of objects
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        console.log("📊 Rules data:", rulesData);
-
-        // Parse Commands sheet (nếu có)
-        let commandsData: any[] = [];
-        if (commandsSheetName && workbook.Sheets[commandsSheetName]) {
-          const commandsSheet = workbook.Sheets[commandsSheetName];
-          commandsData = XLSX.utils.sheet_to_json(commandsSheet, { header: 1 });
-          console.log("⚡ Commands data:", commandsData);
+        if (!jsonData || jsonData.length < 2) {
+          throw new Error("File Excel không có dữ liệu hoặc thiếu header");
         }
 
-        // Chuyển đổi dữ liệu Excel thành Rules
+        console.log("📊 Raw Excel data:", jsonData);
+
+        // Lấy header row
+        const headers = jsonData[0] as string[];
+        console.log("📋 Headers:", headers);
+
+        // Các cột bắt buộc cho rule
+        const ruleColumns = [
+          "Name",
+          "Description",
+          "Severity",
+          "Parameters_JSON",
+        ];
+
+        // Kiểm tra có đủ cột bắt buộc không
+        const missingColumns = ruleColumns.filter(
+          (col) => !headers.includes(col)
+        );
+        if (missingColumns.length > 0) {
+          throw new Error(
+            `Thiếu các cột bắt buộc: ${missingColumns.join(", ")}`
+          );
+        }
+
+        // Tìm các cột command (các cột còn lại không phải rule columns)
+        const commandColumns = headers.filter(
+          (header) => !ruleColumns.includes(header)
+        );
+        console.log("⚡ Command columns found:", commandColumns);
+
         const rules: Rule[] = [];
-        const commands: WorkloadCommand[] = [];
+        const commands: Command[] = [];
 
-        // Process rules (bỏ qua header row)
-        for (let i = 1; i < rulesData.length; i++) {
-          const row = rulesData[i] as any[];
-          if (row.length < 3) continue; // Skip empty rows
+        // Process từng row (bỏ qua header row)
+        for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
+          const row = jsonData[rowIndex] as any[];
 
+          if (!row || row.length === 0 || !row[0]) {
+            continue; // Skip empty rows
+          }
+
+          // Tạo object từ row data
+          const rowData: Record<string, any> = {};
+          headers.forEach((header, colIndex) => {
+            rowData[header] = row[colIndex];
+          });
+
+          // Tạo rule từ dữ liệu row
           const rule: Rule = {
-            name: row[0] || `Rule ${i}`,
-            description: row[1] || "",
-            category: row[2] || "General",
-            severity: mapSeverity(row[3]),
-            rule_type: mapRuleType(row[4]),
-            condition: row[5] || "",
-            action: row[6] || "",
-            is_active: row[7] !== false && row[7] !== "false",
+            name: rowData["Name"] || `Rule ${rowIndex}`,
+            description: rowData["Description"] || "",
+            severity: mapSeverity(rowData["Severity"]),
+            parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {}, // ✅ Đây mới đúng!
+            is_active: true, // Mặc định là active
+            // Bỏ các field cũ không cần thiết
           };
 
           rules.push(rule);
-        }
 
-        // Process commands (bỏ qua header row)
-        for (let i = 1; i < commandsData.length; i++) {
-          const row = commandsData[i] as any[];
-          if (row.length < 4) continue; // Skip empty rows
+          // Tạo commands từ các cột command
+          commandColumns.forEach((columnName) => {
+            const commandText = rowData[columnName];
 
-          const command: WorkloadCommand = {
-            rule_index: parseInt(row[0]) || 0,
-            os_version: row[1] || "ubuntu24",
-            command_text: row[2] || "",
-            is_active: row[3] !== false && row[3] !== "false",
-          };
+            if (
+              commandText &&
+              typeof commandText === "string" &&
+              commandText.trim()
+            ) {
+              const command: Command = {
+                rule_index: rowIndex - 1, // Index của rule (0-based)
+                os_version: extractOsVersionFromColumnName(columnName),
+                command_text: commandText.trim(),
+                is_active: true,
+              };
 
-          commands.push(command);
+              commands.push(command);
+            }
+          });
         }
 
         console.log("✅ Parsed successfully:", {
           rules: rules.length,
           commands: commands.length,
+          ruleColumns,
+          commandColumns,
         });
 
         return {
@@ -134,6 +191,9 @@ export function useExcelParser() {
           commands,
           warnings: [
             `Đã parse thành công ${rules.length} rules và ${commands.length} commands từ Excel file`,
+            `Tìm thấy ${commandColumns.length} loại OS: ${commandColumns.join(
+              ", "
+            )}`,
           ],
         };
       } catch (err: any) {
@@ -145,7 +205,7 @@ export function useExcelParser() {
         };
       }
     },
-    [mapSeverity, mapRuleType]
+    [mapSeverity, parseJsonSafely, extractOsVersionFromColumnName]
   );
 
   return {

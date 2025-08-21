@@ -1,4 +1,3 @@
-// src/utils/excel-template.ts
 import * as XLSX from "xlsx";
 
 export interface WorkloadTemplateRow {
@@ -17,7 +16,7 @@ export interface WorkloadRuleCreate {
   name: string;
   description?: string;
   severity: string;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, any>; // ✅ Đây mới đúng!
   is_active: boolean;
 }
 
@@ -92,28 +91,14 @@ export class ExcelTemplateGenerator {
         CentOS8_Command:
           "grep -E 'ucredit\\|lcredit\\|dcredit\\|ocredit' /etc/pam.d/system-auth /etc/security/pwquality.conf 2>/dev/null",
       },
-      {
-        Name: "ssh_config",
-        Description: "Cấu hình SSH bảo mật",
-        Severity: "high",
-        Parameters_JSON: JSON.stringify({
-          rule_type: "security",
-          condition: "PermitRootLogin=no",
-          action: "check_ssh_config",
-          config_file: "/etc/ssh/sshd_config",
-        }),
-        Ubuntu_Command: "grep PermitRootLogin /etc/ssh/sshd_config",
-        CentOS7_Command: "grep PermitRootLogin /etc/ssh/sshd_config",
-        CentOS8_Command: "grep PermitRootLogin /etc/ssh/sshd_config",
-      },
     ];
   }
 
   /**
-   * Parse dữ liệu từ Excel thành format backend
+   * ✅ Parse dữ liệu từ Excel thành format backend - FIXED VERSION
    */
   static parseExcelToBackendFormat(
-    excelData: any[]
+    excelData: WorkloadTemplateRow[]
   ): WorkloadWithRulesAndCommandsRequest {
     const rules: WorkloadRuleCreate[] = [];
     const commands: WorkloadCommandCreate[] = [];
@@ -127,7 +112,7 @@ export class ExcelTemplateGenerator {
         name: row.Name || "",
         description: row.Description || "",
         severity: (row.Severity || "medium").toLowerCase(),
-        parameters: this.parseJsonSafely(row.Parameters_JSON),
+        parameters: this.parseJsonSafely(row.Parameters_JSON), // ✅ Đây mới đúng!
         is_active: true, // Mặc định là true
       };
 
@@ -147,7 +132,7 @@ export class ExcelTemplateGenerator {
           typeof commandText === "string" &&
           commandText.trim()
         ) {
-          // Lấy OS version từ tên cột (ví dụ: Ubuntu_Command -> Ubuntu)
+          // Lấy OS version từ tên cột (ví dụ: Ubuntu_Command -> ubuntu)
           const osVersion = this.extractOsVersionFromColumnName(columnName);
 
           const command: WorkloadCommandCreate = {
@@ -184,190 +169,46 @@ export class ExcelTemplateGenerator {
 
     try {
       return JSON.parse(jsonString);
-    } catch (e) {
-      console.warn("Invalid JSON in Parameters_JSON:", jsonString);
+    } catch (error) {
+      console.warn("Failed to parse JSON:", jsonString, error);
       return undefined;
     }
   }
 
   /**
    * Extract OS version từ tên cột
-   * Ví dụ: "Ubuntu_Command" -> "Ubuntu", "CentOS7_Command" -> "CentOS7"
    */
   private static extractOsVersionFromColumnName(columnName: string): string {
-    // Loại bỏ "_Command" từ cuối tên cột
-    if (columnName.endsWith("_Command")) {
-      return columnName.replace("_Command", "");
-    }
+    const cleanName = columnName.replace(/_Command$/i, "").toLowerCase();
 
-    // Nếu không có pattern "_Command", trả về tên cột gốc
-    return columnName;
-  }
-
-  /**
-   * Tạo file Excel template và tải xuống
-   */
-  static downloadTemplate(
-    filename: string = "workload-rules-template.xlsx"
-  ): void {
-    try {
-      // Tạo dữ liệu mẫu
-      const sampleData = this.createSampleData();
-
-      // Tạo worksheet từ dữ liệu
-      const worksheet = XLSX.utils.json_to_sheet(sampleData);
-
-      // Định nghĩa độ rộng cột
-      const columnWidths = [
-        { wch: 20 }, // A: Name
-        { wch: 50 }, // B: Description
-        { wch: 12 }, // C: Severity
-        { wch: 80 }, // D: Parameters_JSON
-        { wch: 50 }, // E: Ubuntu_Command
-        { wch: 50 }, // F: CentOS7_Command
-        { wch: 50 }, // G: CentOS8_Command
-      ];
-
-      worksheet["!cols"] = columnWidths;
-
-      // Tạo workbook
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Workload_Template");
-
-      // Tạo và tải xuống file
-      XLSX.writeFile(workbook, filename);
-    } catch (error) {
-      console.error("Lỗi khi tạo file Excel template:", error);
-      throw new Error("Không thể tạo file template. Vui lòng thử lại.");
-    }
-  }
-
-  /**
-   * Tạo template trống (chỉ có header)
-   */
-  static downloadEmptyTemplate(
-    filename: string = "workload-rules-empty-template.xlsx"
-  ): void {
-    try {
-      // Tạo dữ liệu chỉ có header
-      const emptyData = [
-        {
-          Name: "",
-          Description: "",
-          Severity: "",
-          Parameters_JSON: "",
-          Ubuntu_Command: "",
-          CentOS7_Command: "",
-          CentOS8_Command: "",
-        },
-      ];
-
-      const worksheet = XLSX.utils.json_to_sheet(emptyData);
-
-      // Định nghĩa độ rộng cột
-      const columnWidths = [
-        { wch: 20 }, // A: Name
-        { wch: 50 }, // B: Description
-        { wch: 12 }, // C: Severity
-        { wch: 80 }, // D: Parameters_JSON
-        { wch: 50 }, // E: Ubuntu_Command
-        { wch: 50 }, // F: CentOS7_Command
-        { wch: 50 }, // G: CentOS8_Command
-      ];
-
-      worksheet["!cols"] = columnWidths;
-
-      // Xóa dòng dữ liệu trống, chỉ giữ header
-      const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
-      for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-        for (let C = range.s.c; C <= range.e.c; ++C) {
-          const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-          delete worksheet[cellAddress];
-        }
-      }
-      worksheet["!ref"] = XLSX.utils.encode_range({
-        s: { r: 0, c: 0 },
-        e: { r: 0, c: range.e.c },
-      });
-
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Workload_Template");
-
-      XLSX.writeFile(workbook, filename);
-    } catch (error) {
-      console.error("Lỗi khi tạo file Excel template trống:", error);
-      throw new Error("Không thể tạo file template trống. Vui lòng thử lại.");
-    }
-  }
-
-  /**
-   * Validate dữ liệu từ file Excel upload
-   */
-  static validateExcelData(data: any[]): {
-    isValid: boolean;
-    errors: string[];
-    warnings: string[];
-  } {
-    const errors: string[] = [];
-    const warnings: string[] = [];
-
-    // Kiểm tra có dữ liệu hay không
-    if (!data || data.length === 0) {
-      errors.push("File Excel không có dữ liệu");
-      return { isValid: false, errors, warnings };
-    }
-
-    // Kiểm tra các cột bắt buộc
-    const requiredColumns = ["Name", "Description", "Severity"];
-    const firstRow = data[0];
-
-    for (const column of requiredColumns) {
-      if (!(column in firstRow)) {
-        errors.push(`Thiếu cột bắt buộc: ${column}`);
-      }
-    }
-
-    // Kiểm tra từng dòng dữ liệu
-    data.forEach((row, index) => {
-      const rowNumber = index + 1;
-
-      // Kiểm tra Name
-      if (!row.Name || typeof row.Name !== "string" || row.Name.trim() === "") {
-        errors.push(`Dòng ${rowNumber}: Name không được để trống`);
-      }
-
-      // Kiểm tra Severity
-      const validSeverities = ["low", "medium", "high", "critical"];
-      if (
-        row.Severity &&
-        !validSeverities.includes(row.Severity.toLowerCase())
-      ) {
-        warnings.push(
-          `Dòng ${rowNumber}: Severity "${
-            row.Severity
-          }" không hợp lệ. Chỉ chấp nhận: ${validSeverities.join(", ")}`
-        );
-      }
-
-      // Kiểm tra Parameters_JSON
-      if (row.Parameters_JSON) {
-        try {
-          JSON.parse(row.Parameters_JSON);
-        } catch (e) {
-          errors.push(
-            `Dòng ${rowNumber}: Parameters_JSON không phải là JSON hợp lệ`
-          );
-        }
-      }
-
-      // Kiểm tra Is_Active (bỏ vì không còn sử dụng)
-      // Các cột command sẽ được validate riêng nếu cần
-    });
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings,
+    const osMapping: Record<string, string> = {
+      ubuntu: "ubuntu",
+      centos7: "centos7",
+      centos8: "centos8",
+      rhel7: "rhel7",
+      rhel8: "rhel8",
+      debian: "debian",
     };
+
+    return osMapping[cleanName] || cleanName;
+  }
+
+  /**
+   * Tạo và download template Excel
+   */
+  static downloadTemplate(filename: string = "workload-template.xlsx") {
+    const sampleData = this.createSampleData();
+
+    // Tạo workbook
+    const workbook = XLSX.utils.book_new();
+
+    // Tạo worksheet từ sample data
+    const worksheet = XLSX.utils.json_to_sheet(sampleData);
+
+    // Thêm worksheet vào workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Rules");
+
+    // Download file
+    XLSX.writeFile(workbook, filename);
   }
 }
