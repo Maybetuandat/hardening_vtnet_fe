@@ -1,3 +1,4 @@
+// src/components/work-loads/add-workload/workload-basic-form.tsx
 import React from "react";
 import {
   Card,
@@ -9,10 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Info, Server, Database, Globe, BarChart3 } from "lucide-react";
+import { Info } from "lucide-react";
 import { AddWorkloadFormData } from "@/types/add-workload";
-import { WorkloadType } from "@/types/workload";
 import { useTranslation } from "react-i18next";
 
 interface WorkloadBasicFormProps {
@@ -31,6 +30,7 @@ export function WorkloadBasicForm({
   const handleFieldChange = (field: keyof AddWorkloadFormData, value: any) => {
     onUpdateFormData({ [field]: value });
   };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -40,89 +40,66 @@ export function WorkloadBasicForm({
             Basic Information
           </CardTitle>
           <CardDescription>
-            Configure the basic settings for your new workload. This information
-            will be used to identify and categorize the workload.
+            Configure the basic settings for your new workload. Enter a name and
+            description to identify this workload in your system.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Name and Display Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">
-                Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleFieldChange("name", e.target.value)}
-                placeholder={t("workloads.form.namePlaceholder")}
-                className={errors?.name ? "border-red-500" : ""}
-              />
-              {errors?.name && (
-                <p className="text-sm text-red-600">{errors.name}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                {t("workloads.form.nameHelp")}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="display_name">
-                {t("workloads.form.displayName")}
-              </Label>
-              <Input
-                id="display_name"
-                value={formData.display_name}
-                onChange={(e) =>
-                  handleFieldChange("display_name", e.target.value)
-                }
-                placeholder={t("workloads.form.displayNamePlaceholder")}
-                className={errors?.display_name ? "border-red-500" : ""}
-              />
-              {errors?.display_name && (
-                <p className="text-sm text-red-600">{errors.display_name}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                {t("workloads.form.displayNameHelp")}
-              </p>
-            </div>
+          {/* Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">
+              Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleFieldChange("name", e.target.value)}
+              placeholder="Enter workload name (e.g., ubuntu-24-04)"
+              className={errors?.name ? "border-red-500" : ""}
+            />
+            {errors?.name && (
+              <p className="text-sm text-red-600">{errors.name}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              A unique identifier for this workload. Use lowercase letters,
+              numbers, and hyphens.
+            </p>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">
-              {t("workloads.form.description")}
-            </Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleFieldChange("description", e.target.value)}
-              placeholder={t("workloads.form.descriptionPlaceholder")}
-              rows={3}
+              placeholder="Describe the purpose and scope of this workload..."
+              rows={4}
               className={errors?.description ? "border-red-500" : ""}
             />
             {errors?.description && (
               <p className="text-sm text-red-600">{errors.description}</p>
             )}
+            <p className="text-xs text-muted-foreground">
+              Provide a detailed description of what this workload covers and
+              its intended use.
+            </p>
           </div>
 
-          {/* Active Status */}
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="space-y-0.5">
-              <Label htmlFor="is_active" className="text-base">
-                {t("workloads.form.isActive")}
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {t("workloads.form.activeHelp")}
-              </p>
+          {/* Info Card */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-900">
+                  Next Step: Upload Rules Configuration
+                </p>
+                <p className="text-xs text-blue-700">
+                  After completing this form, you'll upload an Excel file
+                  containing the security rules and commands for this workload.
+                </p>
+              </div>
             </div>
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={(checked) =>
-                handleFieldChange("is_active", checked)
-              }
-            />
           </div>
         </CardContent>
       </Card>

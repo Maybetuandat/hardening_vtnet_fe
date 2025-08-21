@@ -1,4 +1,3 @@
-// src/components/add-workload/excel-upload-form.tsx
 import React, { useState, useCallback } from "react";
 import {
   Card,
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+
 import { Progress } from "@/components/ui/progress";
 import {
   Upload,
@@ -20,14 +19,24 @@ import {
   Loader2,
   X,
   Eye,
+  Command,
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Rule } from "@/types/rule";
-import { ExcelUploadResult } from "@/types/add-workload";
+import { ExcelUploadResult, WorkloadCommand } from "@/types/add-workload";
 import { RulePreviewDialog } from "./rule-preview-dialog";
+import { ExcelTemplateGenerator } from "@/utils/excel-template-rule";
 
 interface ExcelUploadFormProps {
   rules: Rule[];
+  commands?: WorkloadCommand[];
   loading: boolean;
   onFileUpload: (file: File) => Promise<ExcelUploadResult>;
   onRulesChange: (rules: Rule[]) => void;
@@ -35,6 +44,7 @@ interface ExcelUploadFormProps {
 
 export function ExcelUploadForm({
   rules,
+  commands = [],
   loading,
   onFileUpload,
   onRulesChange,
@@ -45,6 +55,7 @@ export function ExcelUploadForm({
   );
   const [uploadedFileName, setUploadedFileName] = useState<string>("");
   const [showPreview, setShowPreview] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -101,14 +112,17 @@ export function ExcelUploadForm({
     }
   };
 
-  const downloadTemplate = () => {
-    // In a real application, this would download a template file
-    const link = document.createElement("a");
-    link.href = "#"; // This would be the actual template URL
-    link.download = "workload-rules-template.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadTemplate = async (withSampleData: boolean = true) => {
+    setDownloadLoading(true);
+    try {
+      ExcelTemplateGenerator.downloadTemplate("workload-rules-template.xlsx");
+    } catch (error) {
+      console.error("Error downloading template:", error);
+      // Có thể thêm toast notification ở đây
+      alert("Không thể tải xuống template. Vui lòng thử lại.");
+    } finally {
+      setDownloadLoading(false);
+    }
   };
 
   const removeUploadedFile = () => {
@@ -126,8 +140,8 @@ export function ExcelUploadForm({
             Upload Rules Configuration
           </CardTitle>
           <CardDescription>
-            Upload an Excel file containing your workload rules. Download the
-            template to see the required format.
+            Upload an Excel file containing your workload rules and commands.
+            Download the template to see the required format.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -136,10 +150,15 @@ export function ExcelUploadForm({
             <Button
               variant="outline"
               size="sm"
-              onClick={downloadTemplate}
+              onClick={() => handleDownloadTemplate()}
+              disabled={downloadLoading}
               className="flex items-center gap-2"
             >
-              <Download className="h-4 w-4" />
+              {downloadLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
               Download Template
             </Button>
           </div>
@@ -213,32 +232,35 @@ export function ExcelUploadForm({
               {uploadResult.success ? (
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
-                  <AlertDescription className="flex items-center justify-between">
-                    <div>
+                  <AlertDescription>
+                    <div className="space-y-2">
                       <p className="font-medium">File uploaded successfully!</p>
-                      <p className="text-sm">
-                        Found {uploadResult.rules.length} rules in{" "}
-                        {uploadedFileName}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowPreview(true)}
-                        className="flex items-center gap-1"
-                      >
-                        <Eye className="h-4 w-4" />
-                        Preview
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={removeUploadedFile}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm">
+                          Found {rules.length} rules and {commands.length}{" "}
+                          commands
+                        </span>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowPreview(true)}
+                            className="flex items-center gap-1"
+                          >
+                            <Eye className="h-3 w-3" />
+                            Preview Rules
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={removeUploadedFile}
+                            className="flex items-center gap-1"
+                          >
+                            <X className="h-3 w-3" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </AlertDescription>
                 </Alert>
@@ -246,12 +268,14 @@ export function ExcelUploadForm({
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    <p className="font-medium">Upload failed</p>
-                    {uploadResult.errors?.map((error, index) => (
-                      <p key={index} className="text-sm">
-                        {error}
-                      </p>
-                    ))}
+                    <div className="space-y-2">
+                      <p className="font-medium">Upload failed</p>
+                      {uploadResult.errors?.map((error, index) => (
+                        <p key={index} className="text-sm">
+                          {error}
+                        </p>
+                      ))}
+                    </div>
                   </AlertDescription>
                 </Alert>
               )}
@@ -261,79 +285,56 @@ export function ExcelUploadForm({
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    <p className="font-medium">Warnings:</p>
-                    {uploadResult.warnings.map((warning, index) => (
-                      <p key={index} className="text-sm">
-                        {warning}
-                      </p>
-                    ))}
+                    <div className="space-y-1">
+                      <p className="font-medium">Warnings:</p>
+                      {uploadResult.warnings.map((warning, index) => (
+                        <p key={index} className="text-sm">
+                          {warning}
+                        </p>
+                      ))}
+                    </div>
                   </AlertDescription>
                 </Alert>
               )}
             </div>
           )}
 
-          {/* Rules Summary */}
-          {rules.length > 0 && (
-            <Card className="bg-muted/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Rules Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {rules.length}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Total Rules
+          {/* Rules and Commands Summary */}
+          {uploadResult?.success && (
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <div>
+                      <p className="font-medium">{rules.length} Rules</p>
+                      <p className="text-sm text-muted-foreground">
+                        Security rules loaded
+                      </p>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {rules.filter((r) => r.is_active).length}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Active</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {
-                        rules.filter(
-                          (r) =>
-                            r.severity === "critical" || r.severity === "high"
-                        ).length
-                      }
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      High Priority
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {new Set(rules.map((r) => r.category)).size}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Categories
-                    </div>
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {Array.from(new Set(rules.map((r) => r.category))).map(
-                    (category) => (
-                      <Badge key={category} variant="secondary">
-                        {category}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Command className="h-4 w-4 text-blue-500" />
+                    <div>
+                      <p className="font-medium">{commands.length} Commands</p>
+                      <p className="text-sm text-muted-foreground">
+                        Execution commands loaded
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Rule Preview Dialog */}
+      {/* Rules Preview Dialog */}
       <RulePreviewDialog
         open={showPreview}
         onOpenChange={setShowPreview}

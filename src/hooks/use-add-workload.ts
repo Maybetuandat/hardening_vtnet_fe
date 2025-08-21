@@ -5,9 +5,10 @@ import {
   WorkloadStep,
   ExcelUploadResult,
   WorkloadWithRules,
+  CreateWorkloadRequest,
 } from "@/types/add-workload";
-import { WorkloadType } from "@/types/workload";
-import { Rule, RuleSeverity, RuleType } from "@/types/rule";
+import { useWorkloadApi } from "@/hooks/workload/use-workload-api";
+import { useExcelParser } from "@/hooks/workload/use-excel-parser";
 
 export function useAddWorkload() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -16,18 +17,20 @@ export function useAddWorkload() {
 
   const [formData, setFormData] = useState<AddWorkloadFormData>({
     name: "",
-    display_name: "",
     description: "",
-    workload_type: "",
-    is_active: true,
     rules: [],
+    commands: [],
   });
+
+  // Hooks
+  const { createWorkloadWithRulesAndCommands } = useWorkloadApi();
+  const { parseExcelFile: parseExcel } = useExcelParser();
 
   const steps: WorkloadStep[] = [
     {
       id: 1,
       title: "Basic Information",
-      description: "Configure workload basic settings",
+      description: "Configure workload name and description",
       isCompleted: false,
       isActive: currentStep === 0,
     },
@@ -40,81 +43,27 @@ export function useAddWorkload() {
     },
   ];
 
-  // Mock function to simulate Excel parsing
+  /**
+   * Parse Excel file và cập nhật formData
+   */
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
       setLoading(true);
       setError(null);
 
       try {
-        // Simulate processing delay
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const result = await parseExcel(file);
 
-        // Mock parsed rules
-        const mockRules: Rule[] = [
-          {
-            name: "Password Complexity",
-            description: "Ensure strong password policy",
-            category: "Authentication",
-            severity: RuleSeverity.HIGH,
-            rule_type: RuleType.SECURITY,
-            condition:
-              "password_min_length >= 8 AND password_complexity = true",
-            action: "enforce_password_policy",
-            is_active: true,
-          },
-          {
-            name: "Failed Login Attempts",
-            description: "Monitor failed login attempts",
-            category: "Authentication",
-            severity: RuleSeverity.MEDIUM,
-            rule_type: RuleType.SECURITY,
-            condition: "failed_login_count > 5",
-            action: "lock_account_temporary",
-            is_active: true,
-          },
-          {
-            name: "File Permissions",
-            description: "Check critical file permissions",
-            category: "File System",
-            severity: RuleSeverity.CRITICAL,
-            rule_type: RuleType.COMPLIANCE,
-            condition: "file_permission != 644",
-            action: "fix_file_permissions",
-            is_active: true,
-          },
-          {
-            name: "Service Status",
-            description: "Monitor critical services",
-            category: "Services",
-            severity: RuleSeverity.HIGH,
-            rule_type: RuleType.MONITORING,
-            condition: "service_status != running",
-            action: "restart_service",
-            is_active: true,
-          },
-          {
-            name: "Disk Usage",
-            description: "Monitor disk space usage",
-            category: "Resources",
-            severity: RuleSeverity.MEDIUM,
-            rule_type: RuleType.PERFORMANCE,
-            condition: "disk_usage > 85",
-            action: "alert_admin",
-            is_active: true,
-          },
-        ];
+        if (result.success) {
+          // Cập nhật formData với rules và commands từ Excel
+          setFormData((prev) => ({
+            ...prev,
+            rules: result.rules,
+            commands: result.commands || [],
+          }));
+        }
 
-        setFormData((prev) => ({
-          ...prev,
-          rules: mockRules,
-        }));
-
-        return {
-          success: true,
-          rules: mockRules,
-          warnings: ["Some rules were modified to fit the current schema"],
-        };
+        return result;
       } catch (err: any) {
         setError(err.message || "Failed to parse Excel file");
         return {
@@ -126,21 +75,59 @@ export function useAddWorkload() {
         setLoading(false);
       }
     },
-    []
+    [parseExcel]
   );
 
+  /**
+   * Tạo workload với rules và commands thông qua API
+   */
   const createWorkloadWithRules = useCallback(
     async (data: WorkloadWithRules): Promise<void> => {
       setLoading(true);
       setError(null);
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        // Chuyển đổi dữ liệu rules từ frontend format sang backend format
+        const rulesForApi = data.rules.map((rule) => ({
+          name: rule.name,
+          description: rule.description || "",
+          severity: rule.severity.toLowerCase() as
+            | "low"
+            | "medium"
+            | "high"
+            | "critical",
+          parameters: {
+            category: rule.category,
+            rule_type: rule.rule_type,
+            condition: rule.condition,
+            action: rule.action,
+          },
+          is_active: rule.is_active,
+        }));
 
-        console.log("Creating workload with rules:", data);
+        // Lấy commands từ formData (đã được parse từ Excel)
+        const commandsForApi = formData.commands || [];
 
-        // Mock successful creation
+        // Tạo request payload theo format backend yêu cầu
+        const requestData: CreateWorkloadRequest = {
+          workload: {
+            name: data.name,
+            description: data.description || "",
+          },
+          rules: rulesForApi,
+          commands: commandsForApi,
+        };
+
+        console.log("🚀 Creating workload with request data:", requestData);
+
+        // Gọi API
+        const response = await createWorkloadWithRulesAndCommands(requestData);
+
+        console.log("✅ Workload created successfully:", response);
+
+        // Reset form sau khi tạo thành công
+        resetForm();
+
         return Promise.resolve();
       } catch (err: any) {
         setError(err.message || "Failed to create workload");
@@ -149,7 +136,7 @@ export function useAddWorkload() {
         setLoading(false);
       }
     },
-    []
+    [formData.commands, createWorkloadWithRulesAndCommands]
   );
 
   const updateFormData = useCallback(
@@ -174,11 +161,9 @@ export function useAddWorkload() {
   const resetForm = useCallback(() => {
     setFormData({
       name: "",
-      display_name: "",
       description: "",
-      workload_type: "",
-      is_active: true,
       rules: [],
+      commands: [],
     });
     setCurrentStep(0);
     setError(null);
@@ -187,7 +172,7 @@ export function useAddWorkload() {
   // Validation for step 1
   const isStep1Valid = useCallback(() => {
     return !!formData.name.trim();
-  }, [formData.name, formData.workload_type]);
+  }, [formData.name]);
 
   // Validation for step 2
   const isStep2Valid = useCallback(() => {

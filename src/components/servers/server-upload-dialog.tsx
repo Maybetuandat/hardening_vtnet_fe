@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useServerTemplate } from "@/utils/excel-template";
+import { useServerTemplate } from "@/utils/excel-template-server";
 import {
   useServerUpload,
   ServerUploadData,
