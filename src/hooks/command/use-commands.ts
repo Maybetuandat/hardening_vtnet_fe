@@ -105,6 +105,7 @@ export function useCommands(): UseCommandsReturn {
     async (commandId: number): Promise<void> => {
       try {
         await api.delete(`/commands/${commandId}`);
+
         toast.success("Xóa command thành công");
       } catch (err: any) {
         console.error("Error deleting command:", err);

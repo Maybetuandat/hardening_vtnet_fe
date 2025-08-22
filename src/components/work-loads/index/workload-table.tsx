@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Workload } from "@/types/workload";
 import { Edit, Trash2, Loader2, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface WorkloadTableProps {
   workloads: Workload[];
@@ -36,10 +37,34 @@ export function WorkloadTable({
   onDelete,
   onPageChange,
 }: WorkloadTableProps) {
+  const navigate = useNavigate();
+
   // Format date
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("vi-VN");
+  };
+
+  // Handle row click to navigate to detail page
+  const handleRowClick = (workload: Workload, event: React.MouseEvent) => {
+    // Prevent navigation if clicking on action buttons
+    const target = event.target as HTMLElement;
+    if (target.closest("button") || target.closest('[role="button"]')) {
+      return;
+    }
+
+    navigate(`/workloads/${workload.id}`);
+  };
+
+  // Handle action clicks with event stopping
+  const handleEdit = (workload: Workload, event: React.MouseEvent) => {
+    event.stopPropagation();
+    onEdit(workload);
+  };
+
+  const handleDelete = (workload: Workload, event: React.MouseEvent) => {
+    event.stopPropagation();
+    onDelete(workload);
   };
 
   return (
@@ -81,8 +106,8 @@ export function WorkloadTable({
               {workloads.map((workload) => (
                 <TableRow
                   key={workload.id}
-                  onClick={() => onEdit(workload)}
-                  className="cursor-pointer hover:bg-muted"
+                  className="cursor-pointer hover:bg-muted transition-colors"
+                  onClick={(event) => handleRowClick(workload, event)}
                 >
                   <TableCell className="font-medium">{workload.name}</TableCell>
                   <TableCell>
@@ -114,7 +139,7 @@ export function WorkloadTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onEdit(workload)}
+                        onClick={(event) => handleEdit(workload, event)}
                         className="h-8 w-8 p-0"
                         title="Chỉnh sửa"
                       >
@@ -123,7 +148,7 @@ export function WorkloadTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDelete(workload)}
+                        onClick={(event) => handleDelete(workload, event)}
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                         title="Xóa"
                       >

@@ -128,17 +128,11 @@ export const WorkloadDetailPage: React.FC = () => {
           {/* Rules Section */}
           <RulesSection
             workloadId={workload.id}
-            key={`rule-list-${Date.now()}`}
             onRuleSelect={setSelectedRuleId}
             selectedRuleId={selectedRuleId}
           />
 
-          {selectedRuleId && (
-            <CommandsSection
-              key={`command-list-${Date.now()}`}
-              ruleId={selectedRuleId}
-            />
-          )}
+          {selectedRuleId && <CommandsSection ruleId={selectedRuleId} />}
         </div>
       </div>
     </div>

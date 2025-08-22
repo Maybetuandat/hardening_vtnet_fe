@@ -59,22 +59,6 @@ export const CommandsSection: React.FC<CommandsSectionProps> = ({ ruleId }) => {
     fetchCommandsByRuleId(ruleId);
   };
 
-  const getOsIcon = (osVersion: string) => {
-    const os = osVersion.toLowerCase();
-    if (os.includes("ubuntu") || os.includes("debian")) {
-      return "🐧";
-    } else if (
-      os.includes("centos") ||
-      os.includes("rhel") ||
-      os.includes("redhat")
-    ) {
-      return "🔴";
-    } else if (os.includes("windows")) {
-      return "🪟";
-    }
-    return "💻";
-  };
-
   const truncateCommand = (command: string, maxLength: number = 60) => {
     if (command.length <= maxLength) return command;
     return command.substring(0, maxLength) + "...";
@@ -91,9 +75,6 @@ export const CommandsSection: React.FC<CommandsSectionProps> = ({ ruleId }) => {
                 <CardTitle className="text-xl">
                   Commands ({commands.length})
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Danh sách commands cho rule được chọn
-                </p>
               </div>
             </div>
             <Button
@@ -143,9 +124,6 @@ export const CommandsSection: React.FC<CommandsSectionProps> = ({ ruleId }) => {
                     <TableRow key={command.id}>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <span className="text-lg">
-                            {getOsIcon(command.os_version)}
-                          </span>
                           <span className="font-medium">
                             {command.os_version}
                           </span>

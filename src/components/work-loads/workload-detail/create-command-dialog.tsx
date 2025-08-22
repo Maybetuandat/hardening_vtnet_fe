@@ -153,14 +153,6 @@ export const CreateCommandDialog: React.FC<CreateCommandDialogProps> = ({
                 echo "net.ipv4.ip_forward = 1" {">>"} /etc/sysctl.conf && sysctl
                 -p
               </code>
-              <p>Ví dụ Ansible task:</p>
-              <code className="block bg-muted p-2 rounded text-xs">
-                {`- name: Set kernel parameter
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    state: present`}
-              </code>
             </div>
           </div>
 

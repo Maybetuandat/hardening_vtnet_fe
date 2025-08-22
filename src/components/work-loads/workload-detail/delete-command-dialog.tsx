@@ -32,7 +32,14 @@ export const DeleteCommandDialog: React.FC<DeleteCommandDialogProps> = ({
     try {
       setLoading(true);
       await deleteCommand(command.id);
-      onSuccess();
+
+      // Đóng dialog trước, sau đó mới gọi onSuccess
+      onOpenChange(false);
+
+      // Delay một chút để dialog đóng hoàn toàn trước khi refresh data
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
     } catch (error) {
       // Error is already handled in the hook
     } finally {
@@ -55,29 +62,31 @@ export const DeleteCommandDialog: React.FC<DeleteCommandDialogProps> = ({
             </div>
             <AlertDialogTitle>Xác nhận xóa Command</AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-left space-y-3">
-            <p>Bạn có chắc chắn muốn xóa command này không?</p>
+          <AlertDialogDescription asChild>
+            <div>
+              <p>Bạn có chắc chắn muốn xóa command này không?</p>
 
-            <div className="bg-gray-50 border rounded-md p-3 space-y-2">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-gray-600">OS:</span>
-                <span className="text-sm">{command.os_version}</span>
+              <div className="bg-gray-50 border rounded-md p-3 space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-600">OS:</span>
+                  <span className="text-sm">{command.os_version}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-gray-600">
+                    Command:
+                  </span>
+                  <code className="block text-xs bg-gray-100 p-2 rounded border max-w-full overflow-hidden">
+                    {truncateCommand(command.command_text, 100)}
+                  </code>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-sm font-medium text-gray-600">
-                  Command:
-                </span>
-                <code className="block text-xs bg-gray-100 p-2 rounded border max-w-full overflow-hidden">
-                  {truncateCommand(command.command_text, 100)}
-                </code>
-              </div>
-            </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
-              <p className="text-sm text-amber-800">
-                <strong>Cảnh báo:</strong> Hành động này sẽ xóa vĩnh viễn
-                command và không thể hoàn tác.
-              </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+                <p className="text-sm text-amber-800">
+                  <strong>Cảnh báo:</strong> Hành động này sẽ xóa vĩnh viễn
+                  command và không thể hoàn tác.
+                </p>
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

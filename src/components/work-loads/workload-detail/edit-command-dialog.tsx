@@ -1,4 +1,3 @@
-// src/components/workload-detail/EditCommandDialog.tsx
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -83,7 +82,14 @@ export const EditCommandDialog: React.FC<EditCommandDialogProps> = ({
     try {
       setLoading(true);
       await updateCommand(command.id, formData);
-      onSuccess();
+
+      // Đóng dialog trước, sau đó mới gọi onSuccess
+      onOpenChange(false);
+
+      // Delay một chút để dialog đóng hoàn toàn trước khi refresh data
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
     } catch (error) {
       // Error is already handled in the hook
     } finally {
@@ -161,14 +167,6 @@ export const EditCommandDialog: React.FC<EditCommandDialogProps> = ({
               <code className="block bg-muted p-2 rounded text-xs">
                 echo "net.ipv4.ip_forward = 1" {">>"} /etc/sysctl.conf && sysctl
                 -p
-              </code>
-              <p>Ví dụ Ansible task:</p>
-              <code className="block bg-muted p-2 rounded text-xs">
-                {`- name: Set kernel parameter
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    state: present`}
               </code>
             </div>
           </div>
