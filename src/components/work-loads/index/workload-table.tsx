@@ -1,4 +1,3 @@
-// src/components/work-loads/workload-table.tsx
 import React from "react";
 import {
   Table,
@@ -80,7 +79,11 @@ export function WorkloadTable({
             </TableHeader>
             <TableBody>
               {workloads.map((workload) => (
-                <TableRow key={workload.id}>
+                <TableRow
+                  key={workload.id}
+                  onClick={() => onEdit(workload)}
+                  className="cursor-pointer hover:bg-muted"
+                >
                   <TableCell className="font-medium">{workload.name}</TableCell>
                   <TableCell>
                     {workload.description ? (

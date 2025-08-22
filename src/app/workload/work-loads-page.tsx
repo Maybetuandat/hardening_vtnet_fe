@@ -1,14 +1,13 @@
-// src/app/workload/work-loads-page.tsx
 import { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { Workload } from "@/types/workload";
-import React from "react";
+
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { WorkloadDeleteDialog } from "@/components/work-loads/workload-delete-dialog";
-import WorkloadHeader from "@/components/work-loads/workload-header";
-import { WorkloadTable } from "@/components/work-loads/workload-table";
+import { WorkloadDeleteDialog } from "@/components/work-loads/index/workload-delete-dialog";
+import WorkloadHeader from "@/components/work-loads/index/workload-header";
+import { WorkloadTable } from "@/components/work-loads/index/workload-table";
 import FilterBar from "@/components/ui/filter-bar";
 import { useNavigate } from "react-router-dom";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
@@ -37,20 +36,13 @@ export default function WorkloadsPage() {
     deleteWorkload,
   } = useWorkloads();
 
-  // Auto search when dependencies change
   useEffect(() => {
     searchWorkloads(searchTerm, 1, 10);
   }, [searchTerm, status, dateFilter]);
 
-  // Handle search change
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
   }, []);
-
-  // Handle search execution (manual trigger if needed)
-  const handleSearch = useCallback(() => {
-    searchWorkloads(searchTerm, 1, 10);
-  }, [searchWorkloads, searchTerm]);
 
   const handleRefresh = useCallback(() => {
     searchWorkloads(searchTerm, currentPage, 10);
@@ -61,7 +53,6 @@ export default function WorkloadsPage() {
     navigate("/workloads/add");
   }, [navigate]);
 
-  // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
       searchWorkloads(searchTerm, page, 10);
@@ -69,15 +60,14 @@ export default function WorkloadsPage() {
     [searchWorkloads, searchTerm]
   );
 
-  // Handle edit workload - navigate to edit page
   const handleEditWorkload = useCallback(
     (workload: Workload) => {
-      navigate(`/workloads/edit/${workload.id}`);
+      navigate(`/workloads/${workload.id}`);
+      console.log("Edit workload:", workload);
     },
     [navigate]
   );
 
-  // Handle delete workload - open confirmation dialog
   const handleDeleteWorkload = useCallback((workload: Workload) => {
     setDeletingWorkload(workload);
     setDeleteDialogOpen(true);

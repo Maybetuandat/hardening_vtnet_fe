@@ -45,7 +45,6 @@ export default function AddWorkloadPage() {
 
   const handleNext = async () => {
     if (currentStep === steps.length - 1) {
-      // Final step - create workload
       await handleCreateWorkload();
     } else {
       nextStep();
@@ -85,11 +84,11 @@ export default function AddWorkloadPage() {
         return (
           <ExcelUploadForm
             rules={formData.rules}
-            commands={formData.commands} // ✅ Truyền commands từ formData
+            commands={formData.commands}
             loading={loading}
             onFileUpload={parseExcelFile}
             onRulesChange={(rules) => updateFormData({ rules })}
-            onCommandsChange={(commands) => updateFormData({ commands })} // ✅ Thêm handler cho commands
+            onCommandsChange={(commands) => updateFormData({ commands })}
           />
         );
       default:

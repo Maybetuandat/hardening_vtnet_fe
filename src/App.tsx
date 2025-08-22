@@ -11,6 +11,7 @@ import ServersPage from "./app/server/server-page";
 import SecurityStandardPage from "./app/security-standard/security-standard";
 import NotFoundPage from "./app/404/not-found-page";
 import AddWorkloadPage from "./app/workload/add-workload-page";
+import { WorkloadDetailPage } from "./app/workload/workload-detail-page";
 
 function App() {
   return (
@@ -44,14 +45,14 @@ function App() {
           }
         />
 
-        {/* <Route
-          path="/workload/:id"
+        <Route
+          path="/workloads/:workloadId"
           element={
             <MainLayout>
               <WorkloadDetailPage />
             </MainLayout>
           }
-        /> */}
+        />
         <Route
           path="/workload/add"
           element={
