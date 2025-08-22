@@ -295,7 +295,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                           </TableCell>
                         )}
                         <TableCell>
-                          <DropdownMenu>
+                          <DropdownMenu modal={false}>
                             <DropdownMenuTrigger
                               asChild
                               onClick={(e) => e.stopPropagation()}
