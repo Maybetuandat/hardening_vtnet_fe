@@ -10,37 +10,6 @@ import {
   XCircle,
   AlertTriangle,
 } from "lucide-react";
-import { WorkloadType } from "@/types/workload";
-
-export const getWorkloadIcon = (type: WorkloadType) => {
-  switch (type) {
-    case WorkloadType.OS:
-      return <Server className="h-5 w-5" />;
-    case WorkloadType.DATABASE:
-      return <Database className="h-5 w-5" />;
-    case WorkloadType.APP:
-      return <Globe className="h-5 w-5" />;
-    case WorkloadType.BIG_DATA:
-      return <BarChart3 className="h-5 w-5" />;
-    default:
-      return <Server className="h-5 w-5" />;
-  }
-};
-
-export const getWorkloadTypeLabel = (type: WorkloadType) => {
-  switch (type) {
-    case WorkloadType.OS:
-      return "Operating System";
-    case WorkloadType.DATABASE:
-      return "Database";
-    case WorkloadType.APP:
-      return "Application";
-    case WorkloadType.BIG_DATA:
-      return "Big Data";
-    default:
-      return type;
-  }
-};
 
 export const getSeverityColor = (severity: string) => {
   switch (severity) {

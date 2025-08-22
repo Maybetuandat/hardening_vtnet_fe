@@ -19,20 +19,23 @@ import {
   Loader2,
   X,
   Eye,
-  Command,
+  Terminal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { ExcelUploadResult, WorkloadCommand } from "@/types/add-workload";
 import { RulePreviewDialog } from "./rule-preview-dialog";
 import { ExcelTemplateGenerator } from "@/utils/excel-template-rule";
+import { Rule } from "@/types/rule";
+import { ExcelUploadResult } from "@/types/workload";
+import { Command } from "@/types/command";
 
 interface ExcelUploadFormProps {
   rules: Rule[];
-  commands?: WorkloadCommand[];
+  commands?: Command[];
   loading: boolean;
   onFileUpload: (file: File) => Promise<ExcelUploadResult>;
   onRulesChange: (rules: Rule[]) => void;
+  onCommandsChange?: (commands: Command[]) => void;
 }
 
 export function ExcelUploadForm({
@@ -41,6 +44,7 @@ export function ExcelUploadForm({
   loading,
   onFileUpload,
   onRulesChange,
+  onCommandsChange,
 }: ExcelUploadFormProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadResult, setUploadResult] = useState<ExcelUploadResult | null>(
@@ -87,6 +91,10 @@ export function ExcelUploadForm({
       setUploadResult(result);
       if (result.success && result.rules) {
         onRulesChange(result.rules);
+        // ✅ Cập nhật commands nếu có callback và có data
+        if (onCommandsChange && result.commands) {
+          onCommandsChange(result.commands);
+        }
       }
     } catch (error) {
       setUploadResult({
@@ -121,6 +129,10 @@ export function ExcelUploadForm({
     setUploadResult(null);
     setUploadedFileName("");
     onRulesChange([]);
+    // ✅ Clear commands nếu có callback
+    if (onCommandsChange) {
+      onCommandsChange([]);
+    }
   };
 
   return (
@@ -228,10 +240,18 @@ export function ExcelUploadForm({
                     <div className="space-y-2">
                       <p className="font-medium">Tải file thành công!</p>
                       <div className="flex items-center gap-4">
-                        <span className="text-sm">
-                          Tìm thấy {rules.length} quy tắc và {commands.length}{" "}
-                          lệnh
-                        </span>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="flex items-center gap-1">
+                            <FileSpreadsheet className="h-4 w-4" />
+                            {rules.length} quy tắc
+                          </span>
+                          {commands.length > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Terminal className="h-4 w-4" />
+                              {commands.length} lệnh
+                            </span>
+                          )}
+                        </div>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -271,66 +291,17 @@ export function ExcelUploadForm({
                   </AlertDescription>
                 </Alert>
               )}
-
-              {/* Warnings */}
-              {uploadResult.warnings && uploadResult.warnings.length > 0 && (
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <div className="space-y-1">
-                      <p className="font-medium">Cảnh báo:</p>
-                      {uploadResult.warnings.map((warning, index) => (
-                        <p key={index} className="text-sm">
-                          {warning}
-                        </p>
-                      ))}
-                    </div>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-          )}
-
-          {/* Rules and Commands Summary */}
-          {uploadResult?.success && (
-            <div className="grid grid-cols-2 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <div>
-                      <p className="font-medium">{rules.length} Quy tắc</p>
-                      <p className="text-sm text-muted-foreground">
-                        Quy tắc bảo mật đã tải
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
-                    <Command className="h-4 w-4 text-blue-500" />
-                    <div>
-                      <p className="font-medium">{commands.length} Lệnh</p>
-                      <p className="text-sm text-muted-foreground">
-                        Lệnh thực thi đã tải
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Rules Preview Dialog */}
+      {/* Rules Preview Dialog - Updated to include commands */}
       <RulePreviewDialog
         open={showPreview}
         onOpenChange={setShowPreview}
         rules={rules}
+        commands={commands}
       />
     </div>
   );

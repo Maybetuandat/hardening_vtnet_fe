@@ -56,9 +56,7 @@ export default function AddWorkloadPage() {
     try {
       await createWorkloadWithRules({
         name: formData.name,
-
         description: formData.description,
-
         rules: formData.rules,
       });
 
@@ -87,9 +85,11 @@ export default function AddWorkloadPage() {
         return (
           <ExcelUploadForm
             rules={formData.rules}
+            commands={formData.commands} // ✅ Truyền commands từ formData
             loading={loading}
             onFileUpload={parseExcelFile}
             onRulesChange={(rules) => updateFormData({ rules })}
+            onCommandsChange={(commands) => updateFormData({ commands })} // ✅ Thêm handler cho commands
           />
         );
       default:
@@ -101,6 +101,19 @@ export default function AddWorkloadPage() {
     if (loading) return "Đang xử lý...";
     if (currentStep === steps.length - 1) return "Tạo Workload";
     return "Tiếp theo";
+  };
+
+  const getTotalItemsText = () => {
+    const rulesCount = formData.rules.length;
+    const commandsCount = formData.commands?.length || 0;
+
+    if (rulesCount === 0) return null;
+
+    if (commandsCount === 0) {
+      return `${rulesCount} quy tắc sẵn sàng để import`;
+    }
+
+    return `${rulesCount} quy tắc và ${commandsCount} lệnh sẵn sàng để import`;
   };
 
   return (
@@ -184,9 +197,7 @@ export default function AddWorkloadPage() {
               <span>
                 Bước {currentStep + 1} / {steps.length}
               </span>
-              {formData.rules.length > 0 && (
-                <span>{formData.rules.length} quy tắc sẵn sàng để import</span>
-              )}
+              {getTotalItemsText() && <span>{getTotalItemsText()}</span>}
             </div>
           </div>
         </CardContent>
