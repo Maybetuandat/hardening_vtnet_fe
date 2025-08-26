@@ -46,3 +46,27 @@ export interface ComplianceScanResponse {
   total_servers?: number;
   estimated_time?: number;
 }
+export interface ComplianceResultDetail extends ComplianceResult {
+  // Additional detail fields if needed
+}
+
+export interface RuleResult {
+  id: number;
+  rule_id: number;
+  compliance_result_id: number;
+  rule_name: string;
+  status: "passed" | "failed";
+  output: string;
+  error_message?: string;
+  severity: "high" | "medium" | "low" | "info";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RuleResultListResponse {
+  results: RuleResult[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
