@@ -14,9 +14,14 @@ import { useRuleResults } from "@/hooks/rule-result/use-rule-result";
 import { ComplianceResultDetail } from "@/types/compliance";
 
 export default function ComplianceDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  // Fix: Use 'complianceId' to match the route parameter name
+  const { complianceId: id } = useParams<{ complianceId: string }>();
   const navigate = useNavigate();
   const complianceId = parseInt(id || "0", 10);
+
+  console.log("URL Params ID:", id);
+  console.log("Parsed compliance ID:", complianceId);
+  console.log("Is valid ID:", complianceId > 0);
 
   // Local filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,7 +50,7 @@ export default function ComplianceDetailPage() {
 
   // Load compliance detail
   const loadComplianceDetail = useCallback(async () => {
-    if (!complianceId) return;
+    if (!complianceId || complianceId <= 0) return;
 
     setLoadingDetail(true);
     try {
@@ -60,7 +65,7 @@ export default function ComplianceDetailPage() {
 
   // Load rule results with debounce
   useEffect(() => {
-    if (!complianceId) return;
+    if (!complianceId || complianceId <= 0) return;
 
     const timeoutId = setTimeout(() => {
       fetchRuleResults(
@@ -77,7 +82,7 @@ export default function ComplianceDetailPage() {
 
   // Initial load
   useEffect(() => {
-    if (complianceId) {
+    if (complianceId && complianceId > 0) {
       loadComplianceDetail();
     }
   }, [loadComplianceDetail]);
@@ -146,17 +151,21 @@ export default function ComplianceDetailPage() {
   }, [refreshData, loadComplianceDetail]);
 
   const handleBack = () => {
-    navigate("/compliance");
+    navigate("/");
   };
 
   const hasActiveFilters = searchInput.trim() || (status && status !== "all");
 
-  if (!complianceId) {
+  // Debug: Check if ID is valid
+  if (!id || complianceId <= 0) {
+    console.log("Invalid compliance ID detected:", { id, complianceId });
     return (
       <div className="min-h-screen w-full px-4 px-6 space-y-6">
         <HeaderDashBoard />
         <div className="text-center py-12">
-          <p className="text-destructive">ID compliance không hợp lệ</p>
+          <p className="text-destructive">
+            ID compliance không hợp lệ (ID: {id}, Parsed: {complianceId})
+          </p>
           <Button onClick={handleBack} className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Quay lại
@@ -168,29 +177,27 @@ export default function ComplianceDetailPage() {
 
   return (
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
-      <HeaderDashBoard />
-
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={handleBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
           Quay lại danh sách
         </Button>
       </div>
 
       {/* Compliance Detail Info */}
-      {complianceDetail && (
-        <ComplianceDetailInfo
-          compliance={complianceDetail}
-          loading={loadingDetail}
-        />
-      )}
+      <ComplianceDetailInfo
+        compliance={complianceDetail}
+        loading={loadingDetail}
+      />
 
-      {/* Rule Results Section */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Rule Results</h2>
-
-        <Card className="p-6">
+      {/* Filters */}
+      <Card className="p-6">
+        <div className="space-y-4">
           <FilterBar
             searchTerm={searchInput}
             onSearchChange={handleSearchChange}
@@ -198,61 +205,56 @@ export default function ComplianceDetailPage() {
               {
                 value: status,
                 onChange: setStatus,
-                placeholder: "Trạng thái",
+                placeholder: "Chọn trạng thái",
                 options: [
                   { value: "all", label: "Tất cả trạng thái" },
                   { value: "passed", label: "Đạt" },
                   { value: "failed", label: "Lỗi" },
+                  { value: "skipped", label: "Bỏ qua" },
+                  { value: "error", label: "Lỗi thực thi" },
                 ],
-                widthClass: "w-48",
+                widthClass: "w-40",
               },
             ]}
           />
 
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex gap-2">
+          {/* Action Buttons */}
+          {hasActiveFilters && (
+            <div className="flex items-center gap-2 pt-2">
               <Button
                 variant="outline"
+                size="sm"
+                onClick={handleClearFilters}
+                className="text-sm"
+              >
+                Xóa bộ lọc
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleRefresh}
-                disabled={loadingRules}
+                className="text-sm"
               >
                 Làm mới
               </Button>
-
-              {hasActiveFilters && (
-                <Button
-                  variant="outline"
-                  onClick={handleClearFilters}
-                  disabled={loadingRules}
-                >
-                  Xóa bộ lọc
-                </Button>
-              )}
             </div>
+          )}
+        </div>
+      </Card>
 
-            <div className="text-sm text-muted-foreground">
-              {totalItems > 0 && (
-                <span>Tìm thấy {totalItems} rule results</span>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        {/* Results Table */}
-        <RuleResultTable
-          ruleResults={ruleResults}
-          loading={loadingRules}
-          error={error}
-          totalItems={totalItems}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          onStatusToggle={handleStatusToggle}
-          onRefresh={handleRefresh}
-        />
-      </div>
+      {/* Rule Results Table */}
+      <RuleResultTable
+        ruleResults={ruleResults}
+        loading={loadingRules}
+        error={error}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        onStatusToggle={handleStatusToggle}
+      />
     </div>
   );
 }

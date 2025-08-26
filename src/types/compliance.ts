@@ -46,19 +46,20 @@ export interface ComplianceScanResponse {
   total_servers?: number;
   estimated_time?: number;
 }
-export interface ComplianceResultDetail extends ComplianceResult {
-  // Additional detail fields if needed
-}
 
+// Rule Result types - đồng bộ với backend schemas
 export interface RuleResult {
   id: number;
   rule_id: number;
   compliance_result_id: number;
   rule_name: string;
-  status: "passed" | "failed";
-  output: string;
+  status: "passed" | "failed" | "skipped" | "error";
+  message?: string;
+  details?: string;
+  execution_time?: number;
+  severity?: "high" | "medium" | "low" | "info";
+  output?: string;
   error_message?: string;
-  severity: "high" | "medium" | "low" | "info";
   created_at: string;
   updated_at: string;
 }
@@ -69,4 +70,21 @@ export interface RuleResultListResponse {
   page: number;
   page_size: number;
   total_pages: number;
+}
+
+export interface RuleResultCreate {
+  rule_id: number;
+  compliance_result_id: number;
+  rule_name?: string;
+  status: string;
+  message?: string;
+  details?: string;
+  execution_time?: number;
+}
+
+export interface RuleResultUpdate {
+  status?: string;
+  message?: string;
+  details?: string;
+  execution_time?: number;
 }

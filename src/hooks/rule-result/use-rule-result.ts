@@ -1,28 +1,8 @@
 import { useState, useCallback } from "react";
+import { RuleResult, RuleResultListResponse } from "@/types/compliance";
 import { api } from "@/lib/api";
 
-export interface RuleResult {
-  id: number;
-  rule_id: number;
-  compliance_result_id: number;
-  rule_name: string;
-  status: "passed" | "failed";
-  output: string;
-  error_message?: string;
-  severity: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RuleResultListResponse {
-  results: RuleResult[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}
-
-export interface UseRuleResultsReturn {
+interface UseRuleResultsReturn {
   ruleResults: RuleResult[];
   loading: boolean;
   error: string | null;
@@ -30,7 +10,6 @@ export interface UseRuleResultsReturn {
   currentPage: number;
   totalPages: number;
   pageSize: number;
-
   fetchRuleResults: (
     complianceId: number,
     keyword?: string,
@@ -38,13 +17,11 @@ export interface UseRuleResultsReturn {
     page?: number,
     pageSize?: number
   ) => Promise<void>;
-
   updateRuleStatus: (
     ruleResultId: number,
     newStatus: "passed" | "failed"
   ) => Promise<boolean>;
-
-  refreshData: () => Promise<void>;
+  refreshData: () => void;
 }
 
 export function useRuleResults(): UseRuleResultsReturn {
@@ -56,52 +33,69 @@ export function useRuleResults(): UseRuleResultsReturn {
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const [currentParams, setCurrentParams] = useState({
-    complianceId: 0,
-    keyword: "",
-    status: "",
-  });
+  // Store last fetch parameters for refresh
+  const [lastFetchParams, setLastFetchParams] = useState<{
+    complianceId: number;
+    keyword?: string;
+    status?: string;
+    page?: number;
+    pageSize?: number;
+  } | null>(null);
 
   const fetchRuleResults = useCallback(
     async (
       complianceId: number,
       keyword?: string,
       status?: string,
-      page: number = 1,
-      size: number = 10
+      page = 1,
+      pageSize = 10
     ) => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams();
-        params.append("compliance_id", complianceId.toString());
-        if (keyword?.trim()) params.append("keyword", keyword.trim());
-        if (status && status !== "all") params.append("status", status);
-        params.append("page", page.toString());
-        params.append("page_size", size.toString());
-
-        const queryString = params.toString();
-        const url = `/rule-results?${queryString}`;
-
-        const data = await api.get<RuleResultListResponse>(url);
-
-        setRuleResults(data.results || []);
-        setTotalItems(data.total || 0);
-        setCurrentPage(data.page || 1);
-        setTotalPages(data.total_pages || 0);
-        setPageSize(data.page_size || 10);
-
-        setCurrentParams({
-          complianceId,
-          keyword: keyword ?? "",
-          status: status ?? "",
+        const params = new URLSearchParams({
+          compliance_id: complianceId.toString(),
+          page: page.toString(),
+          page_size: pageSize.toString(),
         });
-      } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi tải rule results";
-        setError(errorMessage);
+
+        if (keyword) {
+          params.append("keyword", keyword);
+        }
+        if (status) {
+          params.append("status", status);
+        }
+
+        console.log("Fetching rule results with params:", params.toString());
+
+        const response = await api.get<RuleResultListResponse>(
+          `/rule-results?${params.toString()}`
+        );
+
+        console.log("Rule results response:", response);
+
+        setRuleResults(response.results);
+        setTotalItems(response.total);
+        setCurrentPage(response.page);
+        setTotalPages(response.total_pages);
+        setPageSize(response.page_size);
+
+        // Store parameters for refresh
+        setLastFetchParams({
+          complianceId,
+          keyword,
+          status,
+          page,
+          pageSize,
+        });
+      } catch (err) {
         console.error("Error fetching rule results:", err);
+        setError("Không thể tải danh sách rule results");
+        setRuleResults([]);
+        setTotalItems(0);
+        setCurrentPage(1);
+        setTotalPages(0);
       } finally {
         setLoading(false);
       }
@@ -110,15 +104,14 @@ export function useRuleResults(): UseRuleResultsReturn {
   );
 
   const updateRuleStatus = useCallback(
-    async (
-      ruleResultId: number,
-      newStatus: "passed" | "failed"
-    ): Promise<boolean> => {
+    async (ruleResultId: number, newStatus: "passed" | "failed") => {
       try {
-        setError(null);
+        // Fix: Send new_status as query parameter, not in request body
+        const params = new URLSearchParams({
+          new_status: newStatus,
+        });
 
-        const params = new URLSearchParams();
-        params.append("new_status", newStatus);
+        console.log(`Updating rule ${ruleResultId} status to:`, newStatus);
 
         await api.put(
           `/rule-results/${ruleResultId}/status?${params.toString()}`
@@ -126,16 +119,14 @@ export function useRuleResults(): UseRuleResultsReturn {
 
         // Update local state
         setRuleResults((prev) =>
-          prev.map((rule) =>
-            rule.id === ruleResultId ? { ...rule, status: newStatus } : rule
+          prev.map((rr) =>
+            rr.id === ruleResultId ? { ...rr, status: newStatus } : rr
           )
         );
 
+        console.log("Rule status updated successfully");
         return true;
-      } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi cập nhật trạng thái";
-        setError(errorMessage);
+      } catch (err) {
         console.error("Error updating rule status:", err);
         return false;
       }
@@ -143,17 +134,17 @@ export function useRuleResults(): UseRuleResultsReturn {
     []
   );
 
-  const refreshData = useCallback(async () => {
-    if (currentParams.complianceId > 0) {
-      await fetchRuleResults(
-        currentParams.complianceId,
-        currentParams.keyword,
-        currentParams.status,
-        currentPage,
-        pageSize
+  const refreshData = useCallback(() => {
+    if (lastFetchParams) {
+      fetchRuleResults(
+        lastFetchParams.complianceId,
+        lastFetchParams.keyword,
+        lastFetchParams.status,
+        lastFetchParams.page,
+        lastFetchParams.pageSize
       );
     }
-  }, [fetchRuleResults, currentParams, currentPage, pageSize]);
+  }, [lastFetchParams, fetchRuleResults]);
 
   return {
     ruleResults,
