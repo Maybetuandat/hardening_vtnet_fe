@@ -32,7 +32,7 @@ interface EditCommandDialogProps {
 }
 
 const osVersionOptions = [
-  { value: "ubuntu-20.04", label: "Ubuntu 20.04 LTS" },
+  { value: "Ubuntu 22.04.5 LTS", label: "Ubuntu 22.04.5 LTS" },
   { value: "ubuntu-22.04", label: "Ubuntu 22.04 LTS" },
   { value: "ubuntu-24.04", label: "Ubuntu 24.04 LTS" },
   { value: "centos-7", label: "CentOS 7" },

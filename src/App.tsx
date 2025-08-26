@@ -8,7 +8,7 @@ import HomePage from "./app/dashboard";
 import SystemHardeningDashboard from "./app/dashboard";
 import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
-import SecurityStandardPage from "./app/security-standard/security-standard";
+
 import NotFoundPage from "./app/404/not-found-page";
 import AddWorkloadPage from "./app/workload/add-workload-page";
 import { WorkloadDetailPage } from "./app/workload/workload-detail-page";
