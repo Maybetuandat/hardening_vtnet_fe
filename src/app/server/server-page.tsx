@@ -21,23 +21,19 @@ export default function ServersPage() {
     currentPage,
     pageSize,
     searchServers,
-
     updateServer,
     deleteServer,
     getServerById,
   } = useServers();
 
-  // Local state for UI
   const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState("status"); // Default filter value
+  const [status, setStatus] = useState("status");
 
-  // Dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingServer, setEditingServer] = useState<Server | null>(null);
   const [deletingServer, setDeletingServer] = useState<Server | null>(null);
 
-  // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchServers(
@@ -51,7 +47,6 @@ export default function ServersPage() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, status, pageSize, searchServers]);
 
-  // Event handlers
   const handleRefresh = useCallback(() => {
     searchServers(
       searchTerm,
@@ -109,7 +104,7 @@ export default function ServersPage() {
   const handleFormSuccess = useCallback(
     (message: string) => {
       toast.success(message);
-      handleRefresh(); // Refresh the list after successful operation
+      handleRefresh();
     },
     [handleRefresh]
   );
@@ -117,7 +112,7 @@ export default function ServersPage() {
   const handleDeleteSuccess = useCallback(
     (message: string) => {
       toast.success(message);
-      handleRefresh(); // Refresh the list after successful deletion
+      handleRefresh();
     },
     [handleRefresh]
   );
@@ -134,7 +129,6 @@ export default function ServersPage() {
     toast.info(`Xem lịch sử hardening cho server: ${server.hostname}`);
   }, []);
 
-  // Show error toast if there's an error
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -143,31 +137,26 @@ export default function ServersPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      {/* Header with Upload/Download buttons */}
       <ServerHeader onRefresh={handleRefresh} loading={loading} />
 
-      {/* Filter Bar */}
-      <Card className="p-4">
-        <FilterBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          filters={[
-            {
-              value: status,
-              onChange: setStatus,
-              options: [
-                { value: "status", label: "Tất cả trạng thái" },
-                { value: "true", label: "Hoạt động" },
-                { value: "false", label: "Không hoạt động" },
-              ],
-              placeholder: "Trạng thái",
-              widthClass: "w-36",
-            },
-          ]}
-        />
-      </Card>
+      <FilterBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        filters={[
+          {
+            value: status,
+            onChange: setStatus,
+            options: [
+              { value: "status", label: "Tất cả trạng thái" },
+              { value: "true", label: "Hoạt động" },
+              { value: "false", label: "Không hoạt động" },
+            ],
+            placeholder: "Trạng thái",
+            widthClass: "w-36",
+          },
+        ]}
+      />
 
-      {/* Server List */}
       <ServerList
         key={`server-list-${Date.now()}`}
         servers={servers}
@@ -177,8 +166,6 @@ export default function ServersPage() {
         onDelete={handleDeleteServer}
         onViewHardeningHistory={handleViewHardeningHistory}
       />
-
-      {/* Pagination */}
       {!loading && !error && (
         <Pagination
           currentPage={currentPage}
@@ -193,8 +180,6 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
-
-      {/* Form Dialog for Create/Edit */}
       <ServerFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
@@ -204,8 +189,6 @@ export default function ServersPage() {
         getServerById={getServerById}
         onSuccess={handleFormSuccess}
       />
-
-      {/* Delete Confirmation Dialog */}
       <ServerDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

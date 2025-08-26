@@ -64,8 +64,6 @@ export function useServerForm({
   const [initialFormValues, setInitialFormValues] =
     useState<ServerFormValues | null>(null);
 
-  // Validation states
-
   const [validatingIpAddress, setValidatingIpAddress] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [fieldValidation, setFieldValidation] = useState<{
@@ -88,7 +86,6 @@ export function useServerForm({
     },
   });
 
-  // Validate IP address function
   const validateIpAddress = useCallback(
     async (ipAddress: string) => {
       if (!ipAddress.trim() || !editingServer) return;
@@ -108,7 +105,6 @@ export function useServerForm({
           ip_address: result.valid,
         }));
 
-        // Update validation errors
         setValidationErrors((prev) => {
           const filtered = prev.filter(
             (error) => !error.includes("IP address")
@@ -119,7 +115,6 @@ export function useServerForm({
           return filtered;
         });
 
-        // Reset connection test if IP validation fails
         if (!result.valid) {
           setConnectionTested(false);
           setConnectionResult(null);
@@ -146,7 +141,6 @@ export function useServerForm({
     [editingServer]
   );
 
-  // Watch IP address changes với debounce
   useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name === "ip_address" && initialFormValues && editingServer) {
@@ -161,14 +155,13 @@ export function useServerForm({
 
           const timeoutId = setTimeout(() => {
             validateIpAddress(ipAddress);
-          }, 500); // Debounce 500ms
+          }, 500);
 
           return () => {
             console.log(" Clearing IP validation timeout");
             clearTimeout(timeoutId);
           };
         } else if (!ipChanged) {
-          // Reset IP validation if back to original value
           setFieldValidation((prev) => ({ ...prev, ip_address: true }));
           setValidationErrors((prev) =>
             prev.filter((error) => !error.includes("IP address"))

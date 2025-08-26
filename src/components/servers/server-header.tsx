@@ -1,4 +1,3 @@
-// src/components/servers/server-header.tsx (Updated version)
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Upload } from "lucide-react";

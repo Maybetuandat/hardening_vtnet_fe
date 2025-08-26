@@ -75,7 +75,6 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
     onClose,
   });
 
-  // Load server data when dialog opens
   useEffect(() => {
     if (editingServer && open) {
       loadServerData();
@@ -84,7 +83,6 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
 
   if (!editingServer) return null;
 
-  // console.log("📝 Editing server data:", editingServer);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">

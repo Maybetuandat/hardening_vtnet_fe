@@ -1,34 +1,16 @@
-// src/hooks/server/use-server-upload.ts (Fixed version)
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import {
   TestConnectionRequest,
   TestConnectionResponse,
+  IpValidationResult,
+  ServerUploadData,
   ServerCreate,
 } from "@/types/server";
 import * as XLSX from "xlsx";
 
-export interface ServerUploadData {
-  id: string;
-  ip_address: string;
-  ssh_user: string;
-  ssh_port: number;
-  ssh_password: string;
-  hostname?: string;
-  os_version?: string;
-  status: string;
-  connection_status?: "untested" | "testing" | "success" | "failed";
-  connection_message?: string;
-}
-
-// Thêm interface cho server với workload
-export interface ServerCreateWithWorkload extends ServerCreate {
-  workload_id?: number;
-}
-
 interface UseServerUploadReturn {
-  // States
   dragActive: boolean;
   uploading: boolean;
   testing: boolean;
@@ -37,21 +19,19 @@ interface UseServerUploadReturn {
   uploadedFileName: string;
   errors: string[];
 
-  // Computed states
+  isDirty: boolean;
+
   allServersConnected: boolean;
   anyServerTesting: boolean;
   hasFailedConnections: boolean;
+  canAddServers: boolean;
 
-  // Actions
   setDragActive: (active: boolean) => void;
   handleFileUpload: (file: File) => Promise<void>;
   removeServer: (serverId: string) => void;
   handleDiscard: () => void;
   handleTestConnection: () => Promise<void>;
-  handleAddServers: (
-    onSuccess?: () => void,
-    onRefreshList?: () => void
-  ) => Promise<void>;
+  cancelAllOperations: () => void;
   handleAddServersWithWorkload: (
     workloadId: number,
     onSuccess?: () => void,
@@ -69,6 +49,24 @@ export function useServerUpload(): UseServerUploadReturn {
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
+  const isDirty = servers.length > 0 || uploading || testing || adding;
+
+  const [abortController, setAbortController] =
+    useState<AbortController | null>(null);
+
+  const cancelAllOperations = useCallback(() => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+    }
+    setUploading(false);
+    setTesting(false);
+    setAdding(false);
+    setServers([]);
+    setUploadedFileName("");
+    setErrors([]);
+  }, [abortController]);
+
   // Computed states
   const allServersConnected =
     servers.length > 0 &&
@@ -80,7 +78,39 @@ export function useServerUpload(): UseServerUploadReturn {
     (s) => s.connection_status === "failed"
   );
 
-  // File upload handler
+  // chi co the thuc hien them neu  test thanh cong  het va dia chi ip khong bi trung
+  const canAddServers =
+    servers.length > 0 &&
+    servers.every((s) => s.connection_status === "success") &&
+    !anyServerTesting &&
+    !adding;
+
+  // Validate IP addresses against database
+  const validateIpAddresses = useCallback(
+    async (serverList: ServerUploadData[]) => {
+      const validationResults: { [ip: string]: boolean } = {};
+
+      for (const server of serverList) {
+        try {
+          const response = await api.get<IpValidationResult>(
+            `/servers/validate/ip/${encodeURIComponent(server.ip_address)}`
+          );
+          validationResults[server.ip_address] = response.valid;
+
+          if (!response.valid) {
+            console.log(`IP ${server.ip_address} already exists in database`);
+          }
+        } catch (error) {
+          console.error(`Error validating IP ${server.ip_address}:`, error);
+          validationResults[server.ip_address] = false;
+        }
+      }
+
+      return validationResults;
+    },
+    []
+  );
+
   const handleFileUpload = useCallback(async (file: File) => {
     if (!file) return;
 
@@ -109,7 +139,7 @@ export function useServerUpload(): UseServerUploadReturn {
       console.log("Headers found:", headers);
       console.log("Data rows count:", dataRows.length);
 
-      // Validate required columns - sửa lại logic tìm kiếm column
+      // Validate required columns
       const requiredColumns = [
         "IP Server",
         "SSH User",
@@ -130,7 +160,7 @@ export function useServerUpload(): UseServerUploadReturn {
         throw new Error(`Thiếu các cột bắt buộc: ${missingColumns.join(", ")}`);
       }
 
-      // Find column indices - sửa lại logic tìm index
+      // Find column indices
       const getColumnIndex = (columnName: string) => {
         return headers.findIndex((header) => {
           if (!header) return false;
@@ -144,17 +174,8 @@ export function useServerUpload(): UseServerUploadReturn {
       const userIndex = getColumnIndex("SSH User");
       const portIndex = getColumnIndex("SSH Port");
       const passwordIndex = getColumnIndex("SSH Password");
-      const hostnameIndex = getColumnIndex("Hostname"); // Optional
-      const osVersionIndex = getColumnIndex("OS Version"); // Optional
-
-      console.log("Column indices:", {
-        ipIndex,
-        userIndex,
-        portIndex,
-        passwordIndex,
-        hostnameIndex,
-        osVersionIndex,
-      });
+      const hostnameIndex = getColumnIndex("Hostname");
+      const osVersionIndex = getColumnIndex("OS Version");
 
       // Validate column indices
       if (
@@ -199,14 +220,6 @@ export function useServerUpload(): UseServerUploadReturn {
           } else {
             ssh_port = 22; // Default port
           }
-
-          console.log(`Row ${rowIndex + 2}:`, {
-            ip_address,
-            ssh_user,
-            ssh_port_raw,
-            ssh_port,
-            ssh_password: ssh_password ? "[có]" : "[trống]",
-          });
 
           if (!ip_address || !ssh_user || !ssh_password) {
             processingErrors.push(
@@ -267,9 +280,9 @@ export function useServerUpload(): UseServerUploadReturn {
           };
 
           processedServers.push(serverData);
-          console.log(`✅ Processed server ${rowIndex + 2}:`, serverData);
+          console.log(` Processed server ${rowIndex + 2}:`, serverData);
         } catch (error: any) {
-          console.error(`❌ Error processing row ${rowIndex + 2}:`, error);
+          console.error(` Error processing row ${rowIndex + 2}:`, error);
           processingErrors.push(`Dòng ${rowIndex + 2}: ${error.message}`);
         }
       });
@@ -300,12 +313,14 @@ export function useServerUpload(): UseServerUploadReturn {
     }
   }, []);
 
-  // Test connection for all servers
+  // Test connection for all servers with IP validation first
   const handleTestConnection = useCallback(async () => {
     if (servers.length === 0) return;
 
     setTesting(true);
 
+    const controller = new AbortController();
+    setAbortController(controller);
     // Set all servers to testing state
     setServers((prevServers) =>
       prevServers.map((server) => ({
@@ -316,49 +331,106 @@ export function useServerUpload(): UseServerUploadReturn {
     );
 
     try {
-      const testRequest: TestConnectionRequest = {
-        servers: servers.map((server) => ({
-          ip: server.ip_address,
-          ssh_user: server.ssh_user,
-          ssh_password: server.ssh_password,
-          ssh_port: server.ssh_port,
-        })),
-      };
-
-      const response = await api.post<TestConnectionResponse>(
-        "/servers/test-connection",
-        testRequest
+      const validationResults = await validateIpAddresses(servers);
+      const serversToTest = servers.filter(
+        (server) => validationResults[server.ip_address]
+      );
+      const invalidServers = servers.filter(
+        (server) => !validationResults[server.ip_address]
       );
 
-      // Update servers with test results
-      setServers((prevServers) =>
-        prevServers.map((server) => {
-          const result = response.results.find(
-            (r) => r.ip === server.ip_address
+      //  cap nhat nhung server da co dia chi ip trong he thong
+      if (invalidServers.length > 0) {
+        setServers((prevServers) =>
+          prevServers.map((server) => {
+            if (!validationResults[server.ip_address]) {
+              return {
+                ...server,
+                connection_status: "failed" as const,
+                connection_message: "IP address đã tồn tại trong hệ thống",
+              };
+            }
+            return server;
+          })
+        );
+      }
+
+      if (serversToTest.length > 0) {
+        const testRequest: TestConnectionRequest = {
+          servers: serversToTest.map((server) => ({
+            ip: server.ip_address,
+            ssh_user: server.ssh_user,
+            ssh_password: server.ssh_password,
+            ssh_port: server.ssh_port,
+          })),
+        };
+
+        const response = await api.post<TestConnectionResponse>(
+          "/servers/test-connection",
+
+          testRequest,
+          { signal: controller.signal }
+        );
+
+        setServers((prevServers) =>
+          prevServers.map((server) => {
+            if (!validationResults[server.ip_address]) {
+              return server;
+            }
+
+            const result = response.results.find(
+              (r) => r.ip === server.ip_address
+            );
+            if (result) {
+              return {
+                ...server,
+                connection_status:
+                  result.status === "success"
+                    ? ("success" as const)
+                    : ("failed" as const),
+                connection_message: result.message,
+                hostname: result.hostname || server.hostname,
+                os_version: result.os_version || server.os_version,
+              };
+            }
+            return server;
+          })
+        );
+
+        const totalSuccessful = response.successful_connections;
+        const totalServers = servers.length;
+        toast.success(
+          `Test connection hoàn thành: ${totalSuccessful}/${totalServers} thành công`
+        );
+      } else {
+        toast.warning("Không có server nào hợp lệ để test connection");
+      }
+
+      setTimeout(() => {
+        setServers((prevServers) =>
+          prevServers.filter((server) => server.connection_status === "success")
+        );
+
+        const successfulCount = servers.filter(
+          (server) =>
+            validationResults[server.ip_address] &&
+            serversToTest.find((s) => s.ip_address === server.ip_address)
+        ).length;
+
+        if (successfulCount > 0) {
+          toast.success(
+            `Đã lọc và giữ lại ${successfulCount} server kết nối thành công. Bạn có thể thêm chúng vào hệ thống.`
           );
-          if (result) {
-            return {
-              ...server,
-              connection_status:
-                result.status === "success"
-                  ? ("success" as const)
-                  : ("failed" as const),
-              connection_message: result.message,
-              hostname: result.hostname || server.hostname,
-              os_version: result.os_version || server.os_version,
-            };
-          }
-          return server;
-        })
-      );
-
-      toast.success(
-        `Test connection hoàn thành: ${response.successful_connections}/${response.total_servers} thành công`
-      );
+        } else {
+          toast.error(
+            "Không có server nào kết nối thành công. Vui lòng kiểm tra lại thông tin."
+          );
+        }
+      }, 5000);
     } catch (error: any) {
       console.error("Error testing connection:", error);
 
-      // Set all servers to failed state
+      // Set all remaining servers to failed state
       setServers((prevServers) =>
         prevServers.map((server) => ({
           ...server,
@@ -371,61 +443,17 @@ export function useServerUpload(): UseServerUploadReturn {
     } finally {
       setTesting(false);
     }
-  }, [servers]);
+  }, [servers, validateIpAddresses]);
 
-  // Remove server
   const removeServer = useCallback((serverId: string) => {
     setServers((prevServers) => prevServers.filter((s) => s.id !== serverId));
   }, []);
 
-  // Discard all servers
   const handleDiscard = useCallback(() => {
     setServers([]);
     setUploadedFileName("");
     setErrors([]);
   }, []);
-
-  // Add servers without workload (original function)
-  const handleAddServers = useCallback(
-    async (onSuccess?: () => void, onRefreshList?: () => void) => {
-      if (servers.length === 0) {
-        toast.error("Không có server nào để thêm");
-        return;
-      }
-
-      setAdding(true);
-
-      try {
-        const serverCreateData: ServerCreate[] = servers.map((server) => ({
-          hostname: server.hostname || `server-${server.ip_address}`,
-          ip_address: server.ip_address,
-          os_version: server.os_version || "Unknown",
-          ssh_port: server.ssh_port,
-          ssh_user: server.ssh_user,
-          ssh_password: server.ssh_password,
-        }));
-
-        await api.post("/servers/batch", serverCreateData);
-
-        toast.success(`Đã thêm ${servers.length} server thành công!`);
-
-        // Reset state
-        setServers([]);
-        setUploadedFileName("");
-        setErrors([]);
-
-        // Callbacks
-        if (onSuccess) onSuccess();
-        if (onRefreshList) onRefreshList();
-      } catch (error: any) {
-        console.error("Error adding servers:", error);
-        toast.error(error.message || "Có lỗi xảy ra khi thêm server");
-      } finally {
-        setAdding(false);
-      }
-    },
-    [servers]
-  );
 
   // Add servers with workload (new function)
   const handleAddServersWithWorkload = useCallback(
@@ -439,22 +467,31 @@ export function useServerUpload(): UseServerUploadReturn {
         return;
       }
 
+      if (!canAddServers) {
+        toast.error(
+          "Vui lòng test connection thành công cho tất cả server trước khi thêm"
+        );
+        return;
+      }
+
       setAdding(true);
+      const controller = new AbortController();
+      setAbortController(controller);
 
       try {
-        const serverCreateData: ServerCreateWithWorkload[] = servers.map(
-          (server) => ({
-            hostname: server.hostname || `server-${server.ip_address}`,
-            ip_address: server.ip_address,
-            os_version: server.os_version || "Unknown",
-            ssh_port: server.ssh_port,
-            ssh_user: server.ssh_user,
-            ssh_password: server.ssh_password,
-            workload_id: workloadId, // Thêm workload_id
-          })
-        );
+        const serverCreateData: ServerCreate[] = servers.map((server) => ({
+          hostname: server.hostname || `server-${server.ip_address}`,
+          ip_address: server.ip_address,
+          os_version: server.os_version || "Unknown",
+          ssh_port: server.ssh_port,
+          ssh_user: server.ssh_user,
+          ssh_password: server.ssh_password,
+          workload_id: workloadId,
+        }));
 
-        await api.post("/servers/batch", serverCreateData);
+        await api.post("/servers/batch", serverCreateData, {
+          signal: controller.signal,
+        });
 
         toast.success(
           `Đã thêm ${servers.length} server thành công với workload!`
@@ -475,7 +512,7 @@ export function useServerUpload(): UseServerUploadReturn {
         setAdding(false);
       }
     },
-    [servers]
+    [servers, canAddServers]
   );
 
   return {
@@ -487,11 +524,12 @@ export function useServerUpload(): UseServerUploadReturn {
     servers,
     uploadedFileName,
     errors,
-
+    isDirty,
     // Computed states
     allServersConnected,
     anyServerTesting,
     hasFailedConnections,
+    canAddServers, // New computed state
 
     // Actions
     setDragActive,
@@ -499,7 +537,7 @@ export function useServerUpload(): UseServerUploadReturn {
     removeServer,
     handleDiscard,
     handleTestConnection,
-    handleAddServers,
-    handleAddServersWithWorkload, // New function
+    handleAddServersWithWorkload,
+    cancelAllOperations,
   };
 }

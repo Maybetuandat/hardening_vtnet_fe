@@ -1,5 +1,4 @@
-// src/components/servers/server-upload-dialog-with-workload.tsx
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Workload } from "@/types/workload";
 import { WorkloadSelector } from "./workload-selector";
-import { ServerUploadWithWorkload } from "./server-upload-with-workload";
+import {
+  ServerUploadWithWorkload,
+  ServerUploadWithWorkloadRef,
+} from "./server-upload-with-workload";
+import { ConfirmCancelDialog } from "../ui/confirm-cancel-dialog";
 
 interface ServerUploadDialogWithWorkloadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onServerAdded?: () => void; // Callback để refresh danh sách server
+  onServerAdded?: () => void;
 }
 
 export const ServerUploadDialogWithWorkload: React.FC<
@@ -26,6 +29,30 @@ export const ServerUploadDialogWithWorkload: React.FC<
   const [selectedWorkload, setSelectedWorkload] = useState<Workload | null>(
     null
   );
+  const [isDirty, setIsDirty] = useState(false);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+  const serverUploadRef = useRef<ServerUploadWithWorkloadRef | null>(null);
+
+  useEffect(() => {
+    const checkDirty = () => {
+      if (serverUploadRef.current) {
+        const currentIsDirty =
+          step === "upload-servers" && serverUploadRef.current.isDirty;
+        if (currentIsDirty !== isDirty) {
+          setIsDirty(currentIsDirty);
+        }
+      } else if (step === "select-workload" && selectedWorkload) {
+        // Đã chọn workload cũng coi là dirty
+        setIsDirty(true);
+      } else if (step === "select-workload" && !selectedWorkload) {
+        setIsDirty(false);
+      }
+    };
+
+    checkDirty();
+    const interval = setInterval(checkDirty, 200);
+    return () => clearInterval(interval);
+  }, [step, selectedWorkload, isDirty]);
 
   const handleWorkloadSelected = useCallback((workload: Workload) => {
     setSelectedWorkload(workload);
@@ -38,77 +65,101 @@ export const ServerUploadDialogWithWorkload: React.FC<
   }, []);
 
   const handleUploadComplete = useCallback(() => {
-    // Reset về trạng thái ban đầu
     setStep("select-workload");
     setSelectedWorkload(null);
+    setIsDirty(false);
 
-    // Đóng dialog
     onOpenChange(false);
 
-    // Trigger refresh danh sách server
     if (onServerAdded) {
       onServerAdded();
     }
   }, [onOpenChange, onServerAdded]);
 
   const handleCancel = useCallback(() => {
-    // Reset về trạng thái ban đầu
     setStep("select-workload");
     setSelectedWorkload(null);
+    setIsDirty(false);
 
-    // Đóng dialog
     onOpenChange(false);
   }, [onOpenChange]);
 
-  // Reset state khi dialog đóng
   const handleDialogOpenChange = useCallback(
     (isOpen: boolean) => {
+      if (!isOpen && isDirty) {
+        setShowConfirmCancel(true);
+        return;
+      }
+
       if (!isOpen) {
         setStep("select-workload");
         setSelectedWorkload(null);
+        setIsDirty(false);
       }
       onOpenChange(isOpen);
     },
-    [onOpenChange]
+    [onOpenChange, isDirty]
   );
 
-  return (
-    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-      <DialogContent
-        className={
-          step === "upload-servers"
-            ? "max-w-6xl max-h-[90vh] overflow-y-auto"
-            : "max-w-md"
-        }
-      >
-        <DialogHeader>
-          <DialogTitle>
-            {step === "select-workload"
-              ? "Upload Server"
-              : `Upload Server - ${selectedWorkload?.name}`}
-          </DialogTitle>
-          <DialogDescription>
-            {step === "select-workload"
-              ? "Chọn workload sẽ áp dụng cho các server được upload"
-              : "Upload file Excel chứa thông tin các server"}
-          </DialogDescription>
-        </DialogHeader>
+  const handleConfirmCancel = useCallback(() => {
+    if (serverUploadRef.current) {
+      serverUploadRef.current.cancelAllOperations();
+    }
+    setStep("select-workload");
+    setSelectedWorkload(null);
+    setIsDirty(false);
+    setShowConfirmCancel(false);
+    onOpenChange(false);
+  }, [onOpenChange]);
 
-        {step === "select-workload" ? (
-          <WorkloadSelector
-            onWorkloadSelected={handleWorkloadSelected}
-            onCancel={handleCancel}
-          />
-        ) : (
-          selectedWorkload && (
-            <ServerUploadWithWorkload
-              selectedWorkload={selectedWorkload}
-              onBack={handleBackToWorkloadSelection}
-              onComplete={handleUploadComplete}
+  const handleCancelConfirm = useCallback(() => {
+    setShowConfirmCancel(false);
+  }, []);
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
+        <DialogContent
+          className={
+            step === "upload-servers"
+              ? "max-w-6xl max-h-[90vh] overflow-y-auto"
+              : "max-w-md"
+          }
+        >
+          <DialogHeader>
+            <DialogTitle>
+              {step === "select-workload" ? "Upload Server" : "Upload Server"}
+            </DialogTitle>
+            <DialogDescription>
+              {step === "select-workload"
+                ? "Chọn workload sẽ áp dụng cho các server được upload"
+                : "Upload file Excel chứa thông tin các server"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {step === "select-workload" ? (
+            <WorkloadSelector
+              onWorkloadSelected={handleWorkloadSelected}
+              onCancel={handleCancel}
             />
-          )
-        )}
-      </DialogContent>
-    </Dialog>
+          ) : (
+            selectedWorkload && (
+              <ServerUploadWithWorkload
+                selectedWorkload={selectedWorkload}
+                onBack={handleBackToWorkloadSelection}
+                onComplete={handleUploadComplete}
+                ref={serverUploadRef}
+              />
+            )
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmCancelDialog
+        open={showConfirmCancel}
+        onOpenChange={handleCancelConfirm}
+        onConfirm={handleConfirmCancel}
+      />
+    </>
   );
 };

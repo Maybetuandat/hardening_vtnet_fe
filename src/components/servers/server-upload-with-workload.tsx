@@ -1,5 +1,4 @@
-// src/components/servers/server-upload-with-workload.tsx
-import React, { useCallback } from "react";
+import React, { useCallback, useImperativeHandle, forwardRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,10 +27,13 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Workload } from "@/types/workload";
 import { useServerTemplate } from "@/utils/excel-template-server";
-import {
-  useServerUpload,
-  ServerUploadData,
-} from "@/hooks/server/use-server-upload";
+import { useServerUpload } from "@/hooks/server/use-server-upload";
+import { ServerUploadData } from "@/types/server";
+
+export interface ServerUploadWithWorkloadRef {
+  cancelAllOperations: () => void;
+  isDirty: boolean;
+}
 
 interface ServerUploadWithWorkloadProps {
   selectedWorkload: Workload;
@@ -39,9 +41,10 @@ interface ServerUploadWithWorkloadProps {
   onComplete: () => void;
 }
 
-export const ServerUploadWithWorkload: React.FC<
+export const ServerUploadWithWorkload = forwardRef<
+  ServerUploadWithWorkloadRef,
   ServerUploadWithWorkloadProps
-> = ({ selectedWorkload, onBack, onComplete }) => {
+>(({ selectedWorkload, onBack, onComplete }, ref) => {
   const { downloadTemplate } = useServerTemplate();
 
   const {
@@ -53,11 +56,13 @@ export const ServerUploadWithWorkload: React.FC<
     servers,
     uploadedFileName,
     errors,
+    isDirty,
 
     // Computed states
     allServersConnected,
     anyServerTesting,
     hasFailedConnections,
+    canAddServers,
 
     // Actions
     setDragActive,
@@ -66,7 +71,17 @@ export const ServerUploadWithWorkload: React.FC<
     handleDiscard,
     handleTestConnection,
     handleAddServersWithWorkload,
+    cancelAllOperations,
   } = useServerUpload();
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      cancelAllOperations,
+      isDirty,
+    }),
+    [cancelAllOperations, isDirty]
+  );
 
   // Event handlers for drag & drop
   const handleDrag = useCallback(
@@ -125,9 +140,7 @@ export const ServerUploadWithWorkload: React.FC<
       () => {
         onComplete();
       },
-      () => {
-        // Refresh logic nếu cần
-      }
+      () => {}
     );
   }, [handleAddServersWithWorkload, selectedWorkload.id, onComplete]);
 
@@ -316,8 +329,13 @@ export const ServerUploadWithWorkload: React.FC<
                 </div>
                 <Button
                   onClick={handleAddServersWrapper}
-                  disabled={adding || anyServerTesting}
+                  disabled={!canAddServers}
                   className="flex items-center gap-2"
+                  title={
+                    !canAddServers
+                      ? "Vui lòng test connection thành công cho tất cả server trước khi thêm"
+                      : ""
+                  }
                 >
                   {adding ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -333,7 +351,8 @@ export const ServerUploadWithWorkload: React.FC<
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Tất cả server đã kết nối thành công!
+                    Tất cả server đã kết nối thành công! Bạn có thể thêm chúng
+                    vào hệ thống.
                   </AlertDescription>
                 </Alert>
               )}
@@ -342,11 +361,24 @@ export const ServerUploadWithWorkload: React.FC<
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Một số server không thể kết nối. Vui lòng kiểm tra lại thông
-                    tin.
+                    Một số server không thể kết nối hoặc đã tồn tại trong hệ
+                    thống. Các server lỗi sẽ được tự động loại bỏ sau khi test
+                    connection.
                   </AlertDescription>
                 </Alert>
               )}
+
+              {servers.length > 0 &&
+                !allServersConnected &&
+                !anyServerTesting && (
+                  <Alert variant="default">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Vui lòng test connection để kiểm tra tính hợp lệ của các
+                      server trước khi thêm vào hệ thống.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
               {/* Server Table */}
               <div className="border rounded-md">
@@ -413,4 +445,6 @@ export const ServerUploadWithWorkload: React.FC<
       )}
     </div>
   );
-};
+});
+
+ServerUploadWithWorkload.displayName = "ServerUploadWithWorkload";

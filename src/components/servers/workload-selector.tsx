@@ -1,4 +1,3 @@
-// src/components/servers/workload-selector.tsx
 import React, { useState, useEffect } from "react";
 import {
   Select,

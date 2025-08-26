@@ -1,5 +1,3 @@
-// src/components/server/server-delete-dialog.tsx
-
 import React, { useState } from "react";
 import {
   Dialog,

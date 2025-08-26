@@ -93,8 +93,6 @@ export const ServerList: React.FC<ServerListProps> = ({
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
       toast.success("Đã copy địa chỉ IP!");
-
-      // Reset copied state after 2 seconds
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);

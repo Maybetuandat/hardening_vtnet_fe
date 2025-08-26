@@ -33,16 +33,6 @@ export interface ServerUpdate {
   workload_id?: number;
 }
 
-export interface ServerUploadItem {
-  hostname: string;
-  ip_address: string;
-  os_version: string;
-  ssh_port: number;
-  ssh_user: string;
-  ssh_password: string;
-  workload_name: string;
-}
-
 export interface ServerResponse extends Server {
   workload?: {
     id: number;
@@ -101,4 +91,18 @@ export interface IpValidationResult {
   exists: boolean;
   valid: boolean;
   message: string;
+}
+
+// doi tuong su dung trong form upload server
+export interface ServerUploadData {
+  id: string;
+  ip_address: string;
+  ssh_user: string;
+  ssh_port: number;
+  ssh_password: string;
+  hostname?: string;
+  os_version?: string;
+  status: string;
+  connection_status?: "untested" | "testing" | "success" | "failed";
+  connection_message?: string;
 }
