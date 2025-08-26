@@ -9,6 +9,7 @@ import {
   ServerUpdate,
 } from "@/types/server";
 import { api } from "@/lib/api";
+import { useWorkloads } from "@/hooks/workload/use-workloads";
 
 const serverFormSchema = z.object({
   hostname: z
@@ -35,6 +36,7 @@ const serverFormSchema = z.object({
     .min(1, "SSH User là bắt buộc")
     .max(100, "SSH User quá dài"),
   ssh_password: z.string().optional(),
+  workload_id: z.coerce.number().min(1, "Vui lòng chọn workload"),
 });
 
 export type ServerFormValues = z.infer<typeof serverFormSchema>;
@@ -74,6 +76,13 @@ export function useServerForm({
     ip_address: true,
   });
 
+  // Workload states - sử dụng hook có sẵn
+  const {
+    workloads,
+    loading: loadingWorkloads,
+    fetchWorkloads,
+  } = useWorkloads();
+
   const form = useForm<ServerFormValues>({
     resolver: zodResolver(serverFormSchema),
     defaultValues: {
@@ -83,8 +92,14 @@ export function useServerForm({
       ssh_port: 22,
       ssh_user: "",
       ssh_password: "",
+      workload_id: 0,
     },
   });
+
+  // Load workloads when component mounts
+  useEffect(() => {
+    fetchWorkloads("", 1, 100); // Lấy tất cả workloads
+  }, [fetchWorkloads]);
 
   const validateIpAddress = useCallback(
     async (ipAddress: string) => {
@@ -184,15 +199,14 @@ export function useServerForm({
           values.os_version !== initialFormValues.os_version ||
           values.ssh_port !== initialFormValues.ssh_port ||
           values.ssh_user !== initialFormValues.ssh_user ||
+          values.workload_id !== initialFormValues.workload_id ||
           (values.ssh_password !== "" &&
             values.ssh_password !== initialFormValues.ssh_password);
 
         console.log(" Form values changed:", {
           hasChanges,
-          hostname: values.hostname,
-          ip_address: values.ip_address,
-          initialHostname: initialFormValues.hostname,
-          initialIpAddress: initialFormValues.ip_address,
+          workload_id: values.workload_id,
+          initial_workload_id: initialFormValues.workload_id,
         });
 
         if (hasChanges !== formChanged) {
@@ -228,6 +242,7 @@ export function useServerForm({
         ssh_port: server.ssh_port,
         ssh_user: server.ssh_user || "",
         ssh_password: server.ssh_password,
+        workload_id: server.workload_id ?? 0,
       };
 
       form.reset(serverValues);
@@ -317,6 +332,18 @@ export function useServerForm({
     }
   }, [form, onSuccess, validationErrors]);
 
+  // Close dialog function
+  const handleClose = useCallback(() => {
+    form.reset();
+    setConnectionTested(false);
+    setConnectionResult(null);
+    setFormChanged(false);
+    setInitialFormValues(null);
+    setValidationErrors([]);
+    setFieldValidation({ hostname: true, ip_address: true });
+    onClose();
+  }, [form, onClose]);
+
   // Submit form function
   const onSubmit = useCallback(
     async (values: ServerFormValues) => {
@@ -340,6 +367,7 @@ export function useServerForm({
           os_version: values.os_version,
           ssh_port: values.ssh_port,
           ssh_user: values.ssh_user,
+          workload_id: values.workload_id,
         };
 
         // Only include password if provided
@@ -362,20 +390,8 @@ export function useServerForm({
         setLoading(false);
       }
     },
-    [editingServer, updateServer, onSuccess, onClose, validationErrors]
+    [editingServer, updateServer, onSuccess, handleClose, validationErrors]
   );
-
-  // Close dialog function
-  const handleClose = useCallback(() => {
-    form.reset();
-    setConnectionTested(false);
-    setConnectionResult(null);
-    setFormChanged(false);
-    setInitialFormValues(null);
-    setValidationErrors([]);
-    setFieldValidation({ hostname: true, ip_address: true });
-    onClose();
-  }, [form, onClose]);
 
   // Computed values
   const hasValidationErrors = validationErrors.length > 0;
@@ -411,6 +427,10 @@ export function useServerForm({
     validationErrors,
     fieldValidation,
     hasValidationErrors,
+
+    // Workload states
+    workloads,
+    loadingWorkloads,
 
     // Functions
     loadServerData,

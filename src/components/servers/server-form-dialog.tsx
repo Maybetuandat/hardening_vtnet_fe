@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -15,6 +14,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -63,6 +69,8 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
     validationErrors,
     fieldValidation,
     hasValidationErrors,
+    workloads,
+    loadingWorkloads,
     loadServerData,
     testConnection,
     onSubmit,
@@ -85,7 +93,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Chỉnh sửa Server</DialogTitle>
         </DialogHeader>
@@ -170,6 +178,58 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
 
                 <FormField
                   control={form.control}
+                  name="workload_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Workload</FormLabel>
+                      <Select
+                        value={field.value?.toString() || ""}
+                        onValueChange={(value) =>
+                          field.onChange(parseInt(value))
+                        }
+                        disabled={loadingWorkloads}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            {loadingWorkloads ? (
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span>Đang tải...</span>
+                              </div>
+                            ) : (
+                              <SelectValue placeholder="Chọn workload..." />
+                            )}
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {workloads.map((workload) => (
+                            <SelectItem
+                              key={workload.id}
+                              value={workload.id?.toString() || ""}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {workload.name}
+                                </span>
+                                {workload.description && (
+                                  <span className="text-sm text-muted-foreground">
+                                    {workload.description}
+                                  </span>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
                   name="ssh_port"
                   render={({ field }) => (
                     <FormItem>
@@ -181,9 +241,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="ssh_user"
@@ -197,25 +255,25 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="ssh_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>SSH Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
+
+              <FormField
+                control={form.control}
+                name="ssh_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SSH Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Validation Errors */}
               {hasValidationErrors && (

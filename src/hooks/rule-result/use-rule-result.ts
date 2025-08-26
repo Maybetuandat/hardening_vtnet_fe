@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import { RuleResult, RuleResultListResponse } from "@/types/compliance";
+
 import { api } from "@/lib/api";
+import { RuleResult, RuleResultListResponse } from "@/types/rule-result";
 
 interface UseRuleResultsReturn {
   ruleResults: RuleResult[];

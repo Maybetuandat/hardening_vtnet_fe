@@ -138,10 +138,10 @@ export function ComplianceDetailInfo({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Server className="h-5 w-5" />
-                Compliance Result - {compliance.server_ip}
+                Compliance Result
               </CardTitle>
               <p className="text-muted-foreground mt-1">
-                ID: {compliance.id} | Server ID: {compliance.server_id}
+                Server IP: {compliance.server_ip}
               </p>
               {compliance.server_hostname && (
                 <p className="text-sm text-muted-foreground">

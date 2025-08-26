@@ -1,21 +1,39 @@
-// src/types/compliance.ts
 export interface ComplianceResult {
   id: number;
   server_id: number;
-  server_ip: string;
-  status: string; // "running" | "completed" | "failed" | "pending" | "cancelled"
+  status: string; // "pending" | "running" | "completed" | "failed"
   total_rules: number;
   passed_rules: number;
   failed_rules: number;
   score: number;
-  scan_date?: string;
+  scan_date: string;
   created_at: string;
   updated_at: string;
+  detail_error?: string;
+  server_ip?: string;
 }
 
 export interface ComplianceResultDetail extends ComplianceResult {
   server_hostname: string;
   workload_name: string;
+}
+
+export interface ComplianceResultCreate {
+  server_id: number;
+  status: string;
+  total_rules?: number;
+  passed_rules?: number;
+  failed_rules?: number;
+  score?: number;
+  server_ip?: string;
+}
+
+export interface ComplianceResultUpdate {
+  status?: string;
+  total_rules?: number;
+  passed_rules?: number;
+  failed_rules?: number;
+  score?: number;
 }
 
 export interface ComplianceSearchParams {
@@ -40,51 +58,8 @@ export interface ComplianceScanRequest {
 }
 
 export interface ComplianceScanResponse {
-  success: boolean;
+  success: any;
   message: string;
-  compliance_ids?: number[];
-  total_servers?: number;
-  estimated_time?: number;
-}
-
-// Rule Result types - đồng bộ với backend schemas
-export interface RuleResult {
-  id: number;
-  rule_id: number;
-  compliance_result_id: number;
-  rule_name: string;
-  status: "passed" | "failed" | "skipped" | "error";
-  message?: string;
-  details?: string;
-  execution_time?: number;
-  severity?: "high" | "medium" | "low" | "info";
-  output?: string;
-  error_message?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RuleResultListResponse {
-  results: RuleResult[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}
-
-export interface RuleResultCreate {
-  rule_id: number;
-  compliance_result_id: number;
-  rule_name?: string;
-  status: string;
-  message?: string;
-  details?: string;
-  execution_time?: number;
-}
-
-export interface RuleResultUpdate {
-  status?: string;
-  message?: string;
-  details?: string;
-  execution_time?: number;
+  total_servers: number;
+  started_scans: number[];
 }
