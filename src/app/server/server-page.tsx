@@ -10,6 +10,7 @@ import { ServerList } from "@/components/servers/server-list";
 import { ServerFormDialog } from "@/components/servers/server-form-dialog";
 import { ServerDeleteDialog } from "@/components/servers/server-delete-dialog";
 import { Pagination } from "@/components/ui/pagination";
+import { useNavigate } from "react-router-dom";
 
 export default function ServersPage() {
   const {
@@ -47,6 +48,7 @@ export default function ServersPage() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, status, pageSize, searchServers]);
 
+  const navigate = useNavigate();
   const handleRefresh = useCallback(() => {
     searchServers(
       searchTerm,
@@ -124,10 +126,14 @@ export default function ServersPage() {
     [deleteServer]
   );
 
-  const handleViewHardeningHistory = useCallback((server: Server) => {
-    // TODO: Implement view hardening history functionality
-    toast.info(`Xem lịch sử hardening cho server: ${server.hostname}`);
-  }, []);
+  const handleViewHardeningHistory = useCallback(
+    (server: Server) => {
+      navigate(
+        `/servers/${encodeURIComponent(server.ip_address)}/hardening-history`
+      );
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (error) {

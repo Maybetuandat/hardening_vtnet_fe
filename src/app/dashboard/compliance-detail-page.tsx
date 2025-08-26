@@ -151,7 +151,11 @@ export default function ComplianceDetailPage() {
   }, [refreshData, loadComplianceDetail]);
 
   const handleBack = () => {
-    navigate("/");
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
   };
 
   const hasActiveFilters = searchInput.trim() || (status && status !== "all");
@@ -185,7 +189,7 @@ export default function ComplianceDetailPage() {
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Quay lại danh sách
+          Quay lại
         </Button>
       </div>
 
