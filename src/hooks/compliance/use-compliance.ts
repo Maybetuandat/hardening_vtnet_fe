@@ -28,6 +28,9 @@ export interface UseComplianceReturn {
   getComplianceDetail: (
     complianceId: number
   ) => Promise<ComplianceResultDetail | null>;
+
+  deleteCompliance: (complianceId: number) => Promise<boolean>;
+
   startScan: (serverIds?: number[], batchSize?: number) => Promise<boolean>;
   refreshData: () => Promise<void>;
 }
@@ -73,7 +76,6 @@ export function useCompliance(): UseComplianceReturn {
         const queryString = params.toString();
         const url = queryString ? `/compliance?${queryString}` : "compliance";
 
-        
         const data = await api.get<ComplianceResultListResponse>(url);
 
         setComplianceResults(data.results || []);
@@ -101,7 +103,6 @@ export function useCompliance(): UseComplianceReturn {
         setLoading(true);
         setError(null);
 
-        // ✅ SỬ DỤNG API OBJECT - KHÔNG PHẢI FETCH
         const data = await api.get<ComplianceResultDetail>(
           `/compliance/${complianceId}`
         );
@@ -118,6 +119,38 @@ export function useCompliance(): UseComplianceReturn {
     []
   );
 
+  const refreshData = useCallback(async () => {
+    await fetchComplianceResults(
+      currentSearchParams.keyword,
+      currentSearchParams.serverId,
+      currentSearchParams.status,
+      currentPage,
+      pageSize
+    );
+  }, [fetchComplianceResults, currentSearchParams, currentPage, pageSize]);
+
+  const deleteCompliance = useCallback(
+    async (complianceId: number): Promise<boolean> => {
+      try {
+        setError(null);
+
+        await api.delete(`/compliance/${complianceId}`);
+
+        // Refresh data after successful delete
+        await refreshData();
+
+        return true;
+      } catch (err: any) {
+        const errorMessage =
+          err.message || "Có lỗi xảy ra khi xóa compliance result";
+        setError(errorMessage);
+        console.error("Error deleting compliance:", err);
+        return false;
+      }
+    },
+    [refreshData]
+  );
+
   const startScan = useCallback(
     async (serverIds?: number[], batchSize: number = 100): Promise<boolean> => {
       try {
@@ -129,7 +162,6 @@ export function useCompliance(): UseComplianceReturn {
           batch_size: Math.min(batchSize, 500), // Max 500 as per backend validation
         };
 
-        // ✅ SỬ DỤNG API OBJECT - KHÔNG PHẢI FETCH
         const data = await api.post<ComplianceScanResponse>(
           "/compliance/scan",
           requestBody
@@ -151,18 +183,8 @@ export function useCompliance(): UseComplianceReturn {
         setLoading(false);
       }
     },
-    []
+    [refreshData]
   );
-
-  const refreshData = useCallback(async () => {
-    await fetchComplianceResults(
-      currentSearchParams.keyword,
-      currentSearchParams.serverId,
-      currentSearchParams.status,
-      currentPage,
-      pageSize
-    );
-  }, [fetchComplianceResults, currentSearchParams, currentPage, pageSize]);
 
   return {
     complianceResults,
@@ -176,6 +198,7 @@ export function useCompliance(): UseComplianceReturn {
     // Actions
     fetchComplianceResults,
     getComplianceDetail,
+    deleteCompliance,
     startScan,
     refreshData,
   };

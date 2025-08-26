@@ -7,8 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { useCompliance } from "@/hooks/compliance/use-compliance";
 
 import { ComplianceTable } from "@/components/dashboard/compliance-table";
+
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
+import { DeleteComplianceDialog } from "@/components/dashboard/delete-compliance-dialog";
 
 export default function SystemHardeningDashboard() {
   const navigate = useNavigate();
@@ -17,6 +19,12 @@ export default function SystemHardeningDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [serverId, setServerId] = useState<number | undefined>(undefined);
   const [status, setStatus] = useState("all");
+
+  // Dialog states
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    compliance: null as ComplianceResult | null,
+  });
 
   // Hook for compliance data
   const {
@@ -28,6 +36,7 @@ export default function SystemHardeningDashboard() {
     totalPages,
     pageSize,
     fetchComplianceResults,
+    deleteCompliance,
     startScan,
     refreshData,
   } = useCompliance();
@@ -103,6 +112,26 @@ export default function SystemHardeningDashboard() {
     [navigate]
   );
 
+  const handleDeleteClick = useCallback((compliance: ComplianceResult) => {
+    setDeleteDialog({
+      open: true,
+      compliance,
+    });
+  }, []);
+
+  const handleDeleteConfirm = useCallback(
+    async (complianceId: number) => {
+      const success = await deleteCompliance(complianceId);
+
+      if (success) {
+        toast.success("Đã xóa kết quả compliance thành công");
+      } else {
+        toast.error("Có lỗi xảy ra khi xóa compliance result");
+      }
+    },
+    [deleteCompliance]
+  );
+
   const handleExportReport = useCallback(() => {
     // TODO: Implement export functionality
     toast.info("Tính năng xuất báo cáo đang được phát triển");
@@ -165,7 +194,16 @@ export default function SystemHardeningDashboard() {
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onViewDetail={handleViewDetail}
+        onDelete={handleDeleteClick}
         onRefresh={handleRefresh}
+      />
+
+      {/* Delete Dialog */}
+      <DeleteComplianceDialog
+        compliance={deleteDialog.compliance}
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog((prev) => ({ ...prev, open }))}
+        onDelete={handleDeleteConfirm}
       />
     </div>
   );

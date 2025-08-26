@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { ComplianceResult } from "@/types/compliance";
-import { Eye, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Eye, Loader2, AlertTriangle, RefreshCw, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ComplianceTableProps {
@@ -26,6 +26,7 @@ interface ComplianceTableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onViewDetail: (compliance: ComplianceResult) => void;
+  onDelete: (compliance: ComplianceResult) => void;
   onRefresh: () => void;
 }
 
@@ -40,6 +41,7 @@ export function ComplianceTable({
   onPageChange,
   onPageSizeChange,
   onViewDetail,
+  onDelete,
   onRefresh,
 }: ComplianceTableProps) {
   const navigate = useNavigate();
@@ -134,6 +136,15 @@ export function ComplianceTable({
     onViewDetail(compliance);
   };
 
+  // Handle delete
+  const handleDelete = (
+    compliance: ComplianceResult,
+    event: React.MouseEvent
+  ) => {
+    event.stopPropagation();
+    onDelete(compliance);
+  };
+
   return (
     <Card>
       {loading ? (
@@ -188,7 +199,7 @@ export function ComplianceTable({
                 <TableHead className="text-right">Lỗi</TableHead>
                 <TableHead className="text-center">Điểm số</TableHead>
                 <TableHead>Ngày scan</TableHead>
-                <TableHead className="w-20">Thao tác</TableHead>
+                <TableHead className="w-28">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -234,6 +245,15 @@ export function ComplianceTable({
                         title="Xem chi tiết"
                       >
                         <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(event) => handleDelete(compliance, event)}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        title="Xóa"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
