@@ -199,7 +199,6 @@ export function ComplianceTable({
                 <TableHead className="text-right">Lỗi</TableHead>
                 <TableHead className="text-center">Điểm số</TableHead>
                 <TableHead>Ngày scan</TableHead>
-                <TableHead className="w-28">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,28 +232,6 @@ export function ComplianceTable({
                   <TableCell>
                     <div className="text-sm">
                       {formatDate(compliance.scan_date)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(event) => handleViewDetail(compliance, event)}
-                        className="h-8 w-8 p-0"
-                        title="Xem chi tiết"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(event) => handleDelete(compliance, event)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        title="Xóa"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

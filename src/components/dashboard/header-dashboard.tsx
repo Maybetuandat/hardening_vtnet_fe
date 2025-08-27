@@ -1,5 +1,6 @@
 import DashboardCard from "./dash-board-card";
 import ScanDialog from "./scan-dialog";
+
 import { Button } from "../ui/button";
 import {
   Download,
@@ -9,11 +10,13 @@ import {
   AlertTriangle,
   Clock,
   RefreshCw,
+  Calendar,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useDashboard } from "@/hooks/dashboard/use-dashboard";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import ScheduleDialog from "./scheduler-dialog";
 
 interface HeaderDashBoardProps {
   onRefreshCompliance?: () => Promise<void>;
@@ -25,6 +28,7 @@ export default function HeaderDashBoard({
   const { t } = useTranslation("common");
   const { stats, loading, error, refreshData } = useDashboard();
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false); // Thêm state cho schedule dialog
 
   // Format dữ liệu cho dashboard cards
   const dashboardData = useMemo(() => {
@@ -76,6 +80,10 @@ export default function HeaderDashBoard({
     setScanDialogOpen(true);
   };
 
+  const handleSchedule = () => {
+    setScheduleDialogOpen(true); // Mở dialog đặt lịch
+  };
+
   const handleRefresh = async () => {
     await refreshData(onRefreshCompliance);
   };
@@ -102,6 +110,16 @@ export default function HeaderDashBoard({
         </div>
 
         <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+          {/* Nút đặt lịch - THÊM MỚI */}
+          <Button
+            variant="outline"
+            className="flex items-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+            onClick={handleSchedule}
+          >
+            <Calendar className="h-4 w-4" />
+            <span>Đặt lịch scan</span>
+          </Button>
+
           <Button
             variant="outline"
             className="flex items-center space-x-2"
@@ -146,11 +164,17 @@ export default function HeaderDashBoard({
         ))}
       </div>
 
-      {/* Scan Dialog */}
+      {/* Scan Dialog - Giữ nguyên */}
       <ScanDialog
         open={scanDialogOpen}
         onOpenChange={setScanDialogOpen}
         onScanComplete={handleScanComplete}
+      />
+
+      {/* Schedule Dialog - THÊM MỚI */}
+      <ScheduleDialog
+        isOpen={scheduleDialogOpen}
+        onClose={() => setScheduleDialogOpen(false)}
       />
     </div>
   );
