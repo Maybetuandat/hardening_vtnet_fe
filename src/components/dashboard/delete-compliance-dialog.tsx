@@ -38,7 +38,6 @@ export function DeleteComplianceDialog({
       onOpenChange(false);
     } catch (error) {
       console.error("Error deleting compliance:", error);
-      // Error handling is now done in the parent component
     } finally {
       setLoading(false);
     }

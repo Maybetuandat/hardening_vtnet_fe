@@ -1,2 +1,3 @@
 - bug frontend: code sao cho match thuộc tính os_version của server với command
 - xóa serverity trong rule
+- chuyển add rule component bằng file excel vào trong giao diện workload

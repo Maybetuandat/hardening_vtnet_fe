@@ -25,7 +25,6 @@ export default function ServerHardeningHistoryPage() {
     compliance: null as ComplianceResult | null,
   });
 
-  // Hook for compliance data
   const {
     complianceResults,
     loading,
@@ -44,10 +43,9 @@ export default function ServerHardeningHistoryPage() {
     if (!serverIp) return;
 
     const timeoutId = setTimeout(() => {
-      // Sử dụng API hiện có: /api/compliance/ với keyword=serverIp
       fetchComplianceResults(
         searchTerm || serverIp,
-        undefined, // server_id để undefined
+        undefined,
         status === "all" ? undefined : status,
         1,
         pageSize
@@ -69,10 +67,9 @@ export default function ServerHardeningHistoryPage() {
 
   const handlePageChange = useCallback(
     (page: number) => {
-      // Sử dụng API hiện có với endpoint /api/compliance/
       fetchComplianceResults(
-        serverIp, // keyword search theo IP
-        undefined, // server_id undefined
+        serverIp,
+        undefined,
         status === "all" ? undefined : status,
         page,
         pageSize
@@ -83,10 +80,9 @@ export default function ServerHardeningHistoryPage() {
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
-      // Sử dụng API hiện có với endpoint /api/compliance/
       fetchComplianceResults(
-        serverIp, // keyword search theo IP
-        undefined, // server_id undefined
+        serverIp,
+        undefined,
         status === "all" ? undefined : status,
         1,
         newPageSize
@@ -194,7 +190,6 @@ export default function ServerHardeningHistoryPage() {
         ]}
       />
 
-      {/* Compliance Table - Reuse existing component */}
       <ComplianceTable
         complianceResults={complianceResults}
         loading={loading}

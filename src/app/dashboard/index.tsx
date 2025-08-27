@@ -1,4 +1,3 @@
-// src/app/compliance/compliance-page.tsx
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { ComplianceResult } from "@/types/compliance";
@@ -7,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useCompliance } from "@/hooks/compliance/use-compliance";
 
 import { ComplianceTable } from "@/components/dashboard/compliance-table";
-
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
 import { DeleteComplianceDialog } from "@/components/dashboard/delete-compliance-dialog";
@@ -61,6 +59,24 @@ export default function SystemHardeningDashboard() {
     setSearchTerm(value);
   }, []);
 
+  // Refresh compliance data function for dashboard
+  const handleRefreshCompliance = useCallback(async () => {
+    await fetchComplianceResults(
+      searchTerm || undefined,
+      serverId,
+      status === "all" ? undefined : status,
+      currentPage,
+      pageSize
+    );
+  }, [
+    fetchComplianceResults,
+    searchTerm,
+    serverId,
+    status,
+    currentPage,
+    pageSize,
+  ]);
+
   const handleRefresh = useCallback(() => {
     refreshData();
     toast.success("Dữ liệu đã được làm mới");
@@ -92,19 +108,6 @@ export default function SystemHardeningDashboard() {
     [fetchComplianceResults, searchTerm, serverId, status]
   );
 
-  const handleStartScan = useCallback(async () => {
-    try {
-      const success = await startScan();
-      if (success) {
-        toast.success("Scan compliance đã được khởi động thành công");
-      } else {
-        toast.error("Không thể khởi động scan compliance");
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi khởi động scan");
-    }
-  }, [startScan]);
-
   const handleViewDetail = useCallback(
     (compliance: ComplianceResult) => {
       navigate(`/compliance/${compliance.id}`);
@@ -132,11 +135,6 @@ export default function SystemHardeningDashboard() {
     [deleteCompliance]
   );
 
-  const handleExportReport = useCallback(() => {
-    // TODO: Implement export functionality
-    toast.info("Tính năng xuất báo cáo đang được phát triển");
-  }, []);
-
   // Filter options for FilterBar
   const filterOptions = [
     {
@@ -149,7 +147,6 @@ export default function SystemHardeningDashboard() {
         { value: "running", label: "Đang chạy" },
         { value: "pending", label: "Chờ xử lý" },
         { value: "failed", label: "Thất bại" },
-        { value: "cancelled", label: "Đã hủy" },
       ],
       widthClass: "w-36",
     },
@@ -157,7 +154,7 @@ export default function SystemHardeningDashboard() {
 
   return (
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
-      <HeaderDashBoard />
+      <HeaderDashBoard onRefreshCompliance={handleRefreshCompliance} />
 
       {/* Search and Filters */}
       <Card className="p-6">

@@ -115,7 +115,6 @@ export const WorkloadDetailPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Workload Info */}
         <div className="lg:col-span-1">
           <WorkloadInfoSection
             workload={workload}
@@ -123,7 +122,6 @@ export const WorkloadDetailPage: React.FC = () => {
           />
         </div>
 
-        {/* Right Column - Rules and Commands */}
         <div className="lg:col-span-2 space-y-6">
           {/* Rules Section */}
           <RulesSection

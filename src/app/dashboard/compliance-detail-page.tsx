@@ -14,14 +14,9 @@ import { useRuleResults } from "@/hooks/rule-result/use-rule-result";
 import { ComplianceResultDetail } from "@/types/compliance";
 
 export default function ComplianceDetailPage() {
-  // Fix: Use 'complianceId' to match the route parameter name
   const { complianceId: id } = useParams<{ complianceId: string }>();
   const navigate = useNavigate();
   const complianceId = parseInt(id || "0", 10);
-
-  console.log("URL Params ID:", id);
-  console.log("Parsed compliance ID:", complianceId);
-  console.log("Is valid ID:", complianceId > 0);
 
   // Local filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -160,9 +155,7 @@ export default function ComplianceDetailPage() {
 
   const hasActiveFilters = searchInput.trim() || (status && status !== "all");
 
-  // Debug: Check if ID is valid
   if (!id || complianceId <= 0) {
-    console.log("Invalid compliance ID detected:", { id, complianceId });
     return (
       <div className="min-h-screen w-full px-4 px-6 space-y-6">
         <HeaderDashBoard />
