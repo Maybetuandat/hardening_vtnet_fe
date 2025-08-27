@@ -1,3 +1,13 @@
 - bug frontend: code sao cho match thuộc tính os_version của server với command
 - xóa serverity trong rule
 - chuyển add rule component bằng file excel vào trong giao diện workload
+- tự động xóa các kết quả theo thời gian cũ nhất ( 3 tháng )
+- thêm phần đặt lịch tự động - ưu tiên 1
+- tự động update trạng thái quét - ưu tiên 1
+- báo cáo - ưu tiên 2
+- phân quyền : admin sẽ có quyền : all - ưu tiên 1
+- user: view toàn bộ ,
+- đa ngôn ngữ
+- recommend sửa - ưu tiên 3
+- đọc qua bài toán n8n - áp dụng được ko ?
+- tích hợp ai - đánh giá về hệ thống

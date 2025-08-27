@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui for  add server and list server"
+git commit -m "update code ui before add trigger time "
 git push origin main 

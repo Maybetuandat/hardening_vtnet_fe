@@ -116,22 +116,18 @@ export function RuleResultTable({
   const formatOutput = (output: Record<string, any> | null | undefined) => {
     if (!output) return "No output";
 
-    // Nếu có single_value, hiển thị nó
     if (output.single_value) {
       return output.single_value;
     }
 
-    // Nếu có all_values, hiển thị nó
     if (output.all_values) {
       return output.all_values;
     }
 
-    // Nếu có error, hiển thị error
     if (output.error || output.parse_error) {
       return `Error: ${output.error || output.parse_error}`;
     }
 
-    // Hiển thị số lượng keys
     const keyCount = Object.keys(output).length;
     return `${keyCount} values`;
   };
@@ -171,7 +167,7 @@ export function RuleResultTable({
           relative inline-flex w-14 h-7 items-center rounded-full transition-all duration-200 ease-in-out
           ${
             isPassed
-              ? "bg-sidebar-primary shadow-sm" // Sử dụng màu sidebar primary khi ON
+              ? "bg-sidebar-primary shadow-sm"
               : "bg-gray-200 hover:bg-gray-300"
           }
         `}
