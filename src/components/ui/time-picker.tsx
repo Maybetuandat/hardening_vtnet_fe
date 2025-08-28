@@ -13,7 +13,12 @@ const TimePicker: React.FC<TimePickerProps> = ({
 }) => {
   const [hour, minute] = value.split(":").map(Number);
   const [isDragging, setIsDragging] = useState<"hour" | "minute" | null>(null);
+  const [editMode, setEditMode] = useState<"hour" | "minute" | null>(null);
+  const [tempValue, setTempValue] = useState("");
+
   const clockRef = useRef<SVGSVGElement>(null);
+  const hourInputRef = useRef<HTMLInputElement>(null);
+  const minuteInputRef = useRef<HTMLInputElement>(null);
 
   const handleMouseDown = (type: "hour" | "minute") => {
     if (!disabled) {
@@ -36,15 +41,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
 
     if (isDragging === "hour") {
       const newHour = Math.round(angle / 30) % 12;
-      const adjustedHour = newHour === 0 ? 12 : newHour;
-      const finalHour =
-        hour >= 12
-          ? adjustedHour === 12
-            ? 12
-            : adjustedHour + 12
-          : adjustedHour === 12
-          ? 0
-          : adjustedHour;
+      const finalHour = isAM ? newHour : newHour + 12;
       onChange(
         `${finalHour.toString().padStart(2, "0")}:${minute
           .toString()
@@ -64,6 +61,72 @@ const TimePicker: React.FC<TimePickerProps> = ({
     setIsDragging(null);
   };
 
+  const handleNumberClick = (type: "hour" | "minute") => {
+    if (disabled) return;
+    setEditMode(type);
+    // Hiển thị giờ 12h format (1-12) khi edit
+    const displayValue =
+      type === "hour" ? displayHour.toString() : minute.toString();
+    setTempValue(displayValue);
+    setTimeout(() => {
+      if (type === "hour" && hourInputRef.current) {
+        hourInputRef.current.focus();
+        hourInputRef.current.select();
+      } else if (type === "minute" && minuteInputRef.current) {
+        minuteInputRef.current.focus();
+        minuteInputRef.current.select();
+      }
+    }, 0);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Chỉ cho phép số
+    setTempValue(value);
+  };
+
+  const handleInputBlur = (type: "hour" | "minute") => {
+    let numValue = parseInt(tempValue) || 1;
+
+    if (type === "hour") {
+      // Giờ từ 1-12 cho định dạng 12h
+      numValue = Math.max(1, Math.min(12, numValue));
+      // Chuyển đổi thành 24h format để lưu trữ
+      let hour24;
+      if (numValue === 12) {
+        hour24 = isAM ? 0 : 12;
+      } else {
+        hour24 = isAM ? numValue : numValue + 12;
+      }
+      onChange(
+        `${hour24.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`
+      );
+    } else {
+      numValue = Math.max(0, Math.min(59, numValue));
+      onChange(
+        `${hour.toString().padStart(2, "0")}:${numValue
+          .toString()
+          .padStart(2, "0")}`
+      );
+    }
+
+    setEditMode(null);
+    setTempValue("");
+  };
+
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent,
+    type: "hour" | "minute"
+  ) => {
+    if (e.key === "Enter") {
+      handleInputBlur(type);
+    } else if (e.key === "Escape") {
+      setEditMode(null);
+      setTempValue("");
+    }
+  };
+
   useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
@@ -75,13 +138,13 @@ const TimePicker: React.FC<TimePickerProps> = ({
     }
   }, [isDragging]);
 
-  // Convert 24h to 12h for display
-  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  // Convert 24h to 12h for display (0-11 format)
+  const displayHour = hour % 12;
   const isAM = hour < 12;
 
-  // Calculate angles
-  const hourAngle = (displayHour % 12) * 30 - 90; // 30 degrees per hour
-  const minuteAngle = minute * 6 - 90; // 6 degrees per minute
+  // Calculate angles (displayHour is already 0-11)
+  const hourAngle = displayHour * 30 - 90;
+  const minuteAngle = minute * 6 - 90;
 
   // Calculate positions
   const hourX = Math.cos((hourAngle * Math.PI) / 180) * 50;
@@ -101,8 +164,56 @@ const TimePicker: React.FC<TimePickerProps> = ({
 
   return (
     <div className="flex flex-col items-center space-y-4 select-none">
-      {/* Digital Time Display */}
-      <div className="text-2xl font-mono font-bold text-gray-800">{value}</div>
+      {/* Digital Time Display with Editable Numbers */}
+      <div className="flex items-center space-x-1 text-2xl font-mono font-bold text-gray-800">
+        {editMode === "hour" ? (
+          <input
+            ref={hourInputRef}
+            type="text"
+            value={tempValue}
+            onChange={handleInputChange}
+            onBlur={() => handleInputBlur("hour")}
+            onKeyDown={(e) => handleInputKeyDown(e, "hour")}
+            className="w-12 text-center bg-blue-100 border-2 border-blue-300 rounded px-1 focus:outline-none focus:border-blue-500"
+            maxLength={2}
+            disabled={disabled}
+          />
+        ) : (
+          <span
+            onClick={() => handleNumberClick("hour")}
+            className={`cursor-pointer hover:bg-blue-100 px-1 rounded transition-colors ${
+              disabled ? "cursor-not-allowed opacity-50" : ""
+            }`}
+          >
+            {displayHour.toString().padStart(2, "0")}
+          </span>
+        )}
+
+        <span>:</span>
+
+        {editMode === "minute" ? (
+          <input
+            ref={minuteInputRef}
+            type="text"
+            value={tempValue}
+            onChange={handleInputChange}
+            onBlur={() => handleInputBlur("minute")}
+            onKeyDown={(e) => handleInputKeyDown(e, "minute")}
+            className="w-12 text-center bg-blue-100 border-2 border-blue-300 rounded px-1 focus:outline-none focus:border-blue-500"
+            maxLength={2}
+            disabled={disabled}
+          />
+        ) : (
+          <span
+            onClick={() => handleNumberClick("minute")}
+            className={`cursor-pointer hover:bg-blue-100 px-1 rounded transition-colors ${
+              disabled ? "cursor-not-allowed opacity-50" : ""
+            }`}
+          >
+            {minute.toString().padStart(2, "0")}
+          </span>
+        )}
+      </div>
 
       {/* Clock */}
       <div className="relative">
@@ -148,7 +259,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                   dominantBaseline="middle"
                   className="text-sm font-semibold fill-gray-700"
                 >
-                  {i === 0 ? 12 : i}
+                  {i}
                 </text>
               </g>
             );
@@ -245,11 +356,30 @@ const TimePicker: React.FC<TimePickerProps> = ({
       {/* Instructions */}
       {!disabled && (
         <p className="text-sm text-gray-600 text-center max-w-xs">
-          Kéo kim giờ (đen) hoặc kim phút (xanh) để đặt thời gian
+          Click vào số để chỉnh sửa trực tiếp hoặc kéo kim giờ/phút để đặt thời
+          gian
         </p>
       )}
     </div>
   );
 };
 
-export default TimePicker;
+// Demo component to show usage
+const App = () => {
+  const [time, setTime] = useState("14:30");
+
+  return (
+    <div className="p-8 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Enhanced TimePicker
+      </h1>
+      <TimePicker value={time} onChange={setTime} disabled={false} />
+      <div className="mt-6 p-4 bg-green-50 rounded-lg">
+        <h3 className="font-semibold text-green-800">Thời gian đã chọn:</h3>
+        <p className="text-green-700 font-mono text-lg">{time}</p>
+      </div>
+    </div>
+  );
+};
+
+export default App;
