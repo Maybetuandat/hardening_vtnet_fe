@@ -1,3 +1,4 @@
+// src/app/workload/add-workload-page.tsx - Updated để hỗ trợ validation
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Package,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,6 +35,9 @@ export default function AddWorkloadPage() {
     prevStep,
     resetForm,
     canProceedToNextStep,
+    // Validation states
+    validatingWorkloadName,
+    workloadNameValidation,
   } = useAddWorkload();
 
   const handleBack = () => {
@@ -44,6 +49,16 @@ export default function AddWorkloadPage() {
   };
 
   const handleNext = async () => {
+    // Kiểm tra validation trước khi tiếp tục
+    if (currentStep === 0) {
+      if (!workloadNameValidation.isValid || validatingWorkloadName) {
+        toast.error(
+          "Vui lòng chờ kiểm tra tên workload hoặc sửa lỗi validation"
+        );
+        return;
+      }
+    }
+
     if (currentStep === steps.length - 1) {
       await handleCreateWorkload();
     } else {
@@ -98,105 +113,143 @@ export default function AddWorkloadPage() {
 
   const getNextButtonText = () => {
     if (loading) return "Đang xử lý...";
+    if (validatingWorkloadName && currentStep === 0) return "Đang kiểm tra...";
     if (currentStep === steps.length - 1) return "Tạo Workload";
     return "Tiếp theo";
   };
 
+  const isNextButtonDisabled = () => {
+    if (loading) return true;
+    if (currentStep === 0 && validatingWorkloadName) return true;
+    return !canProceedToNextStep();
+  };
+
   const getTotalItemsText = () => {
     const rulesCount = formData.rules.length;
-    const commandsCount = formData.commands?.length || 0;
+    const commandsCount = formData.commands?.length ?? 0;
 
-    if (rulesCount === 0) return null;
-
-    if (commandsCount === 0) {
-      return `${rulesCount} quy tắc sẵn sàng để import`;
+    if (rulesCount === 0 && commandsCount === 0) {
+      return "Chưa có dữ liệu";
     }
 
-    return `${rulesCount} quy tắc và ${commandsCount} lệnh sẵn sàng để import`;
+    const parts = [];
+    if (rulesCount > 0) parts.push(`${rulesCount} rules`);
+    if (commandsCount > 0) parts.push(`${commandsCount} commands`);
+
+    return parts.join(", ");
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
-      <Card className="rounded-none border-x-0 border-t-0">
-        <CardHeader className="pb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Package className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Thêm Workload Mới
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Tạo cấu hình workload mới với các quy tắc và chính sách bảo mật
-              </p>
-            </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Package className="h-8 w-8" />
+              Tạo Workload Mới
+            </h1>
+            <p className="text-gray-600">
+              Tạo workload với cấu hình rules và commands từ file Excel
+            </p>
           </div>
-        </CardHeader>
-      </Card>
+        </div>
 
-      {/* Step Indicator */}
-      <Card className="rounded-none border-x-0 border-t-0">
-        <CardContent className="py-3">
+        <Button variant="outline" onClick={handleCancel}>
+          Hủy
+        </Button>
+      </div>
+
+      {/* Steps */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tiến trình tạo workload</CardTitle>
+        </CardHeader>
+        <CardContent>
           <StepIndicator steps={steps} currentStep={currentStep} />
         </CardContent>
       </Card>
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive" className="rounded-none border-x-0">
+        <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
+      {/* Validation Warning for Step 1 */}
+      {currentStep === 0 &&
+        formData.name &&
+        !workloadNameValidation.isValid && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {workloadNameValidation.message}
+            </AlertDescription>
+          </Alert>
+        )}
+
       {/* Step Content */}
-      <div className="flex-1 bg-background">
-        <div className="h-full">{renderStepContent()}</div>
-      </div>
+      <div className="min-h-[400px]">{renderStepContent()}</div>
 
       {/* Navigation */}
-      <Card className="rounded-none border-x-0 border-b-0">
-        <CardContent className="py-4">
-          <div className="flex items-center justify-between">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex justify-between items-center">
             <Button
               variant="outline"
               onClick={handleBack}
-              className="flex items-center space-x-2"
-              disabled={loading}
+              disabled={loading || validatingWorkloadName}
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{currentStep === 0 ? "Quay lại Workloads" : "Trước"}</span>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {currentStep === 0 ? "Quay lại danh sách" : "Bước trước"}
             </Button>
 
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" onClick={handleCancel} disabled={loading}>
-                Hủy
-              </Button>
+            <div className="flex items-center gap-2">
+              {/* Validation status indicator */}
+              {currentStep === 0 && formData.name && (
+                <div className="flex items-center gap-2 text-sm">
+                  {validatingWorkloadName ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                      <span className="text-blue-600">
+                        Đang kiểm tra tên...
+                      </span>
+                    </>
+                  ) : workloadNameValidation.message ? (
+                    workloadNameValidation.isValid ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-green-600">Tên hợp lệ</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-red-600">Tên không hợp lệ</span>
+                      </>
+                    )
+                  ) : null}
+                </div>
+              )}
 
               <Button
                 onClick={handleNext}
-                disabled={!canProceedToNextStep()}
-                className="flex items-center space-x-2"
+                disabled={isNextButtonDisabled()}
+                className="min-w-[140px]"
               >
-                <span>{getNextButtonText()}</span>
-                {currentStep < steps.length - 1 ? (
-                  <ArrowRight className="h-4 w-4" />
+                {validatingWorkloadName && currentStep === 0 ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : currentStep === steps.length - 1 ? (
+                  <CheckCircle className="h-4 w-4 mr-2" />
                 ) : (
-                  <CheckCircle className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 mr-2" />
                 )}
+                {getNextButtonText()}
               </Button>
-            </div>
-          </div>
-
-          {/* Progress Summary */}
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>
-                Bước {currentStep + 1} / {steps.length}
-              </span>
-              {getTotalItemsText() && <span>{getTotalItemsText()}</span>}
             </div>
           </div>
         </CardContent>

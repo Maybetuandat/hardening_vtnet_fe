@@ -23,13 +23,56 @@ export function useExcelParser() {
   );
 
   /**
-   * Extract OS version từ tên cột (ví dụ: Ubuntu_Command -> ubuntu)
+   * Tạo hash key cho rule để check duplicate
+   * Dựa trên: name + parameters (vì cùng workload)
+   */
+  const createRuleHashKey = useCallback((rule: Rule): string => {
+    const parametersString = rule.parameters
+      ? JSON.stringify(rule.parameters, Object.keys(rule.parameters).sort())
+      : "";
+    return `${rule.name.toLowerCase().trim()}|${parametersString}`;
+  }, []);
+
+  /**
+   * Detect và loại bỏ duplicate rules trong Excel file
+   */
+  const removeDuplicateRules = useCallback(
+    (rules: Rule[]) => {
+      const seenRules = new Set<string>();
+      const uniqueRules: Rule[] = [];
+      const duplicates: { rule: Rule; index: number; reason: string }[] = [];
+
+      rules.forEach((rule, index) => {
+        const hashKey = createRuleHashKey(rule);
+
+        if (seenRules.has(hashKey)) {
+          duplicates.push({
+            rule,
+            index,
+            reason: `Rule "${rule.name}" với cùng parameters đã tồn tại trong file`,
+          });
+        } else {
+          seenRules.add(hashKey);
+          uniqueRules.push(rule);
+        }
+      });
+
+      return {
+        uniqueRules,
+        duplicates,
+        removedCount: duplicates.length,
+      };
+    },
+    [createRuleHashKey]
+  );
+
+  /**
+   * Extract OS version từ tên cột
    */
   const extractOsVersionFromColumnName = useCallback(
     (columnName: string): string => {
       const cleanName = columnName.replace(/_Command$/i, "").toLowerCase();
 
-      // Map một số tên OS phổ biến
       const osMapping: Record<string, string> = {
         ubuntu: "ubuntu",
         centos7: "centos7",
@@ -45,17 +88,18 @@ export function useExcelParser() {
   );
 
   /**
-   * Parse Excel file theo format mới: Name | Description  | Parameters_JSON | OS_Commands...
+   * Parse Excel file theo format mới: Name | Description | Parameters_JSON | OS_Commands...
+   * Với duplicate detection (name + parameters) và removal
    */
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
       try {
-        console.log(" Parsing Excel file:", file.name);
+        console.log("🔄 Parsing Excel file:", file.name);
 
         const buffer = await file.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "buffer" });
 
-        console.log(" Available sheets:", workbook.SheetNames);
+        console.log("📋 Available sheets:", workbook.SheetNames);
 
         // Lấy sheet đầu tiên hoặc sheet có tên chứa "rule"
         const sheetName =
@@ -75,10 +119,10 @@ export function useExcelParser() {
           throw new Error("File Excel không có dữ liệu hoặc thiếu header");
         }
 
-        console.log("Raw Excel data:", jsonData);
+        console.log("📊 Raw Excel data:", jsonData);
 
         const headers = jsonData[0] as string[];
-        console.log(" Headers:", headers);
+        console.log("📝 Headers:", headers);
 
         const ruleColumns = ["Name", "Description", "Parameters_JSON"];
 
@@ -99,6 +143,7 @@ export function useExcelParser() {
         const rules: Rule[] = [];
         const commands: Command[] = [];
 
+        // Parse tất cả rules trước
         for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
           const row = jsonData[rowIndex] as any[];
 
@@ -115,7 +160,6 @@ export function useExcelParser() {
           const rule: Rule = {
             name: rowData["Name"] || `Rule ${rowIndex}`,
             description: rowData["Description"] || "",
-
             parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {},
             is_active: true,
           };
@@ -143,26 +187,79 @@ export function useExcelParser() {
           });
         }
 
-        console.log(" Parsed successfully:", {
-          rules: rules.length,
-          commands: commands.length,
+        // Check và loại bỏ duplicate rules
+        const { uniqueRules, duplicates, removedCount } =
+          removeDuplicateRules(rules);
+
+        // Filter commands để chỉ giữ lại commands của unique rules
+        const uniqueRuleIndices = new Set(
+          uniqueRules.map((rule) => {
+            // Tìm index gốc của rule trong mảng rules ban đầu
+            const originalIndex = rules.findIndex(
+              (r) => createRuleHashKey(r) === createRuleHashKey(rule)
+            );
+            return originalIndex;
+          })
+        );
+
+        const filteredCommands = commands.filter((cmd) =>
+          uniqueRuleIndices.has(cmd.rule_index)
+        );
+
+        // Update rule_index trong commands sau khi loại bỏ duplicates
+        const finalCommands = filteredCommands.map((cmd) => {
+          const originalRuleIndex = cmd.rule_index;
+          const originalRule = rules[originalRuleIndex];
+          const newRuleIndex = uniqueRules.findIndex(
+            (rule) =>
+              createRuleHashKey(rule) === createRuleHashKey(originalRule)
+          );
+
+          return {
+            ...cmd,
+            rule_index: newRuleIndex,
+          };
+        });
+
+        console.log("✅ Parsed successfully:", {
+          totalRules: rules.length,
+          uniqueRules: uniqueRules.length,
+          duplicatesRemoved: removedCount,
+          commands: finalCommands.length,
           ruleColumns,
           commandColumns,
         });
 
+        // Tạo warnings và errors
+        const warnings: string[] = [
+          `Đã parse thành công ${uniqueRules.length} rules và ${finalCommands.length} commands từ Excel file`,
+          `Tìm thấy ${commandColumns.length} loại OS: ${commandColumns.join(
+            ", "
+          )}`,
+        ];
+
+        const errors: string[] = [];
+
+        if (removedCount > 0) {
+          warnings.push(
+            `⚠️ Đã loại bỏ ${removedCount} rules trùng lặp trong file Excel`
+          );
+          duplicates.forEach((duplicate) => {
+            warnings.push(
+              `   - Row ${duplicate.index + 2}: ${duplicate.reason}`
+            );
+          });
+        }
+
         return {
           success: true,
-          rules,
-          commands,
-          warnings: [
-            `Đã parse thành công ${rules.length} rules và ${commands.length} commands từ Excel file`,
-            `Tìm thấy ${commandColumns.length} loại OS: ${commandColumns.join(
-              ", "
-            )}`,
-          ],
+          rules: uniqueRules,
+          commands: finalCommands,
+          warnings,
+          errors: errors.length > 0 ? errors : undefined,
         };
       } catch (err: any) {
-        console.error(" Error parsing Excel file:", err);
+        console.error("❌ Error parsing Excel file:", err);
         return {
           success: false,
           rules: [],
@@ -170,9 +267,15 @@ export function useExcelParser() {
         };
       }
     },
-    [parseJsonSafely, extractOsVersionFromColumnName]
+    [
+      parseJsonSafely,
+      extractOsVersionFromColumnName,
+      removeDuplicateRules,
+      createRuleHashKey,
+    ]
   );
 
+  // ✅ FIX: Return parseExcelFile function
   return {
     parseExcelFile,
   };

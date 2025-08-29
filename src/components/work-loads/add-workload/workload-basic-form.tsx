@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -9,8 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { AddWorkloadFormData } from "@/types/workload";
+import { useWorkloadNameValidation } from "@/hooks/workload/use-workload-name-validation";
 
 interface WorkloadBasicFormProps {
   formData: AddWorkloadFormData;
@@ -23,8 +24,53 @@ export function WorkloadBasicForm({
   onUpdateFormData,
   errors,
 }: WorkloadBasicFormProps) {
+  const {
+    validatingWorkloadName,
+    workloadNameValidation,
+    debouncedValidateWorkloadName,
+    resetValidation,
+  } = useWorkloadNameValidation();
+
+  const prevNameRef = useRef(formData.name);
+
   const handleFieldChange = (field: keyof AddWorkloadFormData, value: any) => {
     onUpdateFormData({ [field]: value });
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    handleFieldChange("name", newName);
+
+    // Trigger debounced validation
+    debouncedValidateWorkloadName(newName);
+  };
+
+  // Reset validation when component unmounts
+  useEffect(() => {
+    return () => {
+      resetValidation();
+    };
+  }, [resetValidation]);
+
+  // Get input styling based on validation state
+  const getInputClassName = () => {
+    let baseClasses = "";
+
+    if (errors?.name) {
+      baseClasses += "border-red-500 focus:border-red-500 ";
+    } else if (
+      !workloadNameValidation.isValid &&
+      workloadNameValidation.message
+    ) {
+      baseClasses += "border-red-500 focus:border-red-500 ";
+    } else if (
+      workloadNameValidation.isValid &&
+      workloadNameValidation.message
+    ) {
+      baseClasses += "border-green-500 focus:border-green-500 ";
+    }
+
+    return baseClasses;
   };
 
   return (
@@ -42,15 +88,45 @@ export function WorkloadBasicForm({
             <Label htmlFor="name">
               Tên workload <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => handleFieldChange("name", e.target.value)}
-              placeholder="Nhập tên workload (ví dụ: ubuntu-24-04)"
-              className={errors?.name ? "border-red-500" : ""}
-            />
+            <div className="relative">
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={handleNameChange}
+                placeholder="Nhập tên workload (ví dụ: ubuntu-24-04)"
+                className={getInputClassName()}
+              />
+              {validatingWorkloadName && (
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                </div>
+              )}
+            </div>
+
+            {/* Error messages */}
             {errors?.name && (
               <p className="text-sm text-red-600">{errors.name}</p>
+            )}
+
+            {/* Validation messages */}
+            {workloadNameValidation.message && !errors?.name && (
+              <p
+                className={`text-sm ${
+                  workloadNameValidation.isValid
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {workloadNameValidation.isValid ? "✅" : "❌"}{" "}
+                {workloadNameValidation.message}
+              </p>
+            )}
+
+            {/* Loading indicator text */}
+            {validatingWorkloadName && (
+              <p className="text-sm text-blue-600">
+                🔍 Đang kiểm tra tên workload (sẽ hoàn thành trong vài giây)...
+              </p>
             )}
           </div>
 
