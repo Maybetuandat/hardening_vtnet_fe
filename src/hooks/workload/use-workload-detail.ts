@@ -1,4 +1,3 @@
-// src/hooks/workload/use-workload-detail.ts
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import { WorkloadResponse, WorkloadUpdate } from "@/types/workload";

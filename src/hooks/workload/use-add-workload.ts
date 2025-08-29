@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useWorkloadApi } from "@/hooks/workload/use-workload-api";
+
 import { useExcelParser } from "@/hooks/workload/use-excel-parser";
 import {
   AddWorkloadFormData,
@@ -7,7 +7,11 @@ import {
   ExcelUploadResult,
   WorkloadWithRules,
   CreateWorkloadRequest,
+  CreateWorkloadResponse,
 } from "@/types/workload";
+import { api } from "@/lib/api";
+import { CommandCreate } from "@/types/command";
+import { RuleCreate } from "@/types/rule";
 
 export function useAddWorkload() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -22,7 +26,26 @@ export function useAddWorkload() {
   });
 
   // Hooks
-  const { createWorkloadWithRulesAndCommands } = useWorkloadApi();
+
+  const createWorkloadWithRulesAndCommands = useCallback(
+    async (data: CreateWorkloadRequest): Promise<CreateWorkloadResponse> => {
+      try {
+        console.log("Creating workload with data:", data);
+
+        const response = await api.post<CreateWorkloadResponse>(
+          "/workloads/create-with-rules-commands",
+          data
+        );
+
+        console.log("Workload created successfully:", response);
+        return response;
+      } catch (error: any) {
+        console.error("Error creating workload:", error);
+        throw new Error(error.message || "Có lỗi xảy ra khi tạo workload");
+      }
+    },
+    []
+  );
   const { parseExcelFile: parseExcel } = useExcelParser();
 
   const steps: WorkloadStep[] = [
@@ -78,7 +101,8 @@ export function useAddWorkload() {
   );
 
   /**
-   * Tạo workload với rules và commands thông qua API - FIXED VERSION
+   * Tạo workload với rules và commands thông qua API
+   * Sử dụng RuleCreate[] và CommandCreate[] objects
    */
   const createWorkloadWithRules = useCallback(
     async (data: WorkloadWithRules): Promise<void> => {
@@ -86,23 +110,24 @@ export function useAddWorkload() {
       setError(null);
 
       try {
-        // ✅ FIXED: Chuyển đổi đúng format theo Excel template
-        const rulesForApi = data.rules.map((rule) => ({
+        const rulesForApi: RuleCreate[] = data.rules.map((rule) => ({
           name: rule.name,
           description: rule.description || "",
-          severity: rule.severity.toLowerCase() as
-            | "low"
-            | "medium"
-            | "high"
-            | "critical",
-          parameters: rule.parameters, // ✅ Đây mới đúng! Lấy trực tiếp JSON từ Parameters_JSON
-          is_active: rule.is_active,
+          workload_id: 0,
+          parameters: rule.parameters || {},
+          is_active: rule.is_active !== false,
         }));
 
-        // Lấy commands từ formData (đã được parse từ Excel)
-        const commandsForApi = formData.commands || [];
+        const commandsForApi: CommandCreate[] = (formData.commands || []).map(
+          (cmd, index) => ({
+            rule_id: 0,
+            rule_index: cmd.rule_index ?? index,
+            os_version: cmd.os_version,
+            command_text: cmd.command_text,
+            is_active: cmd.is_active !== false,
+          })
+        );
 
-        // Tạo request payload theo format backend yêu cầu
         const requestData: CreateWorkloadRequest = {
           workload: {
             name: data.name,
@@ -112,18 +137,20 @@ export function useAddWorkload() {
           commands: commandsForApi,
         };
 
-        console.log("🚀 Đang tạo workload với dữ liệu FIXED:", requestData);
+        console.log(
+          "Đang tạo workload với dữ liệu:",
+          JSON.stringify(requestData, null, 2)
+        );
 
-        // Gọi API
         const response = await createWorkloadWithRulesAndCommands(requestData);
 
-        console.log("✅ Tạo workload thành công:", response);
+        console.log("Tạo workload thành công:", response);
 
-        // Reset form sau khi tạo thành công
         resetForm();
 
         return Promise.resolve();
       } catch (err: any) {
+        console.error("Chi tiết lỗi:", err);
         setError(err.message || "Không thể tạo workload");
         throw err;
       } finally {

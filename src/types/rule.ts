@@ -1,10 +1,8 @@
-// src/types/rule.ts
 export interface Rule {
   id?: number;
   name: string;
   description?: string;
 
-  severity: RuleSeverity;
   parameters: Record<string, any>;
 
   is_active: boolean;
@@ -13,23 +11,17 @@ export interface Rule {
   updated_at?: string;
 }
 
-export enum RuleSeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
-}
 export interface WorkloadRuleCreate {
   name: string;
   description?: string;
-  severity: string;
+  is_active?: boolean;
   parameters?: Record<string, any>;
 }
 export interface RuleResponse {
   id: number;
   name: string;
   description?: string;
-  severity: string;
+
   workload_id: number;
   parameters?: Record<string, any>;
   is_active: boolean;
@@ -40,7 +32,7 @@ export interface RuleResponse {
 export interface RuleCreate {
   name: string;
   description?: string;
-  severity: string;
+
   workload_id: number;
   parameters?: Record<string, any>;
   is_active: boolean;

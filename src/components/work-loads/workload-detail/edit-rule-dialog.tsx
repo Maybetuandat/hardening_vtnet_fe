@@ -28,13 +28,6 @@ interface EditRuleDialogProps {
   onSuccess: () => void;
 }
 
-const severityOptions = [
-  { value: "low", label: "Low", color: "text-green-600" },
-  { value: "medium", label: "Medium", color: "text-yellow-600" },
-  { value: "high", label: "High", color: "text-orange-600" },
-  { value: "critical", label: "Critical", color: "text-red-600" },
-];
-
 export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   rule,
   open,
@@ -45,7 +38,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   const [formData, setFormData] = useState<RuleCreate>({
     name: rule.name,
     description: rule.description || "",
-    severity: rule.severity,
+
     workload_id: rule.workload_id,
     parameters: rule.parameters || {},
     is_active: rule.is_active,
@@ -59,7 +52,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
       setFormData({
         name: rule.name,
         description: rule.description || "",
-        severity: rule.severity,
+
         workload_id: rule.workload_id,
         parameters: rule.parameters || {},
         is_active: rule.is_active,
@@ -89,7 +82,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     setFormData({
       name: rule.name,
       description: rule.description || "",
-      severity: rule.severity,
+
       workload_id: rule.workload_id,
       parameters: rule.parameters || {},
       is_active: rule.is_active,
@@ -142,31 +135,6 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               rows={3}
               disabled={loading}
             />
-          </div>
-
-          {/* Severity Field */}
-          <div className="space-y-2">
-            <Label htmlFor="severity">
-              Mức độ nghiêm trọng <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={formData.severity}
-              onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, severity: value }))
-              }
-              disabled={loading}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn mức độ nghiêm trọng" />
-              </SelectTrigger>
-              <SelectContent>
-                {severityOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <span className={option.color}>{option.label}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Parameters Field */}

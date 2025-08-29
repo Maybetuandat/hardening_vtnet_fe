@@ -10,13 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Switch } from "@/components/ui/switch";
 import { Save, X } from "lucide-react";
 import { useRules, RuleCreate } from "@/hooks/rule/use-rules";
@@ -28,13 +22,6 @@ interface CreateRuleDialogProps {
   onSuccess: () => void;
 }
 
-const severityOptions = [
-  { value: "low", label: "Low", color: "text-green-600" },
-  { value: "medium", label: "Medium", color: "text-yellow-600" },
-  { value: "high", label: "High", color: "text-orange-600" },
-  { value: "critical", label: "Critical", color: "text-red-600" },
-];
-
 export const CreateRuleDialog: React.FC<CreateRuleDialogProps> = ({
   workloadId,
   open,
@@ -45,7 +32,7 @@ export const CreateRuleDialog: React.FC<CreateRuleDialogProps> = ({
   const [formData, setFormData] = useState<RuleCreate>({
     name: "",
     description: "",
-    severity: "medium",
+
     workload_id: workloadId,
     parameters: {},
     is_active: true,
@@ -57,7 +44,6 @@ export const CreateRuleDialog: React.FC<CreateRuleDialogProps> = ({
     setFormData({
       name: "",
       description: "",
-      severity: "medium",
       workload_id: workloadId,
       parameters: {},
       is_active: true,
@@ -134,32 +120,6 @@ export const CreateRuleDialog: React.FC<CreateRuleDialogProps> = ({
               disabled={loading}
             />
           </div>
-
-          {/* Severity Field */}
-          <div className="space-y-2">
-            <Label htmlFor="severity">
-              Mức độ nghiêm trọng <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={formData.severity}
-              onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, severity: value }))
-              }
-              disabled={loading}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn mức độ nghiêm trọng" />
-              </SelectTrigger>
-              <SelectContent>
-                {severityOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <span className={option.color}>{option.label}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Parameters Field */}
           <div className="space-y-2">
             <Label htmlFor="parameters">Tham số (JSON)</Label>

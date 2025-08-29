@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui with date picker and remove run now feature"
+git commit -m "update ui for validate workload name"
 git push origin main 

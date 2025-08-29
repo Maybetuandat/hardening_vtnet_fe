@@ -3,31 +3,9 @@ import * as XLSX from "xlsx";
 
 import { ExcelUploadResult } from "@/types/workload";
 import { Command } from "@/types/command";
-import { RuleSeverity, Rule } from "@/types/rule";
+import { Rule } from "@/types/rule";
 
 export function useExcelParser() {
-  /**
-   * Helper function để map severity từ Excel
-   */
-  const mapSeverity = useCallback((value: any): RuleSeverity => {
-    const str = String(value).toLowerCase();
-    switch (str) {
-      case "critical":
-        return RuleSeverity.CRITICAL;
-      case "high":
-        return RuleSeverity.HIGH;
-      case "medium":
-        return RuleSeverity.MEDIUM;
-      case "low":
-        return RuleSeverity.LOW;
-      default:
-        return RuleSeverity.MEDIUM;
-    }
-  }, []);
-
-  /**
-   * Parse JSON safely
-   */
   const parseJsonSafely = useCallback(
     (jsonString: string): Record<string, any> | null => {
       if (!jsonString || typeof jsonString !== "string") {
@@ -67,18 +45,17 @@ export function useExcelParser() {
   );
 
   /**
-   * Parse Excel file theo format mới: Name | Description | Severity | Parameters_JSON | OS_Commands...
+   * Parse Excel file theo format mới: Name | Description  | Parameters_JSON | OS_Commands...
    */
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
       try {
-        console.log("📄 Parsing Excel file:", file.name);
+        console.log(" Parsing Excel file:", file.name);
 
-        // Đọc file Excel
         const buffer = await file.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "buffer" });
 
-        console.log("📋 Available sheets:", workbook.SheetNames);
+        console.log(" Available sheets:", workbook.SheetNames);
 
         // Lấy sheet đầu tiên hoặc sheet có tên chứa "rule"
         const sheetName =
@@ -98,21 +75,13 @@ export function useExcelParser() {
           throw new Error("File Excel không có dữ liệu hoặc thiếu header");
         }
 
-        console.log("📊 Raw Excel data:", jsonData);
+        console.log("Raw Excel data:", jsonData);
 
-        // Lấy header row
         const headers = jsonData[0] as string[];
-        console.log("📋 Headers:", headers);
+        console.log(" Headers:", headers);
 
-        // Các cột bắt buộc cho rule
-        const ruleColumns = [
-          "Name",
-          "Description",
-          "Severity",
-          "Parameters_JSON",
-        ];
+        const ruleColumns = ["Name", "Description", "Parameters_JSON"];
 
-        // Kiểm tra có đủ cột bắt buộc không
         const missingColumns = ruleColumns.filter(
           (col) => !headers.includes(col)
         );
@@ -122,7 +91,6 @@ export function useExcelParser() {
           );
         }
 
-        // Tìm các cột command (các cột còn lại không phải rule columns)
         const commandColumns = headers.filter(
           (header) => !ruleColumns.includes(header)
         );
@@ -131,12 +99,11 @@ export function useExcelParser() {
         const rules: Rule[] = [];
         const commands: Command[] = [];
 
-        // Process từng row (bỏ qua header row)
         for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
           const row = jsonData[rowIndex] as any[];
 
           if (!row || row.length === 0 || !row[0]) {
-            continue; // Skip empty rows
+            continue;
           }
 
           // Tạo object từ row data
@@ -145,14 +112,12 @@ export function useExcelParser() {
             rowData[header] = row[colIndex];
           });
 
-          // Tạo rule từ dữ liệu row
           const rule: Rule = {
             name: rowData["Name"] || `Rule ${rowIndex}`,
             description: rowData["Description"] || "",
-            severity: mapSeverity(rowData["Severity"]),
-            parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {}, // ✅ Đây mới đúng!
-            is_active: true, // Mặc định là active
-            // Bỏ các field cũ không cần thiết
+
+            parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {},
+            is_active: true,
           };
 
           rules.push(rule);
@@ -167,7 +132,7 @@ export function useExcelParser() {
               commandText.trim()
             ) {
               const command: Command = {
-                rule_index: rowIndex - 1, // Index của rule (0-based)
+                rule_index: rowIndex - 1,
                 os_version: extractOsVersionFromColumnName(columnName),
                 command_text: commandText.trim(),
                 is_active: true,
@@ -178,7 +143,7 @@ export function useExcelParser() {
           });
         }
 
-        console.log("✅ Parsed successfully:", {
+        console.log(" Parsed successfully:", {
           rules: rules.length,
           commands: commands.length,
           ruleColumns,
@@ -197,7 +162,7 @@ export function useExcelParser() {
           ],
         };
       } catch (err: any) {
-        console.error("❌ Error parsing Excel file:", err);
+        console.error(" Error parsing Excel file:", err);
         return {
           success: false,
           rules: [],
@@ -205,7 +170,7 @@ export function useExcelParser() {
         };
       }
     },
-    [mapSeverity, parseJsonSafely, extractOsVersionFromColumnName]
+    [parseJsonSafely, extractOsVersionFromColumnName]
   );
 
   return {

@@ -1,15 +1,11 @@
-// src/hooks/use-workloads.ts
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
-import { Workload, WorkloadCreate, WorkloadUpdate } from "@/types/workload";
-
-interface WorkLoadListResponse {
-  workloads: Workload[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}
+import {
+  Workload,
+  WorkloadCreate,
+  WorkLoadListResponse,
+  WorkloadUpdate,
+} from "@/types/workload";
 
 export function useWorkloads() {
   const [workloads, setWorkloads] = useState<Workload[]>([]);
@@ -95,7 +91,6 @@ export function useWorkloads() {
           workloadData
         );
 
-        // Update local state
         setWorkloads((prev) =>
           prev.map((workload) => (workload.id === id ? response : workload))
         );
@@ -111,14 +106,11 @@ export function useWorkloads() {
       try {
         await api.delete(`/workloads/${id}`);
 
-        // Remove from local state and refresh if needed
         setWorkloads((prev) => prev.filter((workload) => workload.id !== id));
 
-        // If current page becomes empty, fetch previous page
         if (workloads.length === 1 && currentPage > 1) {
           await fetchWorkloads(undefined, currentPage - 1);
         } else {
-          // Refresh current page to update counts
           await fetchWorkloads(undefined, currentPage);
         }
       } catch (err: any) {
@@ -143,7 +135,6 @@ export function useWorkloads() {
     []
   );
 
-  // Search workloads
   const searchWorkloads = useCallback(
     async (keyword: string, page: number = 1, pageSize: number = 10) => {
       await fetchWorkloads(keyword, page, pageSize);
@@ -151,7 +142,6 @@ export function useWorkloads() {
     [fetchWorkloads]
   );
 
-  // Initial fetch on mount
   useEffect(() => {
     fetchWorkloads();
   }, [fetchWorkloads]);

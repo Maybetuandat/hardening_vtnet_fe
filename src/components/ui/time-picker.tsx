@@ -21,12 +21,13 @@ const TimePicker: React.FC<TimePickerProps> = ({
   const minuteInputRef = useRef<HTMLInputElement>(null);
 
   const handleMouseDown = (type: "hour" | "minute") => {
-    if (!disabled) {
-      setIsDragging(type);
-    }
+    // Chặn tất cả khi disabled
+    if (disabled) return;
+    setIsDragging(type);
   };
 
   const handleMouseMove = (event: MouseEvent) => {
+    // Chặn khi disabled hoặc không có dragging
     if (!isDragging || !clockRef.current || disabled) return;
 
     const rect = clockRef.current.getBoundingClientRect();
@@ -62,7 +63,9 @@ const TimePicker: React.FC<TimePickerProps> = ({
   };
 
   const handleNumberClick = (type: "hour" | "minute") => {
+    // Chặn khi disabled
     if (disabled) return;
+
     setEditMode(type);
     // Hiển thị giờ 12h format (1-12) khi edit
     const displayValue =
@@ -80,11 +83,21 @@ const TimePicker: React.FC<TimePickerProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Chặn khi disabled
+    if (disabled) return;
+
     const value = e.target.value.replace(/\D/g, ""); // Chỉ cho phép số
     setTempValue(value);
   };
 
   const handleInputBlur = (type: "hour" | "minute") => {
+    // Chặn khi disabled
+    if (disabled) {
+      setEditMode(null);
+      setTempValue("");
+      return;
+    }
+
     let numValue = parseInt(tempValue) || 1;
 
     if (type === "hour") {
@@ -127,33 +140,10 @@ const TimePicker: React.FC<TimePickerProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [isDragging]);
-
-  // Convert 24h to 12h for display (0-11 format)
-  const displayHour = hour % 12;
-  const isAM = hour < 12;
-
-  // Calculate angles (displayHour is already 0-11)
-  const hourAngle = displayHour * 30 - 90;
-  const minuteAngle = minute * 6 - 90;
-
-  // Calculate positions
-  const hourX = Math.cos((hourAngle * Math.PI) / 180) * 50;
-  const hourY = Math.sin((hourAngle * Math.PI) / 180) * 50;
-  const minuteX = Math.cos((minuteAngle * Math.PI) / 180) * 70;
-  const minuteY = Math.sin((minuteAngle * Math.PI) / 180) * 70;
-
   const toggleAMPM = () => {
+    // Chặn khi disabled
     if (disabled) return;
+
     const newHour = isAM ? hour + 12 : hour - 12;
     onChange(
       `${newHour.toString().padStart(2, "0")}:${minute
@@ -161,6 +151,31 @@ const TimePicker: React.FC<TimePickerProps> = ({
         .padStart(2, "0")}`
     );
   };
+
+  useEffect(() => {
+    if (isDragging && !disabled) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDragging, disabled]);
+
+  // Convert 24h to 12h for display (0-11 format)
+  const displayHour = hour % 12 || 12; // Hiển thị 12 thay vì 0
+  const isAM = hour < 12;
+
+  // Calculate angles (displayHour is already 1-12, convert to 0-11 for calculation)
+  const hourAngle = (displayHour % 12) * 30 - 90;
+  const minuteAngle = minute * 6 - 90;
+
+  // Calculate positions
+  const hourX = Math.cos((hourAngle * Math.PI) / 180) * 50;
+  const hourY = Math.sin((hourAngle * Math.PI) / 180) * 50;
+  const minuteX = Math.cos((minuteAngle * Math.PI) / 180) * 70;
+  const minuteY = Math.sin((minuteAngle * Math.PI) / 180) * 70;
 
   return (
     <div className="flex flex-col items-center space-y-4 select-none">
@@ -181,15 +196,17 @@ const TimePicker: React.FC<TimePickerProps> = ({
         ) : (
           <span
             onClick={() => handleNumberClick("hour")}
-            className={`cursor-pointer hover:bg-blue-100 px-1 rounded transition-colors ${
-              disabled ? "cursor-not-allowed opacity-50" : ""
+            className={`px-1 rounded transition-colors ${
+              disabled
+                ? "cursor-not-allowed opacity-50 text-gray-400"
+                : "cursor-pointer hover:bg-blue-100"
             }`}
           >
             {displayHour.toString().padStart(2, "0")}
           </span>
         )}
 
-        <span>:</span>
+        <span className={disabled ? "text-gray-400" : ""}>:</span>
 
         {editMode === "minute" ? (
           <input
@@ -206,8 +223,10 @@ const TimePicker: React.FC<TimePickerProps> = ({
         ) : (
           <span
             onClick={() => handleNumberClick("minute")}
-            className={`cursor-pointer hover:bg-blue-100 px-1 rounded transition-colors ${
-              disabled ? "cursor-not-allowed opacity-50" : ""
+            className={`px-1 rounded transition-colors ${
+              disabled
+                ? "cursor-not-allowed opacity-50 text-gray-400"
+                : "cursor-pointer hover:bg-blue-100"
             }`}
           >
             {minute.toString().padStart(2, "0")}
@@ -221,15 +240,17 @@ const TimePicker: React.FC<TimePickerProps> = ({
           ref={clockRef}
           width="200"
           height="200"
-          className="border-2 border-gray-200 rounded-full bg-gray-50"
-          style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+          className={`border-2 border-gray-200 rounded-full ${
+            disabled ? "bg-gray-100 opacity-60" : "bg-gray-50"
+          }`}
+          style={{ cursor: disabled ? "not-allowed" : "default" }}
         >
           {/* Clock face */}
           <circle
             cx="100"
             cy="100"
             r="95"
-            fill="white"
+            fill={disabled ? "#f9fafb" : "white"}
             stroke="#e5e5e5"
             strokeWidth="2"
           />
@@ -249,7 +270,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke="#374151"
+                  stroke={disabled ? "#9ca3af" : "#374151"}
                   strokeWidth="2"
                 />
                 <text
@@ -257,9 +278,11 @@ const TimePicker: React.FC<TimePickerProps> = ({
                   y={100 + Math.sin(angle) * 65}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="text-sm font-semibold fill-gray-700"
+                  className={`text-sm font-semibold ${
+                    disabled ? "fill-gray-400" : "fill-gray-700"
+                  }`}
                 >
-                  {i}
+                  {i === 0 ? 12 : i}
                 </text>
               </g>
             );
@@ -281,7 +304,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke="#9ca3af"
+                  stroke={disabled ? "#d1d5db" : "#9ca3af"}
                   strokeWidth="1"
                 />
               );
@@ -295,7 +318,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
             y1="100"
             x2={100 + hourX}
             y2={100 + hourY}
-            stroke="#1f2937"
+            stroke={disabled ? "#9ca3af" : "#1f2937"}
             strokeWidth="4"
             strokeLinecap="round"
             style={{ cursor: disabled ? "not-allowed" : "grab" }}
@@ -308,7 +331,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
             y1="100"
             x2={100 + minuteX}
             y2={100 + minuteY}
-            stroke="#3b82f6"
+            stroke={disabled ? "#9ca3af" : "#3b82f6"}
             strokeWidth="3"
             strokeLinecap="round"
             style={{ cursor: disabled ? "not-allowed" : "grab" }}
@@ -316,14 +339,19 @@ const TimePicker: React.FC<TimePickerProps> = ({
           />
 
           {/* Center dot */}
-          <circle cx="100" cy="100" r="6" fill="#374151" />
+          <circle
+            cx="100"
+            cy="100"
+            r="6"
+            fill={disabled ? "#9ca3af" : "#374151"}
+          />
 
           {/* Hour hand dot */}
           <circle
             cx={100 + hourX}
             cy={100 + hourY}
             r="8"
-            fill="#1f2937"
+            fill={disabled ? "#9ca3af" : "#1f2937"}
             style={{ cursor: disabled ? "not-allowed" : "grab" }}
             onMouseDown={() => handleMouseDown("hour")}
           />
@@ -333,7 +361,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
             cx={100 + minuteX}
             cy={100 + minuteY}
             r="6"
-            fill="#3b82f6"
+            fill={disabled ? "#9ca3af" : "#3b82f6"}
             style={{ cursor: disabled ? "not-allowed" : "grab" }}
             onMouseDown={() => handleMouseDown("minute")}
           />
@@ -346,7 +374,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
         disabled={disabled}
         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
           disabled
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-50"
             : "bg-blue-100 text-blue-700 hover:bg-blue-200"
         }`}
       >
@@ -360,26 +388,14 @@ const TimePicker: React.FC<TimePickerProps> = ({
           gian
         </p>
       )}
+
+      {disabled && (
+        <p className="text-sm text-gray-400 text-center max-w-xs">
+          Vui lòng kích hoạt để chỉnh sửa thời gian
+        </p>
+      )}
     </div>
   );
 };
 
-// Demo component to show usage
-const App = () => {
-  const [time, setTime] = useState("14:30");
-
-  return (
-    <div className="p-8 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Enhanced TimePicker
-      </h1>
-      <TimePicker value={time} onChange={setTime} disabled={false} />
-      <div className="mt-6 p-4 bg-green-50 rounded-lg">
-        <h3 className="font-semibold text-green-800">Thời gian đã chọn:</h3>
-        <p className="text-green-700 font-mono text-lg">{time}</p>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+export default TimePicker;

@@ -17,6 +17,7 @@ import { useDashboard } from "@/hooks/dashboard/use-dashboard";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import ScheduleDialog from "./scheduler-dialog";
+import { ExportDialog } from "./export-dialog";
 
 interface HeaderDashBoardProps {
   onRefreshCompliance?: () => Promise<void>;
@@ -28,7 +29,8 @@ export default function HeaderDashBoard({
   const { t } = useTranslation("common");
   const { stats, loading, error, refreshData } = useDashboard();
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
-  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false); // Thêm state cho schedule dialog
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false); // Thêm state cho export dialog
 
   // Format dữ liệu cho dashboard cards
   const dashboardData = useMemo(() => {
@@ -73,7 +75,8 @@ export default function HeaderDashBoard({
   }, [stats, loading]);
 
   const handleExport = () => {
-    toast.info("Xuất báo cáo đang được phát triển");
+    // Mở dialog xuất báo cáo thay vì toast
+    setExportDialogOpen(true);
   };
 
   const handleRunAudit = () => {
@@ -81,7 +84,7 @@ export default function HeaderDashBoard({
   };
 
   const handleSchedule = () => {
-    setScheduleDialogOpen(true); // Mở dialog đặt lịch
+    setScheduleDialogOpen(true);
   };
 
   const handleRefresh = async () => {
@@ -110,7 +113,7 @@ export default function HeaderDashBoard({
         </div>
 
         <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-          {/* Nút đặt lịch - THÊM MỚI */}
+          {/* Nút đặt lịch */}
           <Button
             variant="outline"
             className="flex items-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50"
@@ -130,6 +133,7 @@ export default function HeaderDashBoard({
             <span>Làm mới</span>
           </Button>
 
+          {/* Nút xuất báo cáo - Cập nhật để mở dialog */}
           <Button
             variant="outline"
             className="flex items-center space-x-2"
@@ -164,17 +168,22 @@ export default function HeaderDashBoard({
         ))}
       </div>
 
-      {/* Scan Dialog - Giữ nguyên */}
+      {/* Scan Dialog */}
       <ScanDialog
         open={scanDialogOpen}
         onOpenChange={setScanDialogOpen}
         onScanComplete={handleScanComplete}
       />
 
-      {/* Schedule Dialog - THÊM MỚI */}
+      {/* Schedule Dialog */}
       <ScheduleDialog
         isOpen={scheduleDialogOpen}
         onClose={() => setScheduleDialogOpen(false)}
+      />
+
+      <ExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
       />
     </div>
   );

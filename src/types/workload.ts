@@ -1,5 +1,5 @@
-import { Command } from "./command";
-import { Rule } from "./rule";
+import { Command, CommandCreate, CommandResponse } from "./command";
+import { Rule, RuleCreate, RuleResponse } from "./rule";
 
 export interface WorkloadResponse {
   id: number;
@@ -46,26 +46,13 @@ export interface WorkloadWithRules {
   rules: Rule[];
 }
 
-// API Request/Response types để match với backend
+// Schema sử dụng đối tượng types thay vì inline arrays
 export interface CreateWorkloadRequest {
-  workload: {
-    name: string;
-    description?: string;
-  };
-  rules: Array<{
-    name: string;
-    description?: string;
-    severity: "low" | "medium" | "high" | "critical";
-    parameters?: Record<string, any>;
-    is_active: boolean;
-  }>;
-  commands: Array<{
-    rule_index: number;
-    os_version: string;
-    command_text: string;
-    is_active: boolean;
-  }>;
+  workload: WorkloadCreate;
+  rules: RuleCreate[];
+  commands: CommandCreate[];
 }
+
 export interface WorkloadCreate {
   name: string;
   description?: string;
@@ -75,37 +62,32 @@ export interface WorkloadUpdate {
   name?: string;
   description?: string;
 }
+
 export interface CreateWorkloadResponse {
   success: boolean;
   data: {
-    workload: {
-      id: number;
-      name: string;
-      description?: string;
-      created_at: string;
-      updated_at: string;
-    };
-    rules: Array<{
-      id: number;
-      name: string;
-      description?: string;
-      severity: string;
-      workload_id: number;
-      parameters?: Record<string, any>;
-      is_active: boolean;
-      created_at: string;
-      updated_at: string;
-    }>;
-    commands: Array<{
-      id: number;
-      rule_id: number;
-      os_version: string;
-      command_text: string;
-      is_active: boolean;
-      created_at: string;
-      updated_at: string;
-    }>;
+    workload: WorkloadResponse;
+    rules: RuleResponse[];
+    commands: CommandResponse[];
     message: string;
   };
   message: string;
+}
+
+export interface WorkloadTemplateRow {
+  Name: string;
+  Description: string;
+  Parameters_JSON: string;
+  "Ubuntu 22.04": string;
+  CentOS7: string;
+  CentOS8: string;
+  [key: string]: any;
+}
+
+export interface WorkLoadListResponse {
+  workloads: Workload[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }

@@ -69,6 +69,7 @@ export function useCompliance(): UseComplianceReturn {
         const params = new URLSearchParams();
         if (keyword?.trim()) params.append("keyword", keyword.trim());
         if (serverId) params.append("server_id", serverId.toString());
+        params.append("today", "true");
         if (status && status !== "all") params.append("status", status);
         params.append("page", page.toString());
         params.append("page_size", size.toString());

@@ -21,6 +21,12 @@ export interface CommandCreate {
   is_active: boolean;
 }
 
+export interface WorkloadCommandCreate {
+  rule_index: number;
+  os_version: string;
+  command_text: string;
+  is_active: boolean;
+}
 export interface CommandUpdate {
   os_version?: string;
   command_text?: string;

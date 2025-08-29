@@ -91,7 +91,7 @@ export function ExcelUploadForm({
       setUploadResult(result);
       if (result.success && result.rules) {
         onRulesChange(result.rules);
-        // ✅ Cập nhật commands nếu có callback và có data
+
         if (onCommandsChange && result.commands) {
           onCommandsChange(result.commands);
         }
@@ -129,7 +129,7 @@ export function ExcelUploadForm({
     setUploadResult(null);
     setUploadedFileName("");
     onRulesChange([]);
-    // ✅ Clear commands nếu có callback
+
     if (onCommandsChange) {
       onCommandsChange([]);
     }

@@ -1,4 +1,3 @@
-// src/components/work-loads/add-workload/workload-basic-form.tsx
 import React from "react";
 import {
   Card,
@@ -11,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Info } from "lucide-react";
-import { AddWorkloadFormData } from "@/types/add-workload";
+import { AddWorkloadFormData } from "@/types/workload";
 
 interface WorkloadBasicFormProps {
   formData: AddWorkloadFormData;
@@ -36,9 +35,6 @@ export function WorkloadBasicForm({
             <Info className="h-5 w-5" />
             Thông tin cơ bản
           </CardTitle>
-          <CardDescription>
-            Cấu hình thông tin cơ bản cho workload mới
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Name */}

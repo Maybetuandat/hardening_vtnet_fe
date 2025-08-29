@@ -35,75 +35,6 @@ interface RulePreviewDialogProps {
   commands?: Command[];
 }
 
-const getSeverityIcon = (severity: string) => {
-  switch (severity.toLowerCase()) {
-    case "low":
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    case "medium":
-      return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-    case "high":
-      return <AlertCircle className="h-4 w-4 text-orange-500" />;
-    case "critical":
-      return <XCircle className="h-4 w-4 text-red-500" />;
-    default:
-      return <CheckCircle className="h-4 w-4 text-gray-500" />;
-  }
-};
-
-const getSeverityColor = (severity: string) => {
-  switch (severity.toLowerCase()) {
-    case "low":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-    case "medium":
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-    case "high":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
-    case "critical":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-    default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-  }
-};
-
-const getSeverityText = (severity: string) => {
-  switch (severity.toLowerCase()) {
-    case "low":
-      return "Thấp";
-    case "medium":
-      return "Trung bình";
-    case "high":
-      return "Cao";
-    case "critical":
-      return "Nghiêm trọng";
-    default:
-      return severity;
-  }
-};
-
-const getOsIcon = (osVersion: string) => {
-  const os = osVersion.toLowerCase();
-  if (os.includes("ubuntu")) {
-    return <Monitor className="h-4 w-4 text-orange-500" />;
-  } else if (os.includes("centos")) {
-    return <Monitor className="h-4 w-4 text-blue-500" />;
-  } else if (os.includes("rhel") || os.includes("redhat")) {
-    return <Monitor className="h-4 w-4 text-red-500" />;
-  }
-  return <Monitor className="h-4 w-4 text-gray-500" />;
-};
-
-const getOsColor = (osVersion: string) => {
-  const os = osVersion.toLowerCase();
-  if (os.includes("ubuntu")) {
-    return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300";
-  } else if (os.includes("centos")) {
-    return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-  } else if (os.includes("rhel") || os.includes("redhat")) {
-    return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-  }
-  return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-};
-
 // Helper function để render parameters một cách đơn giản
 const renderParameters = (parameters: any) => {
   if (!parameters) return null;
@@ -165,10 +96,8 @@ export function RulePreviewDialog({
   commands = [],
 }: RulePreviewDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSeverity, setSelectedSeverity] = useState<string>("all");
-  const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
 
-  const severities = ["low", "medium", "high", "critical"];
+  const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
 
   // Helper function để lấy commands thuộc về một rule cụ thể
   const getCommandsForRule = (ruleIndex: number) => {
@@ -192,11 +121,7 @@ export function RulePreviewDialog({
       rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rule.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesSeverity =
-      selectedSeverity === "all" ||
-      rule.severity.toLowerCase() === selectedSeverity;
-
-    return matchesSearch && matchesSeverity;
+    return matchesSearch;
   });
 
   return (
@@ -221,21 +146,6 @@ export function RulePreviewDialog({
                 className="pl-10"
               />
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <select
-              value={selectedSeverity}
-              onChange={(e) => setSelectedSeverity(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background text-sm min-w-[120px]"
-            >
-              <option value="all">Tất cả mức độ</option>
-              {severities.map((severity) => (
-                <option key={severity} value={severity}>
-                  {getSeverityText(severity)}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -289,16 +199,6 @@ export function RulePreviewDialog({
                             </div>
                           </div>
                           <div className="flex items-center space-x-2 flex-shrink-0">
-                            <Badge
-                              className={`text-xs ${getSeverityColor(
-                                rule.severity
-                              )}`}
-                            >
-                              <div className="flex items-center space-x-1">
-                                {getSeverityIcon(rule.severity)}
-                                <span>{getSeverityText(rule.severity)}</span>
-                              </div>
-                            </Badge>
                             {hasCommands && (
                               <Button
                                 variant="ghost"
@@ -359,12 +259,9 @@ export function RulePreviewDialog({
                                     <div className="flex items-center gap-2">
                                       <Badge
                                         variant="outline"
-                                        className={`text-xs ${getOsColor(
-                                          command.os_version
-                                        )}`}
+                                        className={`text-xs `}
                                       >
                                         <div className="flex items-center gap-1">
-                                          {getOsIcon(command.os_version)}
                                           <span>{command.os_version}</span>
                                         </div>
                                       </Badge>
@@ -410,7 +307,7 @@ export function RulePreviewDialog({
                                     <Badge
                                       key={os}
                                       variant="outline"
-                                      className={`text-xs ${getOsColor(os)}`}
+                                      className={`text-xs`}
                                     >
                                       {os}
                                     </Badge>
