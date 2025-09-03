@@ -12,14 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { ComplianceResult } from "@/types/compliance";
-import {
-  Loader2,
-  AlertTriangle,
-  RefreshCw,
-  History,
-  Copy,
-  Check,
-} from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
@@ -34,11 +27,12 @@ interface ComplianceTableProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
-
+  onViewDetail: (compliance: ComplianceResult) => void;
+  onDelete: (compliance: ComplianceResult) => void;
   onRefresh: () => void;
 }
 
-export function ComplianceTable({
+export function ComplianceHistoryTable({
   complianceResults,
   loading,
   error,
@@ -135,13 +129,6 @@ export function ComplianceTable({
     navigate(`/compliance/${compliance.id}`);
   };
 
-  const handleViewHardeningHistory = useCallback(
-    (ip_address: string) => {
-      navigate(`/${encodeURIComponent(ip_address)}/hardening-history`);
-    },
-    [navigate]
-  );
-
   // Handle copy IP address
   const handleCopyIP = async (ipAddress: string) => {
     try {
@@ -214,7 +201,6 @@ export function ComplianceTable({
                 <TableHead className="text-right">Lỗi</TableHead>
                 <TableHead className="text-center">Điểm số</TableHead>
                 <TableHead className="text-center">Ngày scan</TableHead>
-                <TableHead className="text-center">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -273,18 +259,6 @@ export function ComplianceTable({
                     <div className="text-center ">
                       {formatDate(compliance.scan_date)}
                     </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:bg-muted"
-                      onClick={() =>
-                        handleViewHardeningHistory(compliance.server_ip || "")
-                      }
-                    >
-                      <History className="mr-2 h-4 w-4" />
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

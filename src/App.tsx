@@ -13,7 +13,7 @@ import NotFoundPage from "./app/404/not-found-page";
 import AddWorkloadPage from "./app/workload/add-workload-page";
 import { WorkloadDetailPage } from "./app/workload/workload-detail-page";
 import ComplianceDetailPage from "./app/dashboard/compliance-detail-page";
-import ServerHardeningHistoryPage from "./app/server/server-hardening-history-page";
+import ServerHardeningHistoryPage from "./app/dashboard/compliance-history-page";
 
 function App() {
   return (
@@ -80,7 +80,7 @@ function App() {
           }
         />
         <Route
-          path="/servers/:serverIp/hardening-history"
+          path="/:serverIp/hardening-history"
           element={
             <MainLayout>
               <ServerHardeningHistoryPage />

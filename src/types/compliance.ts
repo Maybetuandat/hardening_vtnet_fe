@@ -11,6 +11,7 @@ export interface ComplianceResult {
   updated_at: string;
   detail_error?: string;
   server_ip?: string;
+  workload_name?: string;
 }
 
 export interface ComplianceResultDetail extends ComplianceResult {

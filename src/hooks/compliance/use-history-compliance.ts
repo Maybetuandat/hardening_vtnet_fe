@@ -19,7 +19,7 @@ export interface UseComplianceReturn {
   // Actions
   fetchComplianceResults: (
     keyword?: string,
-
+    serverId?: number,
     status?: string,
     page?: number,
     pageSize?: number
@@ -29,13 +29,10 @@ export interface UseComplianceReturn {
     complianceId: number
   ) => Promise<ComplianceResultDetail | null>;
 
-  deleteCompliance: (complianceId: number) => Promise<boolean>;
-
-  startScan: (serverIds?: number[], batchSize?: number) => Promise<boolean>;
   refreshData: () => Promise<void>;
 }
 
-export function useCompliance(): UseComplianceReturn {
+export function useHistoryCompliance(): UseComplianceReturn {
   const [complianceResults, setComplianceResults] = useState<
     ComplianceResult[]
   >([]);
@@ -49,14 +46,14 @@ export function useCompliance(): UseComplianceReturn {
   // Store current search params for refresh
   const [currentSearchParams, setCurrentSearchParams] = useState({
     keyword: "",
-
+    serverId: undefined as number | undefined,
     status: undefined as string | undefined,
   });
 
   const fetchComplianceResults = useCallback(
     async (
       keyword?: string,
-
+      serverId?: number,
       status?: string,
       page: number = 1,
       size: number = 10
@@ -68,14 +65,13 @@ export function useCompliance(): UseComplianceReturn {
         // Build query params
         const params = new URLSearchParams();
         if (keyword?.trim()) params.append("keyword", keyword.trim());
+        if (serverId) params.append("server_id", serverId.toString());
 
-        params.append("today", "true");
         if (status && status !== "all") params.append("status", status);
         params.append("page", page.toString());
         params.append("page_size", size.toString());
 
         const queryString = params.toString();
-        console.log("Query String:", queryString);
         const url = queryString ? `/compliance?${queryString}` : "compliance";
 
         const data = await api.get<ComplianceResultListResponse>(url);
@@ -86,10 +82,8 @@ export function useCompliance(): UseComplianceReturn {
         setTotalPages(data.total_pages || 0);
         setPageSize(data.page_size || 10);
 
-        setCurrentSearchParams({
-          keyword: keyword ?? "",
-          status: status,
-        });
+        // Store current search params
+        setCurrentSearchParams({ keyword: keyword ?? "", serverId, status });
       } catch (err: any) {
         const errorMessage = err.message || "Có lỗi xảy ra khi tải dữ liệu";
         setError(errorMessage);
@@ -126,68 +120,12 @@ export function useCompliance(): UseComplianceReturn {
   const refreshData = useCallback(async () => {
     await fetchComplianceResults(
       currentSearchParams.keyword,
-
+      currentSearchParams.serverId,
       currentSearchParams.status,
       currentPage,
       pageSize
     );
   }, [fetchComplianceResults, currentSearchParams, currentPage, pageSize]);
-
-  const deleteCompliance = useCallback(
-    async (complianceId: number): Promise<boolean> => {
-      try {
-        setError(null);
-
-        await api.delete(`/compliance/${complianceId}`);
-
-        // Refresh data after successful delete
-        await refreshData();
-
-        return true;
-      } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi xóa compliance result";
-        setError(errorMessage);
-        console.error("Error deleting compliance:", err);
-        return false;
-      }
-    },
-    [refreshData]
-  );
-
-  const startScan = useCallback(
-    async (serverIds?: number[], batchSize: number = 100): Promise<boolean> => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const requestBody = {
-          server_ids: serverIds,
-          batch_size: Math.min(batchSize, 500),
-        };
-
-        const data = await api.post<ComplianceScanResponse>(
-          "/compliance/scan",
-          requestBody
-        );
-
-        if (data.success) {
-          await refreshData();
-          return true;
-        }
-
-        return false;
-      } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi khởi động scan";
-        setError(errorMessage);
-        console.error("Error starting compliance scan:", err);
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [refreshData]
-  );
 
   return {
     complianceResults,
@@ -201,8 +139,7 @@ export function useCompliance(): UseComplianceReturn {
     // Actions
     fetchComplianceResults,
     getComplianceDetail,
-    deleteCompliance,
-    startScan,
+
     refreshData,
   };
 }

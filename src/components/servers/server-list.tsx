@@ -196,7 +196,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                 <TableHead>WorkLoad</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Ngày tạo</TableHead>
-                <TableHead className="text-right">Hành động</TableHead>
+                <TableHead className="text-center">Hành động</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -231,7 +231,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                   </TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -250,13 +250,6 @@ export const ServerList: React.FC<ServerListProps> = ({
                         >
                           <Edit className="mr-2 h-4 w-4" />
                           Sửa server
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleViewHardeningHistory(server)}
-                          className="cursor-pointer"
-                        >
-                          <History className="mr-2 h-4 w-4" />
-                          Lịch sử hardening
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

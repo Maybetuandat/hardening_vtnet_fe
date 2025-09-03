@@ -128,9 +128,7 @@ export default function ServersPage() {
 
   const handleViewHardeningHistory = useCallback(
     (server: Server) => {
-      navigate(
-        `/servers/${encodeURIComponent(server.ip_address)}/hardening-history`
-      );
+      navigate(`/${encodeURIComponent(server.ip_address)}/hardening-history`);
     },
     [navigate]
   );

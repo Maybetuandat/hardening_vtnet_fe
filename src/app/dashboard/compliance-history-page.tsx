@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import { useCompliance } from "@/hooks/compliance/use-compliance";
+
 import { ComplianceResult } from "@/types/compliance";
 
-import { ComplianceTable } from "@/components/dashboard/compliance-table";
 import FilterBar from "@/components/ui/filter-bar";
 import { DeleteComplianceDialog } from "@/components/dashboard/delete-compliance-dialog";
+import { ComplianceHistoryTable } from "@/components/dashboard/compliance-history/compliance-history-table";
+import { useHistoryCompliance } from "@/hooks/compliance/use-history-compliance";
 
 export default function ServerHardeningHistoryPage() {
   const { serverIp } = useParams<{ serverIp: string }>();
@@ -34,9 +35,9 @@ export default function ServerHardeningHistoryPage() {
     totalPages,
     pageSize,
     fetchComplianceResults,
-    deleteCompliance,
+
     refreshData,
-  } = useCompliance();
+  } = useHistoryCompliance();
 
   // Initial data load and search effect
   useEffect(() => {
@@ -105,22 +106,8 @@ export default function ServerHardeningHistoryPage() {
     });
   }, []);
 
-  const handleDeleteSuccess = useCallback(
-    async (complianceId: number) => {
-      try {
-        await deleteCompliance(complianceId);
-        toast.success("Đã xóa lịch sử hardening thành công");
-        setDeleteDialog({ open: false, compliance: null });
-        handleRefresh();
-      } catch (error) {
-        toast.error("Không thể xóa lịch sử hardening");
-      }
-    },
-    [deleteCompliance, handleRefresh]
-  );
-
   const handleBack = useCallback(() => {
-    navigate("/servers");
+    navigate(-1);
   }, [navigate]);
 
   if (!serverIp) {
@@ -190,7 +177,7 @@ export default function ServerHardeningHistoryPage() {
         ]}
       />
 
-      <ComplianceTable
+      <ComplianceHistoryTable
         complianceResults={complianceResults}
         loading={loading}
         error={error}
@@ -203,14 +190,6 @@ export default function ServerHardeningHistoryPage() {
         onViewDetail={handleViewDetail}
         onDelete={handleDelete}
         onRefresh={handleRefresh}
-      />
-
-      {/* Delete Dialog */}
-      <DeleteComplianceDialog
-        open={deleteDialog.open}
-        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
-        compliance={deleteDialog.compliance}
-        onDelete={handleDeleteSuccess}
       />
     </div>
   );

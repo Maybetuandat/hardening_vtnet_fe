@@ -1,28 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { ComplianceResult } from "@/types/compliance";
+
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+
 import { useCompliance } from "@/hooks/compliance/use-compliance";
 
 import { ComplianceTable } from "@/components/dashboard/compliance-table";
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
-import { DeleteComplianceDialog } from "@/components/dashboard/delete-compliance-dialog";
 
 export default function SystemHardeningDashboard() {
-  const navigate = useNavigate();
-
-  // Local state for filters
   const [searchTerm, setSearchTerm] = useState("");
-  const [serverId, setServerId] = useState<number | undefined>(undefined);
-  const [status, setStatus] = useState("all");
 
-  // Dialog states
-  const [deleteDialog, setDeleteDialog] = useState({
-    open: false,
-    compliance: null as ComplianceResult | null,
-  });
+  const [status, setStatus] = useState("all");
 
   // Hook for compliance data
   const {
@@ -34,8 +24,6 @@ export default function SystemHardeningDashboard() {
     totalPages,
     pageSize,
     fetchComplianceResults,
-    deleteCompliance,
-    startScan,
     refreshData,
   } = useCompliance();
 
@@ -44,7 +32,7 @@ export default function SystemHardeningDashboard() {
     const timeoutId = setTimeout(() => {
       fetchComplianceResults(
         searchTerm || undefined,
-        serverId,
+
         status === "all" ? undefined : status,
         1,
         pageSize
@@ -52,7 +40,7 @@ export default function SystemHardeningDashboard() {
     }, 500); // Debounce search
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, serverId, status, pageSize, fetchComplianceResults]);
+  }, [searchTerm, status, pageSize, fetchComplianceResults]);
 
   // Event handlers
   const handleSearchChange = useCallback((value: string) => {
@@ -63,19 +51,12 @@ export default function SystemHardeningDashboard() {
   const handleRefreshCompliance = useCallback(async () => {
     await fetchComplianceResults(
       searchTerm || undefined,
-      serverId,
+
       status === "all" ? undefined : status,
       currentPage,
       pageSize
     );
-  }, [
-    fetchComplianceResults,
-    searchTerm,
-    serverId,
-    status,
-    currentPage,
-    pageSize,
-  ]);
+  }, [fetchComplianceResults, searchTerm, status, currentPage, pageSize]);
 
   const handleRefresh = useCallback(() => {
     refreshData();
@@ -86,53 +67,26 @@ export default function SystemHardeningDashboard() {
     (page: number) => {
       fetchComplianceResults(
         searchTerm || undefined,
-        serverId,
+
         status === "all" ? undefined : status,
         page,
         pageSize
       );
     },
-    [fetchComplianceResults, searchTerm, serverId, status, pageSize]
+    [fetchComplianceResults, searchTerm, status, pageSize]
   );
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       fetchComplianceResults(
         searchTerm || undefined,
-        serverId,
+
         status === "all" ? undefined : status,
         1,
         newPageSize
       );
     },
-    [fetchComplianceResults, searchTerm, serverId, status]
-  );
-
-  const handleViewDetail = useCallback(
-    (compliance: ComplianceResult) => {
-      navigate(`/compliance/${compliance.id}`);
-    },
-    [navigate]
-  );
-
-  const handleDeleteClick = useCallback((compliance: ComplianceResult) => {
-    setDeleteDialog({
-      open: true,
-      compliance,
-    });
-  }, []);
-
-  const handleDeleteConfirm = useCallback(
-    async (complianceId: number) => {
-      const success = await deleteCompliance(complianceId);
-
-      if (success) {
-        toast.success("Đã xóa kết quả compliance thành công");
-      } else {
-        toast.error("Có lỗi xảy ra khi xóa compliance result");
-      }
-    },
-    [deleteCompliance]
+    [fetchComplianceResults, searchTerm, status]
   );
 
   // Filter options for FilterBar
@@ -190,17 +144,7 @@ export default function SystemHardeningDashboard() {
         pageSize={pageSize}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
-        onViewDetail={handleViewDetail}
-        onDelete={handleDeleteClick}
         onRefresh={handleRefresh}
-      />
-
-      {/* Delete Dialog */}
-      <DeleteComplianceDialog
-        compliance={deleteDialog.compliance}
-        open={deleteDialog.open}
-        onOpenChange={(open) => setDeleteDialog((prev) => ({ ...prev, open }))}
-        onDelete={handleDeleteConfirm}
       />
     </div>
   );
