@@ -1,3 +1,5 @@
+// src/hooks/compliance/use-compliance.ts - THÊM FUNCTION UPDATE COMPLIANCE RESULT
+
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import {
@@ -19,7 +21,6 @@ export interface UseComplianceReturn {
   // Actions
   fetchComplianceResults: (
     keyword?: string,
-
     status?: string,
     page?: number,
     pageSize?: number
@@ -33,6 +34,9 @@ export interface UseComplianceReturn {
 
   startScan: (serverIds?: number[], batchSize?: number) => Promise<boolean>;
   refreshData: () => Promise<void>;
+
+  // 🔥 NEW - Direct update function for SSE
+  updateComplianceResult: (completedData: any) => void;
 }
 
 export function useCompliance(): UseComplianceReturn {
@@ -49,14 +53,12 @@ export function useCompliance(): UseComplianceReturn {
   // Store current search params for refresh
   const [currentSearchParams, setCurrentSearchParams] = useState({
     keyword: "",
-
     status: undefined as string | undefined,
   });
 
   const fetchComplianceResults = useCallback(
     async (
       keyword?: string,
-
       status?: string,
       page: number = 1,
       size: number = 10
@@ -126,7 +128,6 @@ export function useCompliance(): UseComplianceReturn {
   const refreshData = useCallback(async () => {
     await fetchComplianceResults(
       currentSearchParams.keyword,
-
       currentSearchParams.status,
       currentPage,
       pageSize
@@ -189,6 +190,43 @@ export function useCompliance(): UseComplianceReturn {
     [refreshData]
   );
 
+  // 🔥 NEW - Direct update compliance result from SSE notification
+  const updateComplianceResult = useCallback((completedData: any) => {
+    console.log("🔄 SSE updating compliance result ID:", completedData.id);
+
+    setComplianceResults((prev) => {
+      const existingIndex = prev.findIndex(
+        (item) => item.id === completedData.id
+      );
+
+      if (existingIndex >= 0) {
+        // 🎯 UPDATE IN-PLACE - React sẽ re-render
+        const updated = [...prev];
+        updated[existingIndex] = {
+          ...updated[existingIndex], // Giữ nguyên các field khác
+          status: completedData.status,
+          total_rules: completedData.total_rules,
+          passed_rules: completedData.passed_rules,
+          failed_rules: completedData.failed_rules,
+          score: completedData.score,
+          scan_date: completedData.scan_date,
+          updated_at: completedData.updated_at,
+        };
+
+        console.log(
+          `✅ Updated compliance ${completedData.id}: running → completed (Score: ${completedData.score}%)`
+        );
+        return updated;
+      } else {
+        // Record không có trong danh sách hiện tại (do pagination/filter)
+        console.log(
+          `⚠️ Compliance ${completedData.id} not found in current page, ignoring update`
+        );
+        return prev;
+      }
+    });
+  }, []);
+
   return {
     complianceResults,
     loading,
@@ -204,5 +242,6 @@ export function useCompliance(): UseComplianceReturn {
     deleteCompliance,
     startScan,
     refreshData,
+    updateComplianceResult, // 🔥 NEW
   };
 }
