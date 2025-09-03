@@ -59,19 +59,7 @@ export function RuleResultTable({
       failed: {
         variant: "destructive",
         icon: XCircle,
-        label: "Lỗi",
-        color: "text-red-600",
-      },
-      skipped: {
-        variant: "secondary",
-        icon: MinusCircle,
-        label: "Bỏ qua",
-        color: "text-gray-600",
-      },
-      error: {
-        variant: "destructive",
-        icon: AlertCircle,
-        label: "Lỗi thực thi",
+        label: "Không đạt",
         color: "text-red-600",
       },
     };
@@ -138,11 +126,6 @@ export function RuleResultTable({
   };
 
   const handleStatusToggle = (ruleResult: RuleResult) => {
-    // Chỉ cho phép toggle giữa passed và failed
-    if (ruleResult.status === "skipped" || ruleResult.status === "error") {
-      return;
-    }
-
     const newStatus = ruleResult.status === "passed" ? "failed" : "passed";
     onStatusToggle(ruleResult.id, newStatus);
   };

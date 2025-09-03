@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { ComplianceResult } from "@/types/compliance";
 
 import FilterBar from "@/components/ui/filter-bar";
-import { DeleteComplianceDialog } from "@/components/dashboard/delete-compliance-dialog";
+
 import { ComplianceHistoryTable } from "@/components/dashboard/compliance-history/compliance-history-table";
 import { useHistoryCompliance } from "@/hooks/compliance/use-history-compliance";
 
@@ -19,12 +19,6 @@ export default function ServerHardeningHistoryPage() {
   // Local state for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState("all");
-
-  // Dialog states
-  const [deleteDialog, setDeleteDialog] = useState({
-    open: false,
-    compliance: null as ComplianceResult | null,
-  });
 
   const {
     complianceResults,
@@ -46,12 +40,13 @@ export default function ServerHardeningHistoryPage() {
     const timeoutId = setTimeout(() => {
       fetchComplianceResults(
         searchTerm || serverIp,
-        undefined,
+
         status === "all" ? undefined : status,
         1,
         pageSize
       );
     }, 500); // Debounce search
+    console.log("Fetching compliance results for server IP:", serverIp);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm, status, pageSize, fetchComplianceResults, serverIp]);
@@ -69,7 +64,6 @@ export default function ServerHardeningHistoryPage() {
   const handlePageChange = useCallback(
     (page: number) => {
       fetchComplianceResults(
-        serverIp,
         undefined,
         status === "all" ? undefined : status,
         page,
@@ -82,7 +76,6 @@ export default function ServerHardeningHistoryPage() {
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       fetchComplianceResults(
-        serverIp,
         undefined,
         status === "all" ? undefined : status,
         1,
@@ -98,13 +91,6 @@ export default function ServerHardeningHistoryPage() {
     },
     [navigate]
   );
-
-  const handleDelete = useCallback((compliance: ComplianceResult) => {
-    setDeleteDialog({
-      open: true,
-      compliance,
-    });
-  }, []);
 
   const handleBack = useCallback(() => {
     navigate(-1);
@@ -188,7 +174,6 @@ export default function ServerHardeningHistoryPage() {
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onViewDetail={handleViewDetail}
-        onDelete={handleDelete}
         onRefresh={handleRefresh}
       />
     </div>

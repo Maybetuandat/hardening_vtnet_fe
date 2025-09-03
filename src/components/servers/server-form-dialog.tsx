@@ -169,7 +169,11 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     <FormItem>
                       <FormLabel>OS Version</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ubuntu 24.04 LTS" {...field} />
+                        <Input
+                          placeholder="Ubuntu 24.04 LTS"
+                          {...field}
+                          disabled
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

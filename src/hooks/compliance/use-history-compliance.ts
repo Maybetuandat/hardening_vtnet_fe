@@ -4,7 +4,6 @@ import {
   ComplianceResult,
   ComplianceResultDetail,
   ComplianceResultListResponse,
-  ComplianceScanResponse,
 } from "@/types/compliance";
 
 export interface UseComplianceReturn {
@@ -19,7 +18,7 @@ export interface UseComplianceReturn {
   // Actions
   fetchComplianceResults: (
     keyword?: string,
-    serverId?: number,
+
     status?: string,
     page?: number,
     pageSize?: number
@@ -46,14 +45,14 @@ export function useHistoryCompliance(): UseComplianceReturn {
   // Store current search params for refresh
   const [currentSearchParams, setCurrentSearchParams] = useState({
     keyword: "",
-    serverId: undefined as number | undefined,
+
     status: undefined as string | undefined,
   });
 
   const fetchComplianceResults = useCallback(
     async (
       keyword?: string,
-      serverId?: number,
+
       status?: string,
       page: number = 1,
       size: number = 10
@@ -65,7 +64,6 @@ export function useHistoryCompliance(): UseComplianceReturn {
         // Build query params
         const params = new URLSearchParams();
         if (keyword?.trim()) params.append("keyword", keyword.trim());
-        if (serverId) params.append("server_id", serverId.toString());
 
         if (status && status !== "all") params.append("status", status);
         params.append("page", page.toString());
@@ -83,7 +81,7 @@ export function useHistoryCompliance(): UseComplianceReturn {
         setPageSize(data.page_size || 10);
 
         // Store current search params
-        setCurrentSearchParams({ keyword: keyword ?? "", serverId, status });
+        setCurrentSearchParams({ keyword: keyword ?? "", status });
       } catch (err: any) {
         const errorMessage = err.message || "Có lỗi xảy ra khi tải dữ liệu";
         setError(errorMessage);
@@ -120,7 +118,7 @@ export function useHistoryCompliance(): UseComplianceReturn {
   const refreshData = useCallback(async () => {
     await fetchComplianceResults(
       currentSearchParams.keyword,
-      currentSearchParams.serverId,
+
       currentSearchParams.status,
       currentPage,
       pageSize

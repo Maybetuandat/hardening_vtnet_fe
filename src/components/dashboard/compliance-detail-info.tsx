@@ -27,25 +27,10 @@ export function ComplianceDetailInfo({
         label: "Hoàn thành",
         className: "bg-green-100 text-green-800 border-green-300",
       },
-      running: {
-        variant: "default",
-        label: "Đang chạy",
-        className: "bg-blue-100 text-blue-800 border-blue-300",
-      },
       failed: {
         variant: "destructive",
         label: "Thất bại",
         className: "bg-red-100 text-red-800 border-red-300",
-      },
-      pending: {
-        variant: "secondary",
-        label: "Chờ xử lý",
-        className: "bg-gray-100 text-gray-800 border-gray-300",
-      },
-      cancelled: {
-        variant: "outline",
-        label: "Đã hủy",
-        className: "bg-gray-100 text-gray-600 border-gray-300",
       },
     };
 

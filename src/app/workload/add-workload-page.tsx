@@ -1,5 +1,3 @@
-// src/app/workload/add-workload-page.tsx - Updated để hỗ trợ validation
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -122,21 +120,6 @@ export default function AddWorkloadPage() {
     if (loading) return true;
     if (currentStep === 0 && validatingWorkloadName) return true;
     return !canProceedToNextStep();
-  };
-
-  const getTotalItemsText = () => {
-    const rulesCount = formData.rules.length;
-    const commandsCount = formData.commands?.length ?? 0;
-
-    if (rulesCount === 0 && commandsCount === 0) {
-      return "Chưa có dữ liệu";
-    }
-
-    const parts = [];
-    if (rulesCount > 0) parts.push(`${rulesCount} rules`);
-    if (commandsCount > 0) parts.push(`${commandsCount} commands`);
-
-    return parts.join(", ");
   };
 
   return (

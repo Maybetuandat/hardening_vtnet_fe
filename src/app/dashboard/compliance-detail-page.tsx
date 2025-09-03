@@ -206,9 +206,7 @@ export default function ComplianceDetailPage() {
                 options: [
                   { value: "all", label: "Tất cả trạng thái" },
                   { value: "passed", label: "Đạt" },
-                  { value: "failed", label: "Lỗi" },
-                  { value: "skipped", label: "Bỏ qua" },
-                  { value: "error", label: "Lỗi thực thi" },
+                  { value: "failed", label: "Không đạt" },
                 ],
                 widthClass: "w-40",
               },

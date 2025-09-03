@@ -28,7 +28,7 @@ interface ComplianceTableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onViewDetail: (compliance: ComplianceResult) => void;
-  onDelete: (compliance: ComplianceResult) => void;
+
   onRefresh: () => void;
 }
 
@@ -48,7 +48,6 @@ export function ComplianceHistoryTable({
   const navigate = useNavigate();
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
-  // Format date
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleString("vi-VN", {
@@ -60,7 +59,6 @@ export function ComplianceHistoryTable({
     });
   };
 
-  // Format score with color
   const formatScore = (score: number) => {
     let colorClass = "bg-gray-100 text-gray-800";
     if (score >= 90) colorClass = "bg-green-100 text-green-800";
@@ -75,7 +73,6 @@ export function ComplianceHistoryTable({
     );
   };
 
-  // Get status badge
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       completed: {
@@ -115,7 +112,6 @@ export function ComplianceHistoryTable({
     );
   };
 
-  // Handle row click to navigate to detail page
   const handleRowClick = (
     compliance: ComplianceResult,
     event: React.MouseEvent
