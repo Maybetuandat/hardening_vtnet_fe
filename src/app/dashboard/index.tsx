@@ -7,6 +7,7 @@ import { ComplianceTable } from "@/components/dashboard/compliance-table";
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
 import { useSSENotifications } from "@/hooks/notifications/use-sse-notifications";
+import { ComplianceResult } from "@/types/compliance";
 
 export default function SystemHardeningDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,23 +24,13 @@ export default function SystemHardeningDashboard() {
     pageSize,
     fetchComplianceResults,
     refreshData,
-    updateComplianceResult, // 🔥 NEW - Function to update specific record
+    updateComplianceResult,
   } = useCompliance();
 
-  // 🔥 SSE NOTIFICATION HOOK - UPDATE IN-PLACE
   const { isConnected, connectionError } = useSSENotifications(
     useCallback(
-      (completedData: any) => {
-        console.log(
-          "🎉 Compliance completed, updating existing record:",
-          completedData.id
-        );
-
-        // 🎯 UPDATE IN-PLACE - tìm theo compliance_id và update thuộc tính
+      (completedData: ComplianceResult) => {
         updateComplianceResult(completedData);
-
-        // React sẽ tự động re-render component khi state thay đổi
-        // KHÔNG cần refreshData() nữa
       },
       [updateComplianceResult]
     )
@@ -59,7 +50,6 @@ export default function SystemHardeningDashboard() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, status, pageSize, fetchComplianceResults]);
 
-  // 🔥 HIỂN THỊ CONNECTION ERROR
   useEffect(() => {
     if (connectionError) {
       toast.error(`Lỗi kết nối realtime: ${connectionError}`, {
@@ -133,7 +123,7 @@ export default function SystemHardeningDashboard() {
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
       <HeaderDashBoard onRefreshCompliance={handleRefreshCompliance} />
 
-      {/* 🔥 SSE CONNECTION STATUS INDICATOR */}
+      {/*  SSE CONNECTION STATUS INDICATOR */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div

@@ -109,7 +109,7 @@ export default function ScanDialog({
 
       const scanRequest = {
         server_ids: scanType === "all" ? null : Array.from(selectedServers),
-        batch_size: 100,
+        batch_size: 10,
       };
 
       toast.success(
