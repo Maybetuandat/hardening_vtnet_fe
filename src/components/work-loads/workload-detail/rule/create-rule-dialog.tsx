@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 
 import { Switch } from "@/components/ui/switch";
 import { Save, X } from "lucide-react";
-import { useRules, RuleCreate } from "@/hooks/rule/use-rules";
+import { useRules } from "@/hooks/rule/use-rules";
+import { RuleCreate } from "@/types/rule";
 
 interface CreateRuleDialogProps {
   workloadId: number;
@@ -63,7 +64,6 @@ export const CreateRuleDialog: React.FC<CreateRuleDialogProps> = ({
       resetForm();
       onSuccess();
     } catch (error) {
-      // Error is already handled in the hook
     } finally {
       setLoading(false);
     }

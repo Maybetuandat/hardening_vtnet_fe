@@ -2,39 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 
 import {
   Search,
-  Plus,
-  Eye,
-  Edit,
-  Trash2,
   ChevronLeft,
   ChevronRight,
-  MoreHorizontal,
   X,
+  FileSpreadsheet,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { useRules } from "@/hooks/rule/use-rules";
-import { CreateRuleDialog } from "./create-rule-dialog";
+
 import { DeleteRuleDialog } from "./delete-rule-dialog";
 import { EditRuleDialog } from "./edit-rule-dialog";
+import { RuleExcelUploadDialog } from "./rule-excel-upload-dialog";
 import { RuleResponse } from "@/types/rule";
-import { ParametersPreview } from "./paramter-preview";
+
 import { RulesTable } from "./rule-table";
 
 interface RulesSectionProps {
@@ -49,14 +32,13 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   selectedRuleId,
 }) => {
   const [searchInput, setSearchInput] = useState("");
-
   const [searchKeyword, setSearchKeyword] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  // Dialog states - thay đổi state
+  const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false); // Thay thế isCreateDialogOpen
   const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
   const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
 
@@ -104,8 +86,9 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
     setCurrentPage(page);
   };
 
-  const handleRuleCreated = () => {
-    setIsCreateDialogOpen(false);
+  const handleRulesUploaded = () => {
+    setIsExcelUploadOpen(false);
+
     fetchRules({
       keyword: searchKeyword || undefined,
       workload_id: isSearching ? undefined : workloadId,
@@ -152,17 +135,18 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl">{getTitle()}</CardTitle>
+            {/* Thay đổi button để mở Excel upload */}
             <Button
-              onClick={() => setIsCreateDialogOpen(true)}
+              onClick={() => setIsExcelUploadOpen(true)} // Thay đổi handler
               size="sm"
-              className="h-8"
+              className="h-8 flex items-center gap-2"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm Rule
+              <FileSpreadsheet className="h-4 w-4" /> {/* Thay icon */}
+              Thêm Rules từ Excel {/* Thay text */}
             </Button>
           </div>
 
-          {/* Enhanced Search with Enter to search */}
+          {/* Enhanced Search with Enter to search - giữ nguyên */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -189,7 +173,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             )}
           </div>
 
-          {/* Search hint */}
           {searchInput && searchInput !== searchKeyword && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground bg-yellow-50 border border-yellow-200 rounded-lg p-2">
               <Search className="h-4 w-4 text-yellow-600" />
@@ -197,7 +180,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             </div>
           )}
 
-          {/* Search mode indicator */}
           {isSearching && (
             <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
@@ -255,7 +237,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                 onDeleteRule={(rule) => setDeletingRule(rule)}
               />
 
-              {/* Pagination */}
+              {/* Pagination - giữ nguyên */}
               <div className="flex items-center justify-between mt-4">
                 <div className="flex items-center space-x-2">
                   <Button
@@ -284,14 +266,17 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
-      <CreateRuleDialog
+      {/* Dialogs - Thay đổi dialogs */}
+
+      {/* Thay CreateRuleDialog bằng RuleExcelUploadDialog */}
+      <RuleExcelUploadDialog
         workloadId={workloadId}
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onSuccess={handleRuleCreated}
+        open={isExcelUploadOpen}
+        onOpenChange={setIsExcelUploadOpen}
+        onSuccess={handleRulesUploaded}
       />
 
+      {/* Các dialog khác giữ nguyên */}
       {editingRule && (
         <EditRuleDialog
           rule={editingRule}

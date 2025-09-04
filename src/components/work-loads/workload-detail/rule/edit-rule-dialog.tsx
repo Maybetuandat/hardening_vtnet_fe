@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Save, X } from "lucide-react";
-import { useRules, RuleResponse, RuleCreate } from "@/hooks/rule/use-rules";
+import { useRules } from "@/hooks/rule/use-rules";
+import { RuleCreate, RuleResponse } from "@/types/rule";
 
 interface EditRuleDialogProps {
   rule: RuleResponse;

@@ -10,7 +10,7 @@ import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
 
 import NotFoundPage from "./app/404/not-found-page";
-import AddWorkloadPage from "./app/workload/add-workload-page";
+import AddWorkloadPage from "./app/workload/create-workload-page";
 import { WorkloadDetailPage } from "./app/workload/workload-detail-page";
 import ComplianceDetailPage from "./app/dashboard/compliance-detail-page";
 import ServerHardeningHistoryPage from "./app/dashboard/compliance-history-page";
