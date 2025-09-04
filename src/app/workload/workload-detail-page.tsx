@@ -7,8 +7,8 @@ import { Separator } from "@/components/ui/separator";
 
 import { useWorkloadDetail } from "@/hooks/workload/use-workload-detail";
 import { toast } from "sonner";
-import { CommandsSection } from "@/components/work-loads/workload-detail/command-session";
-import { RulesSection } from "@/components/work-loads/workload-detail/rule-session";
+import { CommandsSection } from "@/components/work-loads/workload-detail/command/command-session";
+import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
 
 export const WorkloadDetailPage: React.FC = () => {

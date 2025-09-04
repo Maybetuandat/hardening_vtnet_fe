@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+
 import {
   Search,
   Plus,
@@ -28,10 +29,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRules, RuleResponse } from "@/hooks/rule/use-rules";
+import { useRules } from "@/hooks/rule/use-rules";
 import { CreateRuleDialog } from "./create-rule-dialog";
 import { DeleteRuleDialog } from "./delete-rule-dialog";
 import { EditRuleDialog } from "./edit-rule-dialog";
+import { RuleResponse } from "@/types/rule";
+import { ParametersPreview } from "./paramter-preview";
+import { RulesTable } from "./rule-table";
 
 interface RulesSectionProps {
   workloadId: number;
@@ -44,12 +48,14 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   onRuleSelect,
   selectedRuleId,
 }) => {
+  const [searchInput, setSearchInput] = useState("");
+
   const [searchKeyword, setSearchKeyword] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-  const [isSearching, setIsSearching] = useState(false); // ✅ Track search state
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Dialog states
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
   const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
@@ -57,11 +63,10 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   const { rules, loading, error, totalRules, totalPages, fetchRules } =
     useRules();
 
-  // ✅ Fetch rules based on search state
   useEffect(() => {
     const fetchParams = {
       keyword: searchKeyword || undefined,
-      workload_id: isSearching ? undefined : workloadId, // ✅ Only pass workloadId when not searching
+      workload_id: isSearching ? undefined : workloadId,
       page: currentPage,
       page_size: pageSize,
     };
@@ -70,18 +75,29 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
     fetchRules(fetchParams);
   }, [workloadId, currentPage, searchKeyword, isSearching, fetchRules]);
 
-  // ✅ Handle search input change
-  const handleSearch = (value: string) => {
-    setSearchKeyword(value);
-    setCurrentPage(1); // Reset to first page when searching
-    setIsSearching(value.trim() !== ""); // ✅ Set search state based on input
+  const handleSearchInputChange = (value: string) => {
+    setSearchInput(value);
   };
 
-  // ✅ Clear search and return to workload-specific rules
+  const handleSearchSubmit = (value: string) => {
+    const trimmedValue = value.trim();
+    setSearchKeyword(trimmedValue);
+    setCurrentPage(1);
+    setIsSearching(trimmedValue !== "");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearchSubmit(searchInput);
+    }
+  };
+
   const handleClearSearch = () => {
+    setSearchInput("");
     setSearchKeyword("");
     setCurrentPage(1);
-    setIsSearching(false); // ✅ Return to workload-specific mode
+    setIsSearching(false);
   };
 
   const handlePageChange = (page: number) => {
@@ -90,7 +106,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const handleRuleCreated = () => {
     setIsCreateDialogOpen(false);
-    // ✅ Refresh with current search state
     fetchRules({
       keyword: searchKeyword || undefined,
       workload_id: isSearching ? undefined : workloadId,
@@ -101,7 +116,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const handleRuleUpdated = () => {
     setEditingRule(null);
-    // ✅ Refresh with current search state
     fetchRules({
       keyword: searchKeyword || undefined,
       workload_id: isSearching ? undefined : workloadId,
@@ -112,11 +126,11 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const handleRuleDeleted = () => {
     setDeletingRule(null);
-    // If deleted rule was selected, clear selection
+
     if (deletingRule && selectedRuleId === deletingRule.id) {
       onRuleSelect(null);
     }
-    // ✅ Refresh with current search state
+
     fetchRules({
       keyword: searchKeyword || undefined,
       workload_id: isSearching ? undefined : workloadId,
@@ -148,21 +162,22 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             </Button>
           </div>
 
-          {/* ✅ Enhanced Search with clear button */}
+          {/* Enhanced Search with Enter to search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={
                 isSearching
-                  ? "Tìm kiếm trong tất cả rules..."
-                  : "Tìm kiếm rules của workload này..."
+                  ? "Nhấn Enter để tìm kiếm trong tất cả rules..."
+                  : "Nhấn Enter để tìm kiếm rules của workload này..."
               }
-              value={searchKeyword}
-              onChange={(e) => handleSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="pl-10 pr-10"
             />
-            {/* ✅ Clear search button */}
-            {searchKeyword && (
+            {/* Clear search button */}
+            {(searchInput || searchKeyword) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -174,13 +189,22 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             )}
           </div>
 
-          {/* ✅ Search mode indicator */}
+          {/* Search hint */}
+          {searchInput && searchInput !== searchKeyword && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-yellow-50 border border-yellow-200 rounded-lg p-2">
+              <Search className="h-4 w-4 text-yellow-600" />
+              <span>Nhấn Enter để tìm kiếm "{searchInput}"</span>
+            </div>
+          )}
+
+          {/* Search mode indicator */}
           {isSearching && (
             <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <Search className="h-4 w-4 text-blue-600" />
                 <span className="text-sm text-blue-800">
-                  Đang tìm kiếm trong tất cả rules của hệ thống
+                  Đang tìm kiếm trong tất cả rules với từ khóa: "{searchKeyword}
+                  "
                 </span>
               </div>
               <Button
@@ -189,7 +213,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                 onClick={handleClearSearch}
                 className="h-7"
               >
-                Quay lại rules của workload
+                Xóa tìm kiếm
               </Button>
             </div>
           )}
@@ -210,122 +234,29 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 {searchKeyword
-                  ? "Không tìm thấy rule nào"
+                  ? `Không tìm thấy rule nào với từ khóa "${searchKeyword}"`
                   : isSearching
                   ? "Không có rule nào trong hệ thống"
                   : "Workload này chưa có rule nào"}
               </p>
+              {searchInput && searchInput !== searchKeyword && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Nhấn Enter để tìm kiếm "{searchInput}"
+                </p>
+              )}
             </div>
           ) : (
             <>
-              {/* Table */}
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tên</TableHead>
-                      <TableHead>Mức độ</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      {/* ✅ Show workload column when searching all rules */}
-                      {isSearching && <TableHead>Workload</TableHead>}
-                      <TableHead className="w-[100px]">Thao tác</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rules.map((rule) => (
-                      <TableRow
-                        key={rule.id}
-                        className={`cursor-pointer ${
-                          selectedRuleId === rule.id ? "bg-muted" : ""
-                        }`}
-                        onClick={() => onRuleSelect(rule.id)}
-                      >
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{rule.name}</p>
-                            {rule.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-1">
-                                {rule.description}
-                              </p>
-                            )}
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className={
-                              rule.is_active
-                                ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                : "bg-gray-100 text-gray-800 hover:bg-gray-100"
-                            }
-                          >
-                            {rule.is_active ? "Hoạt động" : "Tạm dừng"}
-                          </Badge>
-                        </TableCell>
-                        {/* ✅ Show workload info when searching */}
-                        {isSearching && (
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              Workload ID: {rule.workload_id}
-                            </span>
-                          </TableCell>
-                        )}
-                        <TableCell>
-                          <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger
-                              asChild
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onRuleSelect(rule.id);
-                                }}
-                              >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Xem Commands
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingRule(rule);
-                                }}
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Chỉnh sửa
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeletingRule(rule);
-                                }}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Xóa
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <RulesTable
+                rules={rules}
+                selectedRuleId={selectedRuleId}
+                onRuleSelect={onRuleSelect}
+                onEditRule={(rule) => setEditingRule(rule)}
+                onDeleteRule={(rule) => setDeletingRule(rule)}
+              />
 
               {/* Pagination */}
               <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-muted-foreground">
-                  Hiển thị {(currentPage - 1) * pageSize + 1} -{" "}
-                  {Math.min(currentPage * pageSize, totalRules)} trong{" "}
-                  {totalRules} rules
-                </p>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
@@ -336,7 +267,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <span className="text-sm">
-                    Trang {currentPage} / {totalPages}
+                    {currentPage} / {totalPages}
                   </span>
                   <Button
                     variant="outline"
