@@ -58,7 +58,7 @@ export function useSSENotifications(
               console.log(" SSE connection established");
               break;
 
-            case "compliance_completed":
+            case "completed":
               console.log(" Compliance scan completed:", message.data);
 
               toast.success(
@@ -76,6 +76,18 @@ export function useSSENotifications(
               }
               break;
 
+            case "failed":
+              toast.error(
+                `Scan thất bại: ${message.message || "Lỗi không xác định"}`,
+                {
+                  duration: 5000,
+                }
+              );
+
+              if (onComplianceCompleted) {
+                onComplianceCompleted(message.data as ComplianceResult);
+              }
+              break;
             case "heartbeat":
               // Silent heartbeat
               break;

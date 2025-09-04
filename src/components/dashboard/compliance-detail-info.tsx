@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Clock,
   Cpu,
+  XCircle,
 } from "lucide-react";
 import { ComplianceResultDetail } from "@/types/compliance";
 
@@ -229,6 +230,33 @@ export function ComplianceDetailInfo({
           </div>
         </CardContent>
       </Card>
+
+      {/* Detail Error Card */}
+      {compliance.detail_error && (
+        <Card className="border-red-200 bg-red-50/50">
+          <CardHeader className="bg-red-50 border-b border-red-200">
+            <CardTitle className="flex items-center gap-2 text-red-800">
+              <XCircle className="h-5 w-5" />
+              Chi tiết lỗi
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="bg-white border border-red-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-medium text-red-900 mb-2">
+                    Thông tin lỗi:
+                  </h4>
+                  <div className="text-sm text-red-800 whitespace-pre-wrap break-words font-mono bg-red-50 p-3 rounded border">
+                    {compliance.detail_error}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
