@@ -62,12 +62,12 @@ export function useExcelParser() {
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
       try {
-        console.log("🔄 Parsing Excel file:", file.name);
+        console.log(" Parsing Excel file:", file.name);
 
         const buffer = await file.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "buffer" });
 
-        console.log("📋 Available sheets:", workbook.SheetNames);
+        console.log(" Available sheets:", workbook.SheetNames);
 
         // Lấy sheet đầu tiên hoặc sheet có tên chứa "rule"
         const sheetName =
@@ -87,10 +87,10 @@ export function useExcelParser() {
           throw new Error("File Excel không có dữ liệu hoặc thiếu header");
         }
 
-        console.log("📊 Raw Excel data:", jsonData);
+        console.log(" Raw Excel data:", jsonData);
 
         const headers = jsonData[0] as string[];
-        console.log("📝 Headers:", headers);
+        console.log(" Headers:", headers);
 
         // Required columns theo format mới
         const ruleColumns = [
@@ -145,7 +145,7 @@ export function useExcelParser() {
         const { uniqueRules, duplicates, removedCount } =
           removeDuplicateRules(rules);
 
-        console.log("✅ Parsed successfully:", {
+        console.log(" Parsed successfully:", {
           totalRules: rules.length,
           uniqueRules: uniqueRules.length,
           duplicatesRemoved: removedCount,
@@ -162,7 +162,7 @@ export function useExcelParser() {
 
         if (removedCount > 0) {
           warnings.push(
-            `⚠️ Đã loại bỏ ${removedCount} rules trùng lặp trong file Excel`
+            ` Đã loại bỏ ${removedCount} rules trùng lặp trong file Excel`
           );
           duplicates.forEach((duplicate) => {
             warnings.push(
@@ -178,7 +178,7 @@ export function useExcelParser() {
           errors: errors.length > 0 ? errors : undefined,
         };
       } catch (err: any) {
-        console.error("❌ Error parsing Excel file:", err);
+        console.error(" Error parsing Excel file:", err);
         return {
           success: false,
           rules: [],

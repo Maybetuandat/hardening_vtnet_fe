@@ -16,6 +16,7 @@ export interface RuleCheckResult {
   is_active: boolean;
   is_duplicate: boolean;
   duplicate_reason?: "name" | "parameter_hash";
+  command: string;
 }
 
 interface UseRuleExcelUploadReturn {
@@ -72,6 +73,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             workload_id: 0, // Sẽ được set sau
             parameters: rule.parameters || {},
             is_active: rule.is_active !== false,
+            command: rule.command || "",
           }));
 
           setRules(rulesForApi);
@@ -104,7 +106,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
       setError(null);
 
       try {
-        console.log("🔍 Checking rules existence:", {
+        console.log(" Checking rules existence:", {
           workloadId,
           rulesCount: rules.length,
         });
@@ -113,29 +115,21 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         const rulesToCheck = rules.map((rule) => ({
           ...rule,
           workload_id: workloadId,
+          command: rule.command || "",
         }));
 
-        // FIX: Gọi API với workload_id là query parameter
         const response = await api.post<RuleCheckResult[]>(
-          `/rules/check-existence?workload_id=${workloadId}`,
-          rulesToCheck // rules array sẽ là request body
+          "/rules/check-existence",
+          {
+            workload_id: workloadId,
+            rules: rulesToCheck,
+          }
         );
 
-        console.log("✅ Rules existence check completed:", response);
+        console.log(" Rules existence check completed:", response);
         setCheckResults(response);
-
-        const duplicateCount = response.filter((r) => r.is_duplicate).length;
-        const uniqueCount = response.filter((r) => !r.is_duplicate).length;
-
-        if (duplicateCount > 0) {
-          toast.warning(
-            `Phát hiện ${duplicateCount} rules trùng lặp. Chỉ có thể tạo ${uniqueCount} rules mới.`
-          );
-        } else {
-          toast.success(`Tất cả ${uniqueCount} rules đều có thể được tạo.`);
-        }
       } catch (err: any) {
-        console.error("❌ Error checking rules existence:", err);
+        console.error(" Error checking rules existence:", err);
         const errorMessage = err.message || "Không thể kiểm tra rule existence";
         setError(errorMessage);
         toast.error(errorMessage);
@@ -146,9 +140,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
     [rules]
   );
 
-  /**
-   * Tạo các rules unique (đã được check)
-   */
   const createUniqueRules = useCallback(
     async (workloadId: number): Promise<void> => {
       if (!checkResults) {
@@ -160,7 +151,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
       setError(null);
 
       try {
-        // Chỉ tạo rules không duplicate
         const uniqueResults = checkResults.filter(
           (result) => !result.is_duplicate
         );
@@ -170,7 +160,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
           return;
         }
 
-        console.log("🚀 Creating unique rules:", {
+        console.log(" Creating unique rules:", {
           workloadId,
           uniqueCount: uniqueResults.length,
         });
@@ -184,14 +174,13 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             workload_id: workloadId,
             parameters: result.parameters || {},
             is_active: result.is_active,
+            command: result.command || "",
           };
           const createdRule = await createRule(ruleData);
           createdRules.push(createdRule);
         }
-
-        console.log("✅ Rules created successfully:", createdRules.length);
       } catch (err: any) {
-        console.error("❌ Error creating rules:", err);
+        console.error(" Error creating rules:", err);
         const errorMessage = err.message || "Không thể tạo rules";
         setError(errorMessage);
         throw new Error(errorMessage);
@@ -211,7 +200,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
     setCheckResults(null);
   }, []);
 
-  // Logic để enable/disable nút Add
   const canAddRules =
     checkResults !== null &&
     checkResults.some((r) => !r.is_duplicate) &&

@@ -115,6 +115,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                 description: r.description,
                 parameters: r.parameters ?? {},
                 is_active: r.is_active,
+                command: r.command || "",
               }))}
               loading={loading}
               onFileUpload={handleFileUpload}
@@ -217,6 +218,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
           description: r.description,
           parameters: r.parameters ?? {},
           is_active: r.is_active,
+          command: r.command || "",
         }))}
       />
     </>
