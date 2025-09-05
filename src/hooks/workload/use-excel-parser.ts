@@ -90,7 +90,6 @@ export function useExcelParser() {
         console.log(" Raw Excel data:", jsonData);
 
         const headers = jsonData[0] as string[];
-        console.log(" Headers:", headers);
 
         // Required columns theo format mới
         const ruleColumns = [
@@ -134,7 +133,7 @@ export function useExcelParser() {
             command:
               rowData["command"] && typeof rowData["command"] === "string"
                 ? rowData["command"].trim()
-                : undefined,
+                : "",
             is_active: true,
           };
 

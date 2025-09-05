@@ -45,13 +45,9 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
     null
   );
 
-  // Hooks - tái sử dụng existing hooks
   const { parseExcelFile: parseExcel } = useExcelParser();
   const { createRule } = useRules();
 
-  /**
-   * Parse Excel file - tái sử dụng logic từ useExcelParser
-   */
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
       setLoading(true);
@@ -66,14 +62,13 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         const result = await parseExcel(file);
 
         if (result.success && result.rules) {
-          // Convert sang RuleCreate format
           const rulesForApi = result.rules.map((rule) => ({
             name: rule.name,
             description: rule.description || "",
-            workload_id: 0, // Sẽ được set sau
+            workload_id: 0,
             parameters: rule.parameters || {},
             is_active: rule.is_active !== false,
-            command: rule.command || "",
+            command: rule.command, // ✅ Remove || "" here
           }));
 
           setRules(rulesForApi);
@@ -111,11 +106,10 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
           rulesCount: rules.length,
         });
 
-        // Update workload_id cho rules
         const rulesToCheck = rules.map((rule) => ({
           ...rule,
           workload_id: workloadId,
-          command: rule.command || "",
+          command: rule.command, // ✅ Remove || "" here
         }));
 
         const response = await api.post<RuleCheckResult[]>(
@@ -174,8 +168,11 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             workload_id: workloadId,
             parameters: result.parameters || {},
             is_active: result.is_active,
-            command: result.command || "",
+            command: result.command,
           };
+
+          console.log("Creating rule with command:", result.command); // Debug log
+
           const createdRule = await createRule(ruleData);
           createdRules.push(createdRule);
         }

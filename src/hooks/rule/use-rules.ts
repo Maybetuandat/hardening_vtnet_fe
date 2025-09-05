@@ -67,6 +67,7 @@ export function useRules(): UseRulesReturn {
   const createRule = useCallback(
     async (data: RuleCreate): Promise<RuleResponse> => {
       try {
+        console.log("Creating rule with data:", data);
         const response = await api.post<RuleResponse>("/rules", data);
         toast.success("Tạo rule thành công");
         return response;

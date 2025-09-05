@@ -3,13 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  FileSpreadsheet,
-} from "lucide-react";
+import { Search, X, FileSpreadsheet } from "lucide-react";
 
 import { useRules } from "@/hooks/rule/use-rules";
 
@@ -17,6 +11,7 @@ import { DeleteRuleDialog } from "./delete-rule-dialog";
 import { EditRuleDialog } from "./edit-rule-dialog";
 import { RuleExcelUploadDialog } from "./rule-excel-upload-dialog";
 import { RuleResponse } from "@/types/rule";
+import { Pagination } from "@/components/ui/pagination"; // Import component Pagination
 
 import { RulesTable } from "./rule-table";
 
@@ -34,11 +29,11 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10); // Cho phép thay đổi pageSize
   const [isSearching, setIsSearching] = useState(false);
 
-  // Dialog states - thay đổi state
-  const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false); // Thay thế isCreateDialogOpen
+  // Dialog states
+  const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
   const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
 
@@ -55,7 +50,14 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
     console.log("Fetching rules with params:", fetchParams);
     fetchRules(fetchParams);
-  }, [workloadId, currentPage, searchKeyword, isSearching, fetchRules]);
+  }, [
+    workloadId,
+    currentPage,
+    pageSize,
+    searchKeyword,
+    isSearching,
+    fetchRules,
+  ]);
 
   const handleSearchInputChange = (value: string) => {
     setSearchInput(value);
@@ -84,6 +86,11 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi page size
   };
 
   const handleRulesUploaded = () => {
@@ -135,18 +142,17 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl">{getTitle()}</CardTitle>
-            {/* Thay đổi button để mở Excel upload */}
+
             <Button
-              onClick={() => setIsExcelUploadOpen(true)} // Thay đổi handler
+              onClick={() => setIsExcelUploadOpen(true)}
               size="sm"
               className="h-8 flex items-center gap-2"
             >
-              <FileSpreadsheet className="h-4 w-4" /> {/* Thay icon */}
-              Thêm Rules từ Excel {/* Thay text */}
+              <FileSpreadsheet className="h-4 w-4" />
+              Thêm Rules từ Excel
             </Button>
           </div>
 
-          {/* Enhanced Search with Enter to search - giữ nguyên */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -237,38 +243,23 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                 onDeleteRule={(rule) => setDeletingRule(rule)}
               />
 
-              {/* Pagination - giữ nguyên */}
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm">
-                    {currentPage} / {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalElements={totalRules}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                loading={loading}
+                showInfo={true}
+                showPageSizeSelector={true}
+                pageSizeOptions={[5, 10, 20, 50, 100]}
+              />
             </>
           )}
         </CardContent>
       </Card>
 
-      {/* Dialogs - Thay đổi dialogs */}
-
-      {/* Thay CreateRuleDialog bằng RuleExcelUploadDialog */}
       <RuleExcelUploadDialog
         workloadId={workloadId}
         open={isExcelUploadOpen}
@@ -276,7 +267,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
         onSuccess={handleRulesUploaded}
       />
 
-      {/* Các dialog khác giữ nguyên */}
       {editingRule && (
         <EditRuleDialog
           rule={editingRule}

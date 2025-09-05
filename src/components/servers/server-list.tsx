@@ -49,15 +49,6 @@ export const ServerList: React.FC<ServerListProps> = ({
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
   const getStatusBadge = (status?: boolean) => {
-    if (!status) {
-      return (
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Circle className="h-2 w-2 fill-gray-400 text-gray-400" />
-          Không xác định
-        </Badge>
-      );
-    }
-
     if (status === true) {
       return (
         <Badge
@@ -70,8 +61,7 @@ export const ServerList: React.FC<ServerListProps> = ({
       );
     } else {
       return (
-        <Badge variant="destructive" className="flex items-center gap-1">
-          <Circle className="h-2 w-2 fill-red-500 text-red-500" />
+        <Badge variant="destructive" className="bg-red-100 text-red-800">
           Offline
         </Badge>
       );

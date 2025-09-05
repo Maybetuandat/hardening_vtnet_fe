@@ -126,8 +126,8 @@ export function useServerUpload(): UseServerUploadReturn {
         header: 1,
       }) as any[][];
 
-      console.log("Raw Excel data:", jsonData);
-      console.log("First 3 rows:", jsonData.slice(0, 3));
+      // console.log("Raw Excel data:", jsonData);
+      // console.log("First 3 rows:", jsonData.slice(0, 3));
 
       if (jsonData.length <= 1) {
         throw new Error("File Excel trống hoặc không có dữ liệu");

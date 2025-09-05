@@ -97,26 +97,17 @@ export const WorkloadDetailPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Quay lại
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{workload.name}</h1>
-            <p className="text-muted-foreground">
-              Chi tiết workload và các thành phần liên quan
-            </p>
-          </div>
         </div>
       </div>
 
       <Separator />
 
-      {/* Main Content - Changed Layout */}
       <div className="space-y-6">
-        {/* WorkloadInfoSection - Now takes full width */}
         <WorkloadInfoSection
           workload={workload}
           onUpdate={handleUpdateWorkload}
         />
 
-        {/* RulesSection - Now displayed as full width table below */}
         <RulesSection
           workloadId={workload.id}
           onRuleSelect={setSelectedRuleId}

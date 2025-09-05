@@ -89,22 +89,12 @@ export function RulePreviewDialog({
 
   const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
 
-  // Helper function để toggle expand/collapse rule
-  const toggleRuleExpansion = (ruleIndex: number) => {
-    const newExpanded = new Set(expandedRules);
-    if (newExpanded.has(ruleIndex)) {
-      newExpanded.delete(ruleIndex);
-    } else {
-      newExpanded.add(ruleIndex);
-    }
-    setExpandedRules(newExpanded);
-  };
-
   const filteredRules = rules.filter((rule) => {
     const matchesSearch =
       searchTerm === "" ||
       rule.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rule.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      rule.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rule.command?.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesSearch;
   });
@@ -125,7 +115,7 @@ export function RulePreviewDialog({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm quy tắc..."
+                placeholder="Tìm kiếm quy tắc hoặc command..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -185,6 +175,21 @@ export function RulePreviewDialog({
                             <p className="text-sm text-muted-foreground leading-relaxed break-words">
                               {rule.description}
                             </p>
+                          </div>
+                        )}
+
+                        {/* Command */}
+                        {rule.command && (
+                          <div>
+                            <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                              <Terminal className="h-4 w-4" />
+                              <span>Command:</span>
+                            </p>
+                            <div className="bg-slate-900 text-slate-100 p-3 rounded-md border">
+                              <code className="text-sm font-mono whitespace-pre-wrap break-all">
+                                {rule.command}
+                              </code>
+                            </div>
                           </div>
                         )}
 

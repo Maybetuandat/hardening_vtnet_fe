@@ -108,21 +108,19 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* Upload Excel Form - tái sử dụng component */}
             <ExcelUploadForm
               rules={rules.map((r) => ({
                 name: r.name,
                 description: r.description,
                 parameters: r.parameters ?? {},
                 is_active: r.is_active,
-                command: r.command || "",
+                command: r.command, // ✅ Remove || "" here
               }))}
               loading={loading}
               onFileUpload={handleFileUpload}
               onRulesChange={() => {}}
             />
 
-            {/* Hiển thị thông tin sau khi upload thành công */}
             {rules.length > 0 && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -218,7 +216,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
           description: r.description,
           parameters: r.parameters ?? {},
           is_active: r.is_active,
-          command: r.command || "",
+          command: r.command,
         }))}
       />
     </>

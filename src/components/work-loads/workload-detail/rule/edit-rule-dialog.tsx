@@ -10,15 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Switch } from "@/components/ui/switch";
-import { Save, X } from "lucide-react";
+import { Save, X, Terminal } from "lucide-react";
 import { useRules } from "@/hooks/rule/use-rules";
 import { RuleCreate, RuleResponse } from "@/types/rule";
 
@@ -39,24 +33,23 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   const [formData, setFormData] = useState<RuleCreate>({
     name: rule.name,
     description: rule.description || "",
-
     workload_id: rule.workload_id,
     parameters: rule.parameters || {},
     is_active: rule.is_active,
+    command: rule.command || "",
   });
 
   const { updateRule } = useRules();
 
-  // Reset form when dialog opens or rule changes
   useEffect(() => {
     if (open) {
       setFormData({
         name: rule.name,
         description: rule.description || "",
-
         workload_id: rule.workload_id,
         parameters: rule.parameters || {},
         is_active: rule.is_active,
+        command: rule.command || "",
       });
     }
   }, [open, rule]);
@@ -64,7 +57,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
+    if (!formData.name.trim() || !formData.command.trim()) {
       return;
     }
 
@@ -83,19 +76,22 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     setFormData({
       name: rule.name,
       description: rule.description || "",
-
       workload_id: rule.workload_id,
       parameters: rule.parameters || {},
       is_active: rule.is_active,
+      command: rule.command || "",
     });
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chỉnh sửa Rule</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Terminal className="h-5 w-5" />
+            Chỉnh sửa Rule
+          </DialogTitle>
           <DialogDescription>
             Cập nhật thông tin rule. Nhấn lưu để áp dụng thay đổi.
           </DialogDescription>
@@ -136,6 +132,29 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               rows={3}
               disabled={loading}
             />
+          </div>
+
+          {/* Command Field - NEW */}
+          <div className="space-y-2">
+            <Label htmlFor="command">
+              Lệnh thực thi <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="command"
+              value={formData.command}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, command: e.target.value }))
+              }
+              placeholder="Nhập lệnh sẽ được thực thi khi rule được kích hoạt"
+              rows={4}
+              disabled={loading}
+              className="font-mono text-sm"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Lệnh này sẽ được thực thi khi rule được kích hoạt. Ví dụ: bash
+              script, API call, etc.
+            </p>
           </div>
 
           {/* Parameters Field */}
@@ -181,7 +200,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex justify-end space-x-3 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -191,7 +210,12 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               <X className="h-4 w-4 mr-2" />
               Hủy
             </Button>
-            <Button type="submit" disabled={loading || !formData.name.trim()}>
+            <Button
+              type="submit"
+              disabled={
+                loading || !formData.name.trim() || !formData.command.trim()
+              }
+            >
               <Save className="h-4 w-4 mr-2" />
               {loading ? "Đang lưu..." : "Lưu thay đổi"}
             </Button>
