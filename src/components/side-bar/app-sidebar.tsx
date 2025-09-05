@@ -6,6 +6,7 @@ import {
   Key,
   Server,
   Package,
+  HardDrive,
   Shield,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
@@ -51,6 +52,12 @@ export function AppSidebar({
         url: "/servers",
         icon: Server,
         isActive: location.pathname.startsWith("/servers"),
+      },
+      {
+        title: t("navigation.os"),
+        url: "/os",
+        icon: HardDrive,
+        isActive: location.pathname.startsWith("/os"),
       },
     ],
     navSecondary: [

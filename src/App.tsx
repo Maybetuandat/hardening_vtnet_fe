@@ -14,6 +14,7 @@ import AddWorkloadPage from "./app/workload/create-workload-page";
 import { WorkloadDetailPage } from "./app/workload/workload-detail-page";
 import ComplianceDetailPage from "./app/dashboard/compliance-detail-page";
 import ServerHardeningHistoryPage from "./app/dashboard/compliance-history-page";
+import OSPage from "./app/os/os-page";
 
 function App() {
   return (
@@ -34,6 +35,14 @@ function App() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/os"
+          element={
+            <MainLayout>
+              <OSPage />
             </MainLayout>
           }
         />
