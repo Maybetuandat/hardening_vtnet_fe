@@ -46,7 +46,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
     checkingExistence,
     error,
     rules,
-    commands,
+
     checkResults,
     canAddRules,
     parseExcelFile,
@@ -116,39 +116,14 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                 parameters: r.parameters ?? {},
                 is_active: r.is_active,
               }))}
-              commands={commands}
               loading={loading}
               onFileUpload={handleFileUpload}
               onRulesChange={() => {}}
-              onCommandsChange={() => {}}
             />
 
             {/* Hiển thị thông tin sau khi upload thành công */}
             {rules.length > 0 && (
               <div className="space-y-4">
-                <Alert>
-                  <CheckCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <div className="space-y-2">
-                      <p className="font-medium">
-                        File đã được parse thành công!
-                      </p>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <FileSpreadsheet className="h-4 w-4" />
-                          {rules.length} rules
-                        </span>
-                        {commands.length > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Terminal className="h-4 w-4" />
-                            {commands.length} commands
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </AlertDescription>
-                </Alert>
-
                 <div className="flex justify-between items-center">
                   <Button
                     variant="outline"
@@ -180,34 +155,6 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
 
             {checkResults && (
               <div className="space-y-4">
-                {/* Summary Statistics */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {checkResults.length}
-                    </div>
-                    <div className="text-sm text-blue-600">Tổng rules</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {uniqueCount}
-                    </div>
-                    <div className="text-sm text-green-600">Rules mới</div>
-                  </div>
-                  <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-600">
-                      {duplicateCount}
-                    </div>
-                    <div className="text-sm text-yellow-600">Trùng lặp</div>
-                  </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {commands.length}
-                    </div>
-                    <div className="text-sm text-purple-600">Commands</div>
-                  </div>
-                </div>
-
                 {/* Duplicate Warning */}
                 {duplicateCount > 0 && (
                   <Alert variant="destructive">
@@ -221,21 +168,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                           <li>Trùng tên: {nameDuplicates} rules</li>
                           <li>Trùng parameters: {paramDuplicates} rules</li>
                         </ul>
-                        <p className="text-sm">
-                          Chỉ có {uniqueCount} rules mới sẽ được tạo.
-                        </p>
                       </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Success Message */}
-                {duplicateCount === 0 && (
-                  <Alert>
-                    <CheckCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Tất cả {uniqueCount} rules đều là mới và có thể được tạo
-                      cùng với {commands.length} commands.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -285,7 +218,6 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
           parameters: r.parameters ?? {},
           is_active: r.is_active,
         }))}
-        commands={commands}
       />
     </>
   );

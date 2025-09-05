@@ -97,11 +97,9 @@ export default function AddWorkloadPage() {
         return (
           <ExcelUploadForm
             rules={formData.rules}
-            commands={formData.commands}
             loading={loading}
             onFileUpload={parseExcelFile}
             onRulesChange={(rules) => updateFormData({ rules })}
-            onCommandsChange={(commands) => updateFormData({ commands })}
           />
         );
       default:

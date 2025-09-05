@@ -27,24 +27,21 @@ import { RulePreviewDialog } from "./rule-preview-dialog";
 import { ExcelTemplateGenerator } from "@/utils/excel-template-rule";
 import { Rule } from "@/types/rule";
 import { ExcelUploadResult } from "@/types/workload";
-import { Command } from "@/types/command";
 
 interface ExcelUploadFormProps {
   rules: Rule[];
-  commands?: Command[];
+
   loading: boolean;
   onFileUpload: (file: File) => Promise<ExcelUploadResult>;
   onRulesChange: (rules: Rule[]) => void;
-  onCommandsChange?: (commands: Command[]) => void;
 }
 
 export function ExcelUploadForm({
   rules,
-  commands = [],
+
   loading,
   onFileUpload,
   onRulesChange,
-  onCommandsChange,
 }: ExcelUploadFormProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadResult, setUploadResult] = useState<ExcelUploadResult | null>(
@@ -91,10 +88,6 @@ export function ExcelUploadForm({
       setUploadResult(result);
       if (result.success && result.rules) {
         onRulesChange(result.rules);
-
-        if (onCommandsChange && result.commands) {
-          onCommandsChange(result.commands);
-        }
       }
     } catch (error) {
       setUploadResult({
@@ -129,10 +122,6 @@ export function ExcelUploadForm({
     setUploadResult(null);
     setUploadedFileName("");
     onRulesChange([]);
-
-    if (onCommandsChange) {
-      onCommandsChange([]);
-    }
   };
 
   return (
@@ -245,12 +234,6 @@ export function ExcelUploadForm({
                             <FileSpreadsheet className="h-4 w-4" />
                             {rules.length} quy tắc
                           </span>
-                          {commands.length > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Terminal className="h-4 w-4" />
-                              {commands.length} lệnh
-                            </span>
-                          )}
                         </div>
                         <div className="flex gap-2">
                           <Button
@@ -301,7 +284,6 @@ export function ExcelUploadForm({
         open={showPreview}
         onOpenChange={setShowPreview}
         rules={rules}
-        commands={commands}
       />
     </div>
   );

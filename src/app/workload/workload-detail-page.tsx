@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { Separator } from "@/components/ui/separator";
 
 import { useWorkloadDetail } from "@/hooks/workload/use-workload-detail";
 import { toast } from "sonner";
-import { CommandsSection } from "@/components/work-loads/workload-detail/command/command-session";
+
 import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
 
@@ -55,14 +55,9 @@ export const WorkloadDetailPage: React.FC = () => {
           <div className="h-8 w-8 bg-muted animate-pulse rounded" />
           <div className="h-8 w-48 bg-muted animate-pulse rounded" />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <div className="h-64 bg-muted animate-pulse rounded-lg" />
-          </div>
-          <div className="lg:col-span-2 space-y-6">
-            <div className="h-96 bg-muted animate-pulse rounded-lg" />
-            <div className="h-64 bg-muted animate-pulse rounded-lg" />
-          </div>
+        <div className="space-y-6">
+          <div className="h-64 bg-muted animate-pulse rounded-lg" />
+          <div className="h-96 bg-muted animate-pulse rounded-lg" />
         </div>
       </div>
     );
@@ -113,25 +108,20 @@ export const WorkloadDetailPage: React.FC = () => {
 
       <Separator />
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <WorkloadInfoSection
-            workload={workload}
-            onUpdate={handleUpdateWorkload}
-          />
-        </div>
+      {/* Main Content - Changed Layout */}
+      <div className="space-y-6">
+        {/* WorkloadInfoSection - Now takes full width */}
+        <WorkloadInfoSection
+          workload={workload}
+          onUpdate={handleUpdateWorkload}
+        />
 
-        <div className="lg:col-span-2 space-y-6">
-          {/* Rules Section */}
-          <RulesSection
-            workloadId={workload.id}
-            onRuleSelect={setSelectedRuleId}
-            selectedRuleId={selectedRuleId}
-          />
-
-          {selectedRuleId && <CommandsSection ruleId={selectedRuleId} />}
-        </div>
+        {/* RulesSection - Now displayed as full width table below */}
+        <RulesSection
+          workloadId={workload.id}
+          onRuleSelect={setSelectedRuleId}
+          selectedRuleId={selectedRuleId}
+        />
       </div>
     </div>
   );

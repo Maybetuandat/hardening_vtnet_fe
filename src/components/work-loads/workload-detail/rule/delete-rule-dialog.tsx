@@ -10,7 +10,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Trash2, AlertTriangle } from "lucide-react";
-import { useRules, RuleResponse } from "@/hooks/rule/use-rules";
+import { useRules } from "@/hooks/rule/use-rules";
+import { RuleResponse } from "@/types/rule";
 
 interface DeleteRuleDialogProps {
   rule: RuleResponse;
@@ -61,7 +62,7 @@ export const DeleteRuleDialog: React.FC<DeleteRuleDialogProps> = ({
               </p>
               <ul className="text-sm text-amber-700 mt-1 space-y-1">
                 <li>• Xóa vĩnh viễn rule này</li>
-                <li>• Xóa tất cả commands liên quan</li>
+
                 <li>• Không thể hoàn tác</li>
               </ul>
             </div>

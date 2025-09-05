@@ -2,10 +2,10 @@ import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { RuleCreate } from "@/types/rule";
-import { Command } from "@/types/command";
+
 import { ExcelUploadResult } from "@/types/workload";
 import { useExcelParser } from "@/hooks/workload/use-excel-parser";
-import { useCommands } from "@/hooks/command/use-commands";
+
 import { useRules } from "@/hooks/rule/use-rules";
 
 export interface RuleCheckResult {
@@ -23,7 +23,7 @@ interface UseRuleExcelUploadReturn {
   checkingExistence: boolean;
   error: string | null;
   rules: RuleCreate[];
-  commands: Command[];
+
   checkResults: RuleCheckResult[] | null;
   canAddRules: boolean;
   parseExcelFile: (file: File) => Promise<ExcelUploadResult>;
@@ -39,7 +39,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
 
   // Data state
   const [rules, setRules] = useState<RuleCreate[]>([]);
-  const [commands, setCommands] = useState<Command[]>([]);
+
   const [checkResults, setCheckResults] = useState<RuleCheckResult[] | null>(
     null
   );
@@ -47,7 +47,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   // Hooks - tái sử dụng existing hooks
   const { parseExcelFile: parseExcel } = useExcelParser();
   const { createRule } = useRules();
-  const { createCommand } = useCommands();
 
   /**
    * Parse Excel file - tái sử dụng logic từ useExcelParser
@@ -76,7 +75,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
           }));
 
           setRules(rulesForApi);
-          setCommands(result.commands || []);
         }
 
         return result;
@@ -175,7 +173,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         console.log("🚀 Creating unique rules:", {
           workloadId,
           uniqueCount: uniqueResults.length,
-          totalCommands: commands.length,
         });
 
         // Tạo rules
@@ -193,44 +190,6 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         }
 
         console.log("✅ Rules created successfully:", createdRules.length);
-
-        // Tạo commands cho unique rules
-        if (commands.length > 0) {
-          const originalUniqueIndices = checkResults
-            .map((result, index) => ({ result, originalIndex: index }))
-            .filter(({ result }) => !result.is_duplicate)
-            .map(({ originalIndex }) => originalIndex);
-
-          const uniqueCommands = commands.filter((cmd) =>
-            originalUniqueIndices.includes(cmd.rule_index ?? 0)
-          );
-
-          // Tạo commands với rule_id từ created rules
-          let commandsCreated = 0;
-          for (const command of uniqueCommands) {
-            const ruleIndex = originalUniqueIndices.indexOf(
-              command.rule_index ?? 0
-            );
-            const correspondingRule = createdRules[ruleIndex];
-
-            if (correspondingRule) {
-              const commandData = {
-                rule_id: correspondingRule.id,
-                os_version: command.os_version,
-                command_text: command.command_text,
-                is_active: command.is_active,
-              };
-              await createCommand(commandData);
-              commandsCreated++;
-            }
-          }
-
-          console.log("✅ Commands created successfully:", commandsCreated);
-        }
-
-        toast.success(
-          `Đã tạo thành công ${createdRules.length} rules và ${commands.length} commands`
-        );
       } catch (err: any) {
         console.error("❌ Error creating rules:", err);
         const errorMessage = err.message || "Không thể tạo rules";
@@ -240,7 +199,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         setLoading(false);
       }
     },
-    [checkResults, commands, createRule, createCommand]
+    [checkResults, createRule]
   );
 
   const resetState = useCallback(() => {
@@ -248,7 +207,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
     setCheckingExistence(false);
     setError(null);
     setRules([]);
-    setCommands([]);
+
     setCheckResults(null);
   }, []);
 
@@ -264,7 +223,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
     checkingExistence,
     error,
     rules,
-    commands,
+
     checkResults,
     canAddRules,
     parseExcelFile,

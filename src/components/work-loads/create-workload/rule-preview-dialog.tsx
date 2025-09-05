@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -14,28 +13,20 @@ import { Input } from "@/components/ui/input";
 import {
   Search,
   Shield,
-  CheckCircle,
-  AlertTriangle,
-  AlertCircle,
-  XCircle,
   FileText,
   Terminal,
-  Monitor,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Rule } from "@/types/rule";
-import { Command } from "@/types/command";
 
 interface RulePreviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   rules: Rule[];
-  commands?: Command[];
 }
 
-// Helper function để render parameters một cách đơn giản
 const renderParameters = (parameters: any) => {
   if (!parameters) return null;
 
@@ -93,16 +84,10 @@ export function RulePreviewDialog({
   open,
   onOpenChange,
   rules,
-  commands = [],
 }: RulePreviewDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
-
-  // Helper function để lấy commands thuộc về một rule cụ thể
-  const getCommandsForRule = (ruleIndex: number) => {
-    return commands.filter((command) => command.rule_index === ruleIndex);
-  };
 
   // Helper function để toggle expand/collapse rule
   const toggleRuleExpansion = (ruleIndex: number) => {
@@ -163,9 +148,7 @@ export function RulePreviewDialog({
                 </div>
               ) : (
                 filteredRules.map((rule, index) => {
-                  const ruleCommands = getCommandsForRule(index);
                   const isExpanded = expandedRules.has(index);
-                  const hasCommands = ruleCommands.length > 0;
 
                   return (
                     <Card
@@ -189,30 +172,8 @@ export function RulePreviewDialog({
                                     Không hoạt động
                                   </Badge>
                                 )}
-                                {hasCommands && (
-                                  <Badge variant="outline" className="text-xs">
-                                    <Terminal className="h-3 w-3 mr-1" />
-                                    {ruleCommands.length} lệnh
-                                  </Badge>
-                                )}
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center space-x-2 flex-shrink-0">
-                            {hasCommands && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleRuleExpansion(index)}
-                                className="h-8 w-8 p-0"
-                              >
-                                {isExpanded ? (
-                                  <ChevronUp className="h-4 w-4" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4" />
-                                )}
-                              </Button>
-                            )}
                           </div>
                         </div>
                       </CardHeader>
@@ -234,98 +195,6 @@ export function RulePreviewDialog({
                               <span>Tham số:</span>
                             </p>
                             {renderParameters(rule.parameters)}
-                          </div>
-                        )}
-
-                        {/* Commands Section - Expanded/Collapsed */}
-                        {hasCommands && isExpanded && (
-                          <div className="mt-4 border-t pt-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <Terminal className="h-4 w-4" />
-                              <h4 className="font-medium text-sm">
-                                Commands ({ruleCommands.length})
-                              </h4>
-                            </div>
-                            <div className="space-y-3">
-                              {ruleCommands.map((command, cmdIndex) => (
-                                <div
-                                  key={`command-${index}-${cmdIndex}`}
-                                  className={cn(
-                                    "border rounded-md p-3 bg-muted/30 transition-opacity",
-                                    !command.is_active && "opacity-60"
-                                  )}
-                                >
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                      <Badge
-                                        variant="outline"
-                                        className={`text-xs `}
-                                      >
-                                        <div className="flex items-center gap-1">
-                                          <span>{command.os_version}</span>
-                                        </div>
-                                      </Badge>
-                                      {!command.is_active && (
-                                        <Badge
-                                          variant="secondary"
-                                          className="text-xs"
-                                        >
-                                          Không hoạt động
-                                        </Badge>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="bg-black/5 dark:bg-white/5 p-3 rounded border font-mono text-sm overflow-x-auto">
-                                    <code className="whitespace-pre-wrap break-words">
-                                      {command.command_text}
-                                    </code>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Commands Summary - When collapsed */}
-                        {hasCommands && !isExpanded && (
-                          <div className="mt-4 border-t pt-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Terminal className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">
-                                  {ruleCommands.length} lệnh được cấu hình
-                                </span>
-                              </div>
-                              <div className="flex gap-1">
-                                {Array.from(
-                                  new Set(
-                                    ruleCommands.map((cmd) => cmd.os_version)
-                                  )
-                                )
-                                  .slice(0, 3)
-                                  .map((os) => (
-                                    <Badge
-                                      key={os}
-                                      variant="outline"
-                                      className={`text-xs`}
-                                    >
-                                      {os}
-                                    </Badge>
-                                  ))}
-                                {ruleCommands.length > 3 && (
-                                  <span className="text-xs text-muted-foreground ml-1">
-                                    +
-                                    {Array.from(
-                                      new Set(
-                                        ruleCommands.map(
-                                          (cmd) => cmd.os_version
-                                        )
-                                      )
-                                    ).length - 3}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
                           </div>
                         )}
                       </CardContent>
