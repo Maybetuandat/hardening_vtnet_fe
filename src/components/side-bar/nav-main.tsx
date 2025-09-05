@@ -28,16 +28,17 @@ export function NavMain({
               <SidebarMenuButton
                 tooltip={item.title}
                 asChild
+                size="lg" // Sử dụng size lớn hơn
                 className={
                   item.isActive
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground h-11 px-3 py-2" // Tăng height và padding
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-11 px-3 py-2"
                 }
               >
                 <Link to={item.url}>
                   {item.icon && (
                     <item.icon
-                      className={`h-4 w-4 ${
+                      className={`h-5 w-5 ${
                         item.isActive
                           ? "text-primary-foreground"
                           : "text-sidebar-foreground"
@@ -45,9 +46,9 @@ export function NavMain({
                     />
                   )}
                   <span
-                    className={`${
+                    className={`text-base font-medium ${
                       item.isActive
-                        ? "font-medium text-primary-foreground"
+                        ? "text-primary-foreground"
                         : "text-sidebar-foreground"
                     }`}
                   >

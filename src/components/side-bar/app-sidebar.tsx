@@ -6,8 +6,8 @@ import {
   Key,
   Server,
   Package,
-  HardDrive,
   Shield,
+  HardDrive, // Thêm icon cho OS
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -40,7 +40,6 @@ export function AppSidebar({
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/" || location.pathname === "/home",
       },
-
       {
         title: t("navigation.workloads"),
         url: "/workloads",
@@ -56,7 +55,7 @@ export function AppSidebar({
       {
         title: t("navigation.os"),
         url: "/os",
-        icon: HardDrive,
+        icon: HardDrive, // Hoặc Terminal tùy bạn chọn
         isActive: location.pathname.startsWith("/os"),
       },
     ],
@@ -71,7 +70,7 @@ export function AppSidebar({
 
   return (
     <Sidebar
-      collapsible="offcanvas"
+      collapsible="icon" // Đổi từ "offcanvas" sang "icon"
       variant={variant}
       {...props}
       className="border-sidebar-border bg-sidebar"
@@ -84,8 +83,8 @@ export function AppSidebar({
               className="data-[slot=sidebar-menu-button]:!p-1.5 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <Link to="/">
-                <Boxes className="h-5 w-5 text-sidebar-primary" />
-                <span className="text-base font-semibold text-sidebar-foreground">
+                <Boxes className="h-6 w-6 text-sidebar-primary" />
+                <span className="text-lg font-semibold text-sidebar-foreground">
                   Hardening System
                 </span>
               </Link>
@@ -95,7 +94,6 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent className="bg-sidebar">
         <NavMain items={data.navMain} />
-
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter className="bg-sidebar border-t border-sidebar-border">

@@ -29,11 +29,14 @@ export function NavSecondary({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
+                tooltip={item.title} // Thêm tooltip
                 className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
                 <a href={item.url}>
-                  <item.icon className="h-4 w-4 text-sidebar-foreground" />
-                  <span className="text-sidebar-foreground">{item.title}</span>
+                  <item.icon className="h-5 w-5 text-sidebar-foreground" />
+                  <span className="text-base text-sidebar-foreground">
+                    {item.title}
+                  </span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
