@@ -1,5 +1,5 @@
 import { WorkloadRuleCreate } from "@/types/rule";
-import { WorkloadTemplateRow } from "@/types/workload";
+
 import * as XLSX from "xlsx";
 
 export interface WorkloadWithRulesAndCommandsRequest {
@@ -62,6 +62,7 @@ export class ExcelTemplateGenerator {
         description: row.Description || "",
         parameters: this.parseJsonSafely(row.Parameters_JSON),
         is_active: true,
+        command: row.command || "",
       };
 
       rules.push(rule);

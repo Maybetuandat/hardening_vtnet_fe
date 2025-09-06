@@ -11,7 +11,7 @@ import {
   CreateWorkloadResponse,
 } from "@/types/workload";
 import { api } from "@/lib/api";
-import { CommandCreate } from "@/types/command";
+
 import { RuleCreate } from "@/types/rule";
 
 export function useAddWorkload() {
@@ -26,7 +26,6 @@ export function useAddWorkload() {
     name: "",
     description: "",
     rules: [],
-    commands: [],
   });
 
   // Hooks
@@ -98,7 +97,7 @@ export function useAddWorkload() {
         if (result.success) {
           console.log("✅ Excel parsing successful:", {
             rules: result.rules.length,
-            commands: result.commands?.length || 0,
+
             warnings: result.warnings?.length || 0,
           });
 
@@ -106,7 +105,6 @@ export function useAddWorkload() {
           setFormData((prev) => ({
             ...prev,
             rules: result.rules,
-            commands: result.commands || [],
           }));
 
           // Lưu duplicate warnings để hiển thị cho user - FIX: Add type annotation
@@ -121,7 +119,7 @@ export function useAddWorkload() {
           // Log thành công với chi tiết
           console.log("📊 Form data updated:", {
             totalRules: result.rules.length,
-            totalCommands: result.commands?.length || 0,
+
             duplicateWarnings: duplicateWarnings.length,
           });
         } else {
@@ -164,7 +162,6 @@ export function useAddWorkload() {
       name: "",
       description: "",
       rules: [],
-      commands: [],
     });
     setCurrentStep(0);
     setError(null);
@@ -185,7 +182,6 @@ export function useAddWorkload() {
         console.log("🔧 Preparing workload creation with:", {
           workloadName: data.name,
           rulesCount: data.rules.length,
-          commandsCount: (formData.commands || []).length,
         });
 
         // Convert rules to API format
@@ -195,18 +191,10 @@ export function useAddWorkload() {
           workload_id: 0, // Will be set by backend
           parameters: rule.parameters || {},
           is_active: rule.is_active !== false,
+          command: rule.command || "",
         }));
 
         // Convert commands to API format
-        const commandsForApi: CommandCreate[] = (formData.commands || []).map(
-          (cmd, index) => ({
-            rule_id: 0, // Will be set by backend
-            rule_index: cmd.rule_index ?? index,
-            os_version: cmd.os_version,
-            command_text: cmd.command_text,
-            is_active: cmd.is_active !== false,
-          })
-        );
 
         const requestData: CreateWorkloadRequest = {
           workload: {
@@ -214,7 +202,6 @@ export function useAddWorkload() {
             description: data.description || "",
           },
           rules: rulesForApi,
-          commands: commandsForApi,
         };
 
         console.log(
@@ -231,14 +218,13 @@ export function useAddWorkload() {
 
         return Promise.resolve();
       } catch (err: any) {
+        console.error("❌ Error creating workload:", error);
         console.error("💥 Error during workload creation:", err);
-        setError(err.message || "Không thể tạo workload");
-        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [formData.commands, createWorkloadWithRulesAndCommands, resetForm]
+    [formData, createWorkloadWithRulesAndCommands, resetForm]
   );
 
   // Validation functions

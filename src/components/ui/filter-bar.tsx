@@ -1,7 +1,9 @@
+// src/components/ui/filter-bar.tsx
 import { FC } from "react";
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, Filter, X } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -26,14 +28,24 @@ interface DropdownFilter {
 interface FilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  onSearchClear?: () => void; // Callback để fetch lại dữ liệu khi clear
   filters: DropdownFilter[];
 }
 
 const FilterBar: FC<FilterBarProps> = ({
   searchTerm,
   onSearchChange,
+  onSearchClear,
   filters,
 }) => {
+  const handleClear = () => {
+    onSearchChange("");
+    // Gọi callback để fetch lại dữ liệu với keyword rỗng
+    if (onSearchClear) {
+      onSearchClear();
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row gap-4 w-full">
@@ -45,8 +57,20 @@ const FilterBar: FC<FilterBarProps> = ({
               placeholder="Tìm kiếm theo tên, mã số, hoặc từ khóa..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200 rounded-lg shadow-sm"
+              className="pl-12 pr-12 py-3 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200 rounded-lg shadow-sm"
             />
+            {searchTerm && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClear}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-full"
+                title="Xóa tìm kiếm"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              </Button>
+            )}
           </div>
         </div>
 

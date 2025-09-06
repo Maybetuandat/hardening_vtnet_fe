@@ -1,4 +1,3 @@
-import { Command, CommandCreate, CommandResponse } from "./command";
 import { Rule, RuleCreate, RuleResponse } from "./rule";
 
 export interface WorkloadResponse {
@@ -21,7 +20,6 @@ export interface AddWorkloadFormData {
   name: string;
   description: string;
   rules: Rule[];
-  commands?: Command[];
 }
 
 export interface WorkloadStep {
@@ -35,7 +33,7 @@ export interface WorkloadStep {
 export interface ExcelUploadResult {
   success: boolean;
   rules: Rule[];
-  commands?: Command[];
+
   errors?: string[];
   warnings?: string[];
 }
@@ -50,7 +48,6 @@ export interface WorkloadWithRules {
 export interface CreateWorkloadRequest {
   workload: WorkloadCreate;
   rules: RuleCreate[];
-  commands: CommandCreate[];
 }
 
 export interface WorkloadCreate {
@@ -68,20 +65,10 @@ export interface CreateWorkloadResponse {
   data: {
     workload: WorkloadResponse;
     rules: RuleResponse[];
-    commands: CommandResponse[];
+
     message: string;
   };
   message: string;
-}
-
-export interface WorkloadTemplateRow {
-  Name: string;
-  Description: string;
-  Parameters_JSON: string;
-  "Ubuntu 22.04": string;
-  CentOS7: string;
-  CentOS8: string;
-  [key: string]: any;
 }
 
 export interface WorkLoadListResponse {
