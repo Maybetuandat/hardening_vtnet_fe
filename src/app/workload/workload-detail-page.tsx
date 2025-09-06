@@ -2,22 +2,45 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
-
-import { useWorkloadDetail } from "@/hooks/workload/use-workload-detail";
 import { toast } from "sonner";
 
 import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
+import { useWorkloads } from "@/hooks/workload/use-workloads";
+import { WorkloadResponse } from "@/types/workload";
 
 export const WorkloadDetailPage: React.FC = () => {
   const { workloadId } = useParams<{ workloadId: string }>();
   const navigate = useNavigate();
   const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
+  const [workload, setWorkload] = useState<WorkloadResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
 
-  const { workload, loading, error, fetchWorkloadDetail } = useWorkloadDetail();
+  const { getWorkloadById } = useWorkloads();
+
+  // Fetch workload detail function
+  const fetchWorkloadDetail = async (id: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const workloadData = await getWorkloadById(id);
+      if (workloadData) {
+        setWorkload(workloadData);
+      } else {
+        setError("Không tìm thấy workload");
+      }
+    } catch (err: any) {
+      console.error("Error fetching workload detail:", err);
+      setError(err.message || "Có lỗi xảy ra khi tải thông tin workload");
+      toast.error("Không thể tải thông tin workload");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -36,7 +59,7 @@ export const WorkloadDetailPage: React.FC = () => {
 
     fetchWorkloadDetail(id);
     hasInitialized.current = true;
-  }, []);
+  }, [workloadId, navigate, getWorkloadById]);
 
   const handleBack = () => {
     navigate("/workloads");

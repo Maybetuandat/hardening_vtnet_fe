@@ -3,7 +3,7 @@ import { RuleCreate, RuleResponse } from "./rule";
 export interface WorkloadCreate {
   name: string;
   description?: string;
-  os_version: string;
+  os_id: number;
 }
 
 // doi tuong de tao cung voi file excel
@@ -34,7 +34,7 @@ export interface WorkloadResponse {
 export interface WorkloadUpdate {
   name?: string;
   description?: string;
-  os_version?: string;
+  os_id?: number;
 }
 
 export interface WorkLoadListResponse {
@@ -43,13 +43,6 @@ export interface WorkLoadListResponse {
   page: number;
   page_size: number;
   total_pages: number;
-}
-
-export interface AddWorkloadFormData {
-  name: string;
-  description: string;
-  os_version: string;
-  rules: RuleCreate[];
 }
 
 export interface WorkloadStep {

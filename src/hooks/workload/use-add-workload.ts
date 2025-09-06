@@ -3,7 +3,6 @@ import { useState, useCallback } from "react";
 import { useExcelParser } from "@/hooks/workload/use-excel-parser";
 import { useWorkloadNameValidation } from "@/hooks/workload/use-workload-name-validation";
 import {
-  AddWorkloadFormData,
   WorkloadStep,
   ExcelUploadResult,
   CreateWorkloadRequest,
@@ -21,11 +20,13 @@ export function useAddWorkload() {
   // State để track duplicate warnings
   const [duplicateWarnings, setDuplicateWarnings] = useState<string[]>([]);
 
-  const [formData, setFormData] = useState<AddWorkloadFormData>({
-    name: "",
-    description: "",
+  const [formData, setFormData] = useState<CreateWorkloadRequest>({
+    workload: {
+      name: "",
+      description: "",
+      os_id: 0,
+    },
     rules: [],
-    os_version: "",
   });
 
   // Hooks
@@ -144,7 +145,7 @@ export function useAddWorkload() {
   );
 
   // Missing functions that are used in the return
-  const updateFormData = useCallback((data: Partial<AddWorkloadFormData>) => {
+  const updateFormData = useCallback((data: Partial<CreateWorkloadRequest>) => {
     setFormData((prev) => ({ ...prev, ...data }));
   }, []);
 
@@ -159,9 +160,11 @@ export function useAddWorkload() {
   const resetForm = useCallback(() => {
     console.log("🔄 Resetting form data");
     setFormData({
-      name: "",
-      description: "",
-      os_version: "",
+      workload: {
+        name: "",
+        description: "",
+        os_id: 0,
+      },
       rules: [],
     });
     setCurrentStep(0);
@@ -182,7 +185,7 @@ export function useAddWorkload() {
       try {
         console.log("🔧 Preparing workload creation with:", {
           workloadName: data.workload.name,
-          osVersion: data.workload.os_version,
+          osVersion: data.workload.os_id,
           rulesCount: data.rules.length,
         });
 
@@ -200,7 +203,7 @@ export function useAddWorkload() {
           workload: {
             name: data.workload.name,
             description: data.workload.description || "",
-            os_version: data.workload.os_version, // Thêm os_version
+            os_id: data.workload.os_id,
           },
           rules: rulesForApi,
         };
@@ -232,14 +235,14 @@ export function useAddWorkload() {
   // Validation functions
   const isStep1Valid = useCallback(() => {
     return (
-      formData.name.trim() !== "" &&
-      formData.os_version.trim() !== "" &&
+      formData.workload.name.trim() !== "" &&
+      formData.workload.os_id !== 0 &&
       workloadNameValidation.isValid &&
       !validatingWorkloadName
     );
   }, [
-    formData.name,
-    formData.os_version,
+    formData.workload.name,
+    formData.workload.os_id,
     workloadNameValidation.isValid,
     validatingWorkloadName,
   ]);

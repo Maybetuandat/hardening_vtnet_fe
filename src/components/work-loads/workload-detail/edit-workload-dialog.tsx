@@ -12,7 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Save, X } from "lucide-react";
 
-import { useWorkloadDetail } from "@/hooks/workload/use-workload-detail";
+import { useWorkloads } from "@/hooks/workload/use-workloads";
+import { OSSelector } from "@/components/work-loads/create-workload/os-selector";
+import { useOS } from "@/hooks/os/use-os";
 import { toast } from "sonner";
 import { WorkloadUpdate, WorkloadResponse } from "@/types/workload";
 
@@ -30,12 +32,15 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
   onSuccess,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [selectedOSVersionId, setSelectedOSVersionId] = useState<number>(0);
   const [formData, setFormData] = useState<WorkloadUpdate>({
     name: workload.name,
     description: workload.description || "",
+    os_id: undefined,
   });
 
-  const { updateWorkload } = useWorkloadDetail();
+  const { updateWorkload } = useWorkloads();
+  const { osVersions, fetchOSVersions } = useOS();
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -43,9 +48,40 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       setFormData({
         name: workload.name,
         description: workload.description || "",
+        os_id: undefined,
       });
+
+      // Load OS versions để tìm current OS ID
+      fetchOSVersions("", 1, 100);
     }
-  }, [open, workload]);
+  }, [open, workload, fetchOSVersions]);
+
+  // Set initial OS version ID when OS versions are loaded
+  useEffect(() => {
+    if (osVersions.length > 0 && workload.os_version) {
+      // Tìm OS ID từ version string của workload hiện tại
+      const currentOS = osVersions.find(
+        (os) => os.version === workload.os_version
+      );
+
+      if (currentOS) {
+        setSelectedOSVersionId(currentOS.id);
+        setFormData((prev) => ({
+          ...prev,
+          os_id: currentOS.id,
+        }));
+      }
+    }
+  }, [osVersions, workload.os_version]);
+
+  // Handle OS ID change from OSSelector
+  const handleOSChange = (osVersionId: number) => {
+    setSelectedOSVersionId(osVersionId);
+    setFormData((prev) => ({
+      ...prev,
+      os_id: osVersionId,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,22 +91,51 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       return;
     }
 
+    if (!formData.os_id) {
+      toast.error("Vui lòng chọn hệ điều hành");
+      return;
+    }
+
     try {
       setLoading(true);
+
+      // Gọi updateWorkload từ useWorkloads hook
       await updateWorkload(workload.id, formData);
+
+      // Hiển thị thông báo thành công
+      toast.success("Cập nhật workload thành công!");
+
+      // Đóng dialog
+      onOpenChange(false);
+
+      // Gọi callback để refresh dữ liệu ở component cha
       onSuccess();
-    } catch (error) {
-      // Error is already handled in the hook
+    } catch (error: any) {
+      // Hiển thị lỗi nếu có
+      toast.error(error.message || "Có lỗi xảy ra khi cập nhật workload");
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
+    // Reset form về giá trị ban đầu
     setFormData({
       name: workload.name,
       description: workload.description || "",
+      os_id: undefined,
     });
+
+    // Reset selected OS version ID
+    if (osVersions.length > 0 && workload.os_version) {
+      const currentOS = osVersions.find(
+        (os) => os.version === workload.os_version
+      );
+      if (currentOS) {
+        setSelectedOSVersionId(currentOS.id);
+      }
+    }
+
     onOpenChange(false);
   };
 
@@ -103,6 +168,14 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
             />
           </div>
 
+          {/* OS Version Selector */}
+          <OSSelector
+            value={selectedOSVersionId}
+            onValueChange={handleOSChange}
+            placeholder="Chọn hệ điều hành..."
+            disabled={loading}
+          />
+
           {/* Description Field */}
           <div className="space-y-2">
             <Label htmlFor="description">Mô tả</Label>
@@ -132,7 +205,10 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
               <X className="h-4 w-4 mr-2" />
               Hủy
             </Button>
-            <Button type="submit" disabled={loading || !formData.name?.trim()}>
+            <Button
+              type="submit"
+              disabled={loading || !formData.name?.trim() || !formData.os_id}
+            >
               <Save className="h-4 w-4 mr-2" />
               {loading ? "Đang lưu..." : "Lưu thay đổi"}
             </Button>

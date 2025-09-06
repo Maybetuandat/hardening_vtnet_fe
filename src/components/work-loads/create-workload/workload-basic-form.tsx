@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Info, Loader2 } from "lucide-react";
-import { AddWorkloadFormData } from "@/types/workload";
+
 import { useWorkloadNameValidation } from "@/hooks/workload/use-workload-name-validation";
 import { OSSelector } from "./os-selector";
+import { CreateWorkloadRequest } from "@/types/workload";
 
 interface WorkloadBasicFormProps {
-  formData: AddWorkloadFormData;
-  onUpdateFormData: (updates: Partial<AddWorkloadFormData>) => void;
+  formData: CreateWorkloadRequest;
+  onUpdateFormData: (updates: Partial<CreateWorkloadRequest>) => void;
   errors?: Record<string, string>;
 }
 
@@ -32,22 +33,29 @@ export function WorkloadBasicForm({
     resetValidation,
   } = useWorkloadNameValidation();
 
-  const prevNameRef = useRef(formData.name);
+  const prevNameRef = useRef(formData.workload.name);
 
-  const handleFieldChange = (field: keyof AddWorkloadFormData, value: any) => {
+  const handleFieldChange = (
+    field: keyof CreateWorkloadRequest,
+    value: any
+  ) => {
     onUpdateFormData({ [field]: value });
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    handleFieldChange("name", newName);
+    handleFieldChange("workload", { ...formData.workload, name: newName });
 
     // Trigger debounced validation
     debouncedValidateWorkloadName(newName);
   };
 
-  const handleOSVersionChange = (osVersion: string) => {
-    handleFieldChange("os_version", osVersion);
+  // Updated to handle number instead of string
+  const handleOSVersionChange = (osVersionId: number) => {
+    handleFieldChange("workload", {
+      ...formData.workload,
+      os_id: osVersionId,
+    });
   };
 
   // Reset validation when component unmounts
@@ -99,7 +107,7 @@ export function WorkloadBasicForm({
             <div className="relative">
               <Input
                 id="name"
-                value={formData.name}
+                value={formData.workload.name}
                 onChange={handleNameChange}
                 placeholder="Nhập tên workload (ví dụ: ubuntu-24-04)"
                 className={getInputClassName()}
@@ -134,10 +142,10 @@ export function WorkloadBasicForm({
 
           {/* OS Version Selector */}
           <OSSelector
-            value={formData.os_version}
+            value={formData.workload.os_id}
             onValueChange={handleOSVersionChange}
             placeholder="Chọn hệ điều hành..."
-            error={errors?.os_version}
+            error={errors?.os_id}
           />
 
           {/* Description */}
@@ -145,8 +153,13 @@ export function WorkloadBasicForm({
             <Label htmlFor="description">Mô tả</Label>
             <Textarea
               id="description"
-              value={formData.description}
-              onChange={(e) => handleFieldChange("description", e.target.value)}
+              value={formData.workload.description || ""}
+              onChange={(e) =>
+                handleFieldChange("workload", {
+                  ...formData.workload,
+                  description: e.target.value,
+                })
+              }
               placeholder="Nhập mô tả cho workload (tùy chọn)"
               rows={4}
             />

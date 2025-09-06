@@ -51,9 +51,9 @@ export default function AddWorkloadPage() {
     try {
       const requestData: CreateWorkloadRequest = {
         workload: {
-          name: formData.name,
-          description: formData.description || "",
-          os_version: formData.os_version,
+          name: formData.workload.name,
+          description: formData.workload.description || "",
+          os_id: formData.workload.os_id,
         },
         rules: formData.rules,
       };
@@ -79,7 +79,7 @@ export default function AddWorkloadPage() {
       }
 
       // Kiểm tra os_version
-      if (!formData.os_version.trim()) {
+      if (!formData.workload.os_id) {
         toast.error("Vui lòng chọn hệ điều hành");
         return;
       }
@@ -177,7 +177,7 @@ export default function AddWorkloadPage() {
 
       {/* Validation Warning for Step 1 */}
       {currentStep === 0 &&
-        formData.name &&
+        formData.workload.name &&
         !workloadNameValidation.isValid && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
@@ -205,7 +205,7 @@ export default function AddWorkloadPage() {
 
             <div className="flex items-center gap-2">
               {/* Validation status indicator */}
-              {currentStep === 0 && formData.name && (
+              {currentStep === 0 && formData.workload.name && (
                 <div className="flex items-center gap-2 text-sm">
                   {validatingWorkloadName ? (
                     <>

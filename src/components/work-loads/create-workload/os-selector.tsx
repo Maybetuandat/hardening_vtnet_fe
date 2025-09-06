@@ -1,4 +1,3 @@
-// src/components/work-loads/create-workload/os-selector.tsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Select,
@@ -15,8 +14,8 @@ import { useOS } from "@/hooks/os/use-os";
 import { useDebouncedCallback } from "use-debounce";
 
 interface OSSelectorProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: number;
+  onValueChange: (value: number) => void; 
   placeholder?: string;
   disabled?: boolean;
   error?: string;
@@ -136,7 +135,13 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
     debouncedSearch(newSearchTerm);
   };
 
-  const selectedOS = allOSVersions.find((os) => os.version === value);
+  // Handle select value change - convert string to number
+  const handleSelectValueChange = (selectedValue: string) => {
+    const selectedId = parseInt(selectedValue, 10);
+    onValueChange(selectedId);
+  };
+
+  const selectedOS = allOSVersions.find((os) => os.id === value);
 
   return (
     <div className="space-y-2">
@@ -146,8 +151,8 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
       <Select
         open={open}
         onOpenChange={setOpen}
-        value={value}
-        onValueChange={onValueChange}
+        value={value ? value.toString() : ""} // Convert number to string for Select component
+        onValueChange={handleSelectValueChange} // Use our custom handler
         disabled={disabled}
       >
         <SelectTrigger className={error ? "border-red-500" : ""}>
@@ -195,7 +200,7 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
           {allOSVersions.map((os) => (
             <SelectItem
               key={os.id}
-              value={os.version}
+              value={os.id.toString()} // Use os.id as value instead of os.version
               className="cursor-pointer hover:bg-accent"
             >
               <div className="flex flex-col">

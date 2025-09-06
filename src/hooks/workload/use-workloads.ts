@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
 import {
-  Workload,
   WorkloadCreate,
   WorkLoadListResponse,
+  WorkloadResponse,
   WorkloadUpdate,
 } from "@/types/workload";
 
 export function useWorkloads() {
-  const [workloads, setWorkloads] = useState<Workload[]>([]);
+  const [workloads, setWorkloads] = useState<WorkloadResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
@@ -59,9 +59,9 @@ export function useWorkloads() {
   );
 
   const getWorkloadById = useCallback(
-    async (id: number): Promise<Workload | null> => {
+    async (id: number): Promise<WorkloadResponse | null> => {
       try {
-        const response = await api.get<Workload>(`/workloads/${id}`);
+        const response = await api.get<WorkloadResponse>(`/workloads/${id}`);
         return response;
       } catch (err: any) {
         throw new Error(err.message || "Failed to fetch workload");
@@ -73,7 +73,10 @@ export function useWorkloads() {
   const createWorkload = useCallback(
     async (workloadData: WorkloadCreate): Promise<void> => {
       try {
-        const response = await api.post<Workload>("/workloads", workloadData);
+        const response = await api.post<WorkloadResponse>(
+          "/workloads",
+          workloadData
+        );
         // Refresh the list after creation
         await fetchWorkloads();
       } catch (err: any) {
@@ -86,7 +89,7 @@ export function useWorkloads() {
   const updateWorkload = useCallback(
     async (id: number, workloadData: WorkloadUpdate): Promise<void> => {
       try {
-        const response = await api.put<Workload>(
+        const response = await api.put<WorkloadResponse>(
           `/workloads/${id}`,
           workloadData
         );
