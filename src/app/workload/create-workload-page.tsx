@@ -16,6 +16,7 @@ import { StepIndicator } from "@/components/ui/step-indicator";
 import { ExcelUploadForm } from "@/components/work-loads/create-workload/excel-upload-form";
 import { WorkloadBasicForm } from "@/components/work-loads/create-workload/workload-basic-form";
 import { useAddWorkload } from "@/hooks/workload/use-add-workload";
+import { CreateWorkloadRequest } from "@/types/workload";
 
 export default function AddWorkloadPage() {
   const navigate = useNavigate();
@@ -46,6 +47,27 @@ export default function AddWorkloadPage() {
     }
   };
 
+  const handleCreateWorkload = async () => {
+    try {
+      const requestData: CreateWorkloadRequest = {
+        workload: {
+          name: formData.name,
+          description: formData.description || "",
+          os_version: formData.os_version,
+        },
+        rules: formData.rules,
+      };
+
+      await createWorkloadWithRules(requestData);
+
+      toast.success("Tạo workload thành công!");
+      navigate("/workloads");
+    } catch (error: any) {
+      toast.error(error.message || "Không thể tạo workload");
+    }
+  };
+
+  // Cập nhật validation trong handleNext:
   const handleNext = async () => {
     // Kiểm tra validation trước khi tiếp tục
     if (currentStep === 0) {
@@ -55,27 +77,18 @@ export default function AddWorkloadPage() {
         );
         return;
       }
+
+      // Kiểm tra os_version
+      if (!formData.os_version.trim()) {
+        toast.error("Vui lòng chọn hệ điều hành");
+        return;
+      }
     }
 
     if (currentStep === steps.length - 1) {
       await handleCreateWorkload();
     } else {
       nextStep();
-    }
-  };
-
-  const handleCreateWorkload = async () => {
-    try {
-      await createWorkloadWithRules({
-        name: formData.name,
-        description: formData.description,
-        rules: formData.rules,
-      });
-
-      toast.success("Tạo workload thành công!");
-      navigate("/workloads");
-    } catch (error: any) {
-      toast.error(error.message || "Không thể tạo workload");
     }
   };
 

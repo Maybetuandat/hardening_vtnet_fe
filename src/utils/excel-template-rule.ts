@@ -1,5 +1,4 @@
-import { WorkloadRuleCreate } from "@/types/rule";
-
+import { RuleCreate } from "@/types/rule";
 import * as XLSX from "xlsx";
 
 export interface WorkloadWithRulesAndCommandsRequest {
@@ -7,7 +6,7 @@ export interface WorkloadWithRulesAndCommandsRequest {
     name: string;
     description?: string;
   };
-  rules: WorkloadRuleCreate[];
+  rules: RuleCreate[];
 }
 
 // Updated interface for the new template format
@@ -54,10 +53,10 @@ export class ExcelTemplateGenerator {
   static parseExcelToBackendFormat(
     excelData: SimpleTemplateRow[]
   ): WorkloadWithRulesAndCommandsRequest {
-    const rules: WorkloadRuleCreate[] = [];
+    const rules: RuleCreate[] = [];
 
     excelData.forEach((row, index) => {
-      const rule: WorkloadRuleCreate = {
+      const rule: RuleCreate = {
         name: row.Name || "",
         description: row.Description || "",
         parameters: this.parseJsonSafely(row.Parameters_JSON),

@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui for workload fix "
+git commit -m "update ui for add osversion "
 git push origin main 

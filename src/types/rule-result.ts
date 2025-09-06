@@ -12,25 +12,6 @@ export interface RuleResult {
   updated_at: string;
 }
 
-export interface RuleResultCreate {
-  compliance_result_id: number;
-  rule_id: number;
-  rule_name?: string;
-  status: string;
-  message?: string;
-  details?: string;
-  execution_time?: number;
-  output?: Record<string, any>;
-}
-
-export interface RuleResultUpdate {
-  status?: string;
-  message?: string;
-  details?: string;
-  execution_time?: number;
-  output?: Record<string, any>;
-}
-
 export interface RuleResultListResponse {
   results: RuleResult[];
   total: number;

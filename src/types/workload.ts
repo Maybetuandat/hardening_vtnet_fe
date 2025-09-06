@@ -1,4 +1,26 @@
-import { Rule, RuleCreate, RuleResponse } from "./rule";
+import { RuleCreate, RuleResponse } from "./rule";
+
+export interface WorkloadCreate {
+  name: string;
+  description?: string;
+  os_version: string;
+}
+
+// doi tuong de tao cung voi file excel
+export interface CreateWorkloadRequest {
+  workload: WorkloadCreate;
+  rules: RuleCreate[];
+}
+export interface CreateWorkloadResponse {
+  success: boolean;
+  data: {
+    workload: WorkloadResponse;
+    rules: RuleResponse[];
+
+    message: string;
+  };
+  message: string;
+}
 
 export interface WorkloadResponse {
   id: number;
@@ -6,20 +28,28 @@ export interface WorkloadResponse {
   description?: string;
   created_at: string;
   updated_at: string;
+  os_version: string;
 }
 
-export interface Workload {
-  id?: number;
-  name: string;
-  description: string;
-  created_at?: string;
-  updated_at?: string;
+export interface WorkloadUpdate {
+  name?: string;
+  description?: string;
+  os_version?: string;
+}
+
+export interface WorkLoadListResponse {
+  workloads: WorkloadResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 export interface AddWorkloadFormData {
   name: string;
   description: string;
-  rules: Rule[];
+  os_version: string;
+  rules: RuleCreate[];
 }
 
 export interface WorkloadStep {
@@ -32,49 +62,8 @@ export interface WorkloadStep {
 
 export interface ExcelUploadResult {
   success: boolean;
-  rules: Rule[];
+  rules: RuleCreate[];
 
   errors?: string[];
   warnings?: string[];
-}
-
-export interface WorkloadWithRules {
-  name: string;
-  description?: string;
-  rules: Rule[];
-}
-
-// Schema sử dụng đối tượng types thay vì inline arrays
-export interface CreateWorkloadRequest {
-  workload: WorkloadCreate;
-  rules: RuleCreate[];
-}
-
-export interface WorkloadCreate {
-  name: string;
-  description?: string;
-}
-
-export interface WorkloadUpdate {
-  name?: string;
-  description?: string;
-}
-
-export interface CreateWorkloadResponse {
-  success: boolean;
-  data: {
-    workload: WorkloadResponse;
-    rules: RuleResponse[];
-
-    message: string;
-  };
-  message: string;
-}
-
-export interface WorkLoadListResponse {
-  workloads: Workload[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
 }

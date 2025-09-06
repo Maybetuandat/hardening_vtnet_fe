@@ -6,7 +6,6 @@ import {
   AddWorkloadFormData,
   WorkloadStep,
   ExcelUploadResult,
-  WorkloadWithRules,
   CreateWorkloadRequest,
   CreateWorkloadResponse,
 } from "@/types/workload";
@@ -26,6 +25,7 @@ export function useAddWorkload() {
     name: "",
     description: "",
     rules: [],
+    os_version: "",
   });
 
   // Hooks
@@ -161,11 +161,12 @@ export function useAddWorkload() {
     setFormData({
       name: "",
       description: "",
+      os_version: "",
       rules: [],
     });
     setCurrentStep(0);
     setError(null);
-    setDuplicateWarnings([]); // Reset duplicate warnings
+    setDuplicateWarnings([]);
     resetValidation();
   }, [resetValidation]);
 
@@ -174,13 +175,14 @@ export function useAddWorkload() {
    * Rules đã được deduplicated từ Excel parsing
    */
   const createWorkloadWithRules = useCallback(
-    async (data: WorkloadWithRules): Promise<void> => {
+    async (data: CreateWorkloadRequest): Promise<void> => {
       setLoading(true);
       setError(null);
 
       try {
         console.log("🔧 Preparing workload creation with:", {
-          workloadName: data.name,
+          workloadName: data.workload.name,
+          osVersion: data.workload.os_version,
           rulesCount: data.rules.length,
         });
 
@@ -194,12 +196,11 @@ export function useAddWorkload() {
           command: rule.command || "",
         }));
 
-        // Convert commands to API format
-
         const requestData: CreateWorkloadRequest = {
           workload: {
-            name: data.name,
-            description: data.description || "",
+            name: data.workload.name,
+            description: data.workload.description || "",
+            os_version: data.workload.os_version, // Thêm os_version
           },
           rules: rulesForApi,
         };
@@ -218,24 +219,30 @@ export function useAddWorkload() {
 
         return Promise.resolve();
       } catch (err: any) {
-        console.error("❌ Error creating workload:", error);
-        console.error("💥 Error during workload creation:", err);
+        console.error("❌ Error creating workload:", err);
+        setError(err.message || "Có lỗi xảy ra khi tạo workload");
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [formData, createWorkloadWithRulesAndCommands, resetForm]
+    [createWorkloadWithRulesAndCommands, resetForm]
   );
 
   // Validation functions
   const isStep1Valid = useCallback(() => {
     return (
       formData.name.trim() !== "" &&
+      formData.os_version.trim() !== "" &&
       workloadNameValidation.isValid &&
       !validatingWorkloadName
     );
-  }, [formData.name, workloadNameValidation.isValid, validatingWorkloadName]);
-
+  }, [
+    formData.name,
+    formData.os_version,
+    workloadNameValidation.isValid,
+    validatingWorkloadName,
+  ]);
   const isStep2Valid = useCallback(() => {
     return formData.rules.length > 0;
   }, [formData.rules]);

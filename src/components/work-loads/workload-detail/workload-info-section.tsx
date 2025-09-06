@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
-import { Edit, Calendar, FileText, Settings, Clock, Hash } from "lucide-react";
+import {
+  Edit,
+  Calendar,
+  FileText,
+  Settings,
+  Clock,
+  Monitor,
+} from "lucide-react";
 import { EditWorkloadDialog } from "./edit-workload-dialog";
 
 import type { WorkloadResponse } from "@/types/workload";
@@ -62,6 +68,19 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
                 <p className="text-sm font-medium text-muted-foreground">Tên</p>
                 <p className="text-lg font-semibold break-words">
                   {workload.name}
+                </p>
+              </div>
+            </div>
+
+            {/* OS Version */}
+            <div className="flex items-start space-x-3">
+              <Monitor className="h-5 w-5 text-muted-foreground mt-1" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Hệ điều hành
+                </p>
+                <p className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md inline-block">
+                  {workload.os_version}
                 </p>
               </div>
             </div>

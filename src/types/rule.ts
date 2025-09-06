@@ -1,22 +1,3 @@
-export interface Rule {
-  id?: number;
-  name: string;
-  description?: string;
-  parameters: Record<string, any>;
-  command: string;
-  is_active: boolean;
-  workload_id?: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface WorkloadRuleCreate {
-  name: string;
-  description?: string;
-  is_active?: boolean;
-  parameters?: Record<string, any>;
-  command: string;
-}
 export interface RuleResponse {
   id: number;
   name: string;
@@ -33,7 +14,7 @@ export interface RuleCreate {
   name: string;
   description?: string;
 
-  workload_id: number;
+  workload_id?: number;
   parameters?: Record<string, any>;
   is_active: boolean;
   command: string;

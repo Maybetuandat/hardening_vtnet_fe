@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Info, Loader2 } from "lucide-react";
 import { AddWorkloadFormData } from "@/types/workload";
 import { useWorkloadNameValidation } from "@/hooks/workload/use-workload-name-validation";
+import { OSSelector } from "./os-selector";
 
 interface WorkloadBasicFormProps {
   formData: AddWorkloadFormData;
@@ -43,6 +44,10 @@ export function WorkloadBasicForm({
 
     // Trigger debounced validation
     debouncedValidateWorkloadName(newName);
+  };
+
+  const handleOSVersionChange = (osVersion: string) => {
+    handleFieldChange("os_version", osVersion);
   };
 
   // Reset validation when component unmounts
@@ -81,6 +86,9 @@ export function WorkloadBasicForm({
             <Info className="h-5 w-5" />
             Thông tin cơ bản
           </CardTitle>
+          <CardDescription>
+            Nhập thông tin cơ bản cho workload của bạn
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Name */}
@@ -117,18 +125,20 @@ export function WorkloadBasicForm({
                     : "text-red-600"
                 }`}
               >
-                {workloadNameValidation.isValid ? "✅" : "❌"}{" "}
-                {workloadNameValidation.message}
-              </p>
-            )}
-
-            {/* Loading indicator text */}
-            {validatingWorkloadName && (
-              <p className="text-sm text-blue-600">
-                🔍 Đang kiểm tra tên workload (sẽ hoàn thành trong vài giây)...
+                {workloadNameValidation.isValid
+                  ? "✓ " + workloadNameValidation.message
+                  : "✗ " + workloadNameValidation.message}
               </p>
             )}
           </div>
+
+          {/* OS Version Selector */}
+          <OSSelector
+            value={formData.os_version}
+            onValueChange={handleOSVersionChange}
+            placeholder="Chọn hệ điều hành..."
+            error={errors?.os_version}
+          />
 
           {/* Description */}
           <div className="space-y-2">
@@ -137,29 +147,12 @@ export function WorkloadBasicForm({
               id="description"
               value={formData.description}
               onChange={(e) => handleFieldChange("description", e.target.value)}
-              placeholder="Mô tả mục đích và phạm vi của workload này..."
+              placeholder="Nhập mô tả cho workload (tùy chọn)"
               rows={4}
-              className={errors?.description ? "border-red-500" : ""}
             />
             {errors?.description && (
               <p className="text-sm text-red-600">{errors.description}</p>
             )}
-          </div>
-
-          {/* Info Card */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-900">
-                  Bước tiếp theo: Upload file cấu hình rules
-                </p>
-                <p className="text-xs text-blue-700">
-                  Sau khi hoàn thành form này, bạn sẽ upload file Excel chứa các
-                  quy tắc bảo mật.
-                </p>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
