@@ -1,5 +1,5 @@
 // src/app/os/os-page.tsx
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import FilterBar from "@/components/ui/filter-bar";
@@ -130,6 +130,10 @@ export default function OSPage() {
       // Error được handle trong hook và hiển thị toast
     }
   };
+
+  useEffect(() => {
+    fetchOSVersions();
+  }, [fetchOSVersions]);
 
   return (
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
