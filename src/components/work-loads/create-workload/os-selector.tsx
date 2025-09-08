@@ -43,7 +43,7 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
     osVersions,
     loading,
     totalPages,
-    fetchOSVersionsAvailable,
+    fetchOSVersions,
     getOSById,
   } = useOS();
 
@@ -75,12 +75,12 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
       }
 
       try {
-        await fetchOSVersionsAvailable(term, resetPageAndList ? 1 : page, 20);
+        await fetchOSVersions(term, resetPageAndList ? 1 : page, 20);
       } catch (error) {
         console.error("Error fetching OS versions:", error);
       }
     },
-    [fetchOSVersionsAvailable, page]
+    [fetchOSVersions, page]
   );
 
   const loadMore = useCallback(async () => {
@@ -90,7 +90,7 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
     const nextPage = page + 1;
 
     try {
-      await fetchOSVersionsAvailable(searchTerm, nextPage, 20);
+      await fetchOSVersions(searchTerm, nextPage, 20);
       setPage(nextPage);
     } catch (error) {
       console.error("Error loading more OS versions:", error);
@@ -102,7 +102,7 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
     hasNextPage,
     page,
     searchTerm,
-    fetchOSVersionsAvailable,
+    fetchOSVersions,
     loading,
     open,
   ]);

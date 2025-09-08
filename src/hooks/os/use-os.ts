@@ -1,4 +1,3 @@
-// src/hooks/os/use-os.ts
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -17,11 +16,7 @@ interface UseOSReturn {
     page?: number,
     size?: number
   ) => Promise<void>;
-  fetchOSVersionsAvailable: (
-    keyword?: string,
-    page?: number,
-    size?: number
-  ) => Promise<void>;
+
   createOSVersion: (osData: OSCreate) => Promise<void>;
   updateOSVersion: (osId: number, osData: OSUpdate) => Promise<void>;
   deleteOSVersion: (osId: number) => Promise<void>;
@@ -86,43 +81,6 @@ export function useOS(): UseOSReturn {
     [handleError]
   );
 
-  const fetchOSVersionsAvailable = useCallback(
-    async (keyword?: string, page: number = 1, size: number = 10) => {
-      setLoading(true);
-      setError(null); // Clear error trước khi fetch
-
-      try {
-        const params = new URLSearchParams({
-          page: page.toString(),
-          page_size: size.toString(),
-          os_available: "true",
-        });
-
-        if (keyword?.trim()) {
-          params.append("keyword", keyword.trim());
-        }
-
-        const response = await api.get<OSListResponse>(
-          `/os_version?${params.toString()}`
-        );
-
-        setOsVersions(response.os || []);
-        setTotalItems(response.total || 0);
-        setTotalPages(response.total_pages || 0);
-        setCurrentPage(response.page || 1);
-        setPageSize(response.page_size || size);
-        setError(null);
-      } catch (err) {
-        handleError(err, "fetch OS versions");
-        setOsVersions([]);
-        setTotalItems(0);
-        setTotalPages(0);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [handleError]
-  );
   const searchOSVersions = useCallback(
     async (keyword?: string, page: number = 1, size: number = 10) => {
       await fetchOSVersions(keyword, page, size);
@@ -217,7 +175,7 @@ export function useOS(): UseOSReturn {
     fetchOSVersions,
     createOSVersion,
     updateOSVersion,
-    fetchOSVersionsAvailable,
+
     deleteOSVersion,
     getOSById,
     searchOSVersions,

@@ -1,8 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
-import { Workload } from "@/types/workload";
-
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { WorkloadDeleteDialog } from "@/components/work-loads/index/workload-delete-dialog";
@@ -11,15 +9,15 @@ import { WorkloadTable } from "@/components/work-loads/index/workload-table";
 import FilterBar from "@/components/ui/filter-bar";
 import { useNavigate } from "react-router-dom";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
+import { WorkloadResponse } from "@/types/workload";
 
 export default function WorkloadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingWorkload, setDeletingWorkload] = useState<Workload | null>(
-    null
-  );
+  const [deletingWorkload, setDeletingWorkload] =
+    useState<WorkloadResponse | null>(null);
 
   const { t } = useTranslation("workload");
   const navigate = useNavigate();
@@ -61,14 +59,14 @@ export default function WorkloadsPage() {
   );
 
   const handleEditWorkload = useCallback(
-    (workload: Workload) => {
+    (workload: WorkloadResponse) => {
       navigate(`/workloads/${workload.id}`);
       console.log("Edit workload:", workload);
     },
     [navigate]
   );
 
-  const handleDeleteWorkload = useCallback((workload: Workload) => {
+  const handleDeleteWorkload = useCallback((workload: WorkloadResponse) => {
     setDeletingWorkload(workload);
     setDeleteDialogOpen(true);
   }, []);
