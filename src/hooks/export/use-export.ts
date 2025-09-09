@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 export interface ExportParams {
   keyword?: string;
-  server_id?: number;
+  list_workload_id?: number[];
   status?: string;
 }
 
@@ -61,9 +61,14 @@ export function useExport(): UseExportReturn {
         if (params?.keyword?.trim()) {
           searchParams.append("keyword", params.keyword.trim());
         }
-        if (params?.server_id) {
-          searchParams.append("server_id", params.server_id.toString());
+        
+        if (params?.list_workload_id && params.list_workload_id.length > 0) {
+          // Thêm từng workload_id vào query params
+          params.list_workload_id.forEach(id => {
+            searchParams.append("list_workload_id", id.toString());
+          });
         }
+        
         if (params?.status) {
           searchParams.append("status", params.status);
         }

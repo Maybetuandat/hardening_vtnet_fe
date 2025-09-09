@@ -39,7 +39,7 @@ export interface ComplianceResultUpdate {
 
 export interface ComplianceSearchParams {
   keyword?: string;
-  server_id?: number;
+  list_workload_id ?: number[],
   status?: string;
   page: number;
   page_size: number;

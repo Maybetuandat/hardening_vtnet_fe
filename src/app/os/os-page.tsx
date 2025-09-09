@@ -1,4 +1,3 @@
-// src/app/os/os-page.tsx
 import React, { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -54,6 +53,7 @@ export default function OSPage() {
     setCurrentSearchTerm("");
     searchOSVersions("", 1, pageSize); // Fetch với keyword rỗng
   }, [searchOSVersions, pageSize]);
+  
   // Handle actual search (khi ấn Enter hoặc form submit)
   const handleSearchSubmit = useCallback(() => {
     setCurrentSearchTerm(searchInput);
@@ -136,7 +136,7 @@ export default function OSPage() {
   }, [fetchOSVersions]);
 
   return (
-    <div className="min-h-screen w-full px-4 px-6 space-y-6">
+    <div className="min-h-screen w-full px-6 space-y-6">
       {/* Header */}
       <OSHeader
         onRefresh={handleRefresh}

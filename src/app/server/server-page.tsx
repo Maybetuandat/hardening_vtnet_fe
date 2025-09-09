@@ -140,27 +140,29 @@ export default function ServersPage() {
   }, [error]);
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="min-h-screen w-full px-6 space-y-6">
       <ServerHeader onRefresh={handleRefresh} loading={loading} />
 
-      <FilterBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filters={[
-          {
-            value: status,
-            onChange: setStatus,
-            options: [
-              { value: "status", label: "Tất cả trạng thái" },
-              { value: "true", label: "Hoạt động" },
-              { value: "false", label: "Không hoạt động" },
-            ],
-            placeholder: "Trạng thái",
-            widthClass: "w-36",
-          },
-        ]}
-        placeholder="Tìm kiếm theo địa chỉ IP hoặc hostname"
-      />
+      <Card className="p-6">
+        <FilterBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={[
+            {
+              value: status,
+              onChange: setStatus,
+              options: [
+                { value: "status", label: "Tất cả trạng thái" },
+                { value: "true", label: "Hoạt động" },
+                { value: "false", label: "Không hoạt động" },
+              ],
+              placeholder: "Trạng thái",
+              widthClass: "w-36",
+            },
+          ]}
+          placeholder="Tìm kiếm theo địa chỉ IP hoặc hostname"
+        />
+      </Card>
 
       <ServerList
         key={`server-list-${Date.now()}`}
@@ -171,6 +173,7 @@ export default function ServersPage() {
         onDelete={handleDeleteServer}
         onViewHardeningHistory={handleViewHardeningHistory}
       />
+      
       {!loading && !error && (
         <Pagination
           currentPage={currentPage}
@@ -185,6 +188,7 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
+      
       <ServerFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
@@ -194,6 +198,7 @@ export default function ServersPage() {
         getServerById={getServerById}
         onSuccess={handleFormSuccess}
       />
+      
       <ServerDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

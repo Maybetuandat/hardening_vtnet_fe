@@ -76,7 +76,7 @@ export function useCompliance(): UseComplianceReturn {
         const queryString = params.toString();
         console.log("Query String:", queryString);
         const url = queryString ? `/compliance?${queryString}` : "compliance";
-
+        console.log("Fetching URL:", url);
         const data = await api.get<ComplianceResultListResponse>(url);
 
         setComplianceResults(data.results || []);

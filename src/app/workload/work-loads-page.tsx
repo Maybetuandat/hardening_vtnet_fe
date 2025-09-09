@@ -29,7 +29,7 @@ export default function WorkloadsPage() {
     totalItems,
     currentPage,
     totalPages,
-    fetchWorkloads,
+    
     searchWorkloads,
     deleteWorkload,
   } = useWorkloads();
@@ -119,7 +119,7 @@ export default function WorkloadsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen w-full px-6 space-y-6">
       {/* Header */}
       <WorkloadHeader
         onAddWorkload={handleAddWorkload}
@@ -129,13 +129,11 @@ export default function WorkloadsPage() {
 
       {/* Search and Filters */}
       <Card className="p-6">
-        <div className="space-y-4">
-          <FilterBar
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
-            filters={filterOptions}
-          />
-        </div>
+        <FilterBar
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          filters={filterOptions}
+        />
       </Card>
 
       {/* Workload Table */}

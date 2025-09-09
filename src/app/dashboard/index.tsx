@@ -123,7 +123,7 @@ export default function SystemHardeningDashboard() {
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
       <HeaderDashBoard onRefreshCompliance={handleRefreshCompliance} />
 
-      {/*  SSE CONNECTION STATUS INDICATOR */}
+      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
