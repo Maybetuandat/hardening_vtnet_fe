@@ -159,6 +159,7 @@ export default function ServersPage() {
             widthClass: "w-36",
           },
         ]}
+        placeholder="Tìm kiếm theo địa chỉ IP hoặc hostname"
       />
 
       <ServerList

@@ -28,8 +28,9 @@ interface DropdownFilter {
 interface FilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  onSearchClear?: () => void; // Callback để fetch lại dữ liệu khi clear
+  onSearchClear?: () => void;
   filters: DropdownFilter[];
+  placeholder?: string;
 }
 
 const FilterBar: FC<FilterBarProps> = ({
@@ -37,10 +38,11 @@ const FilterBar: FC<FilterBarProps> = ({
   onSearchChange,
   onSearchClear,
   filters,
+  placeholder,
 }) => {
   const handleClear = () => {
     onSearchChange("");
-    // Gọi callback để fetch lại dữ liệu với keyword rỗng
+
     if (onSearchClear) {
       onSearchClear();
     }
@@ -49,12 +51,11 @@ const FilterBar: FC<FilterBarProps> = ({
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row gap-4 w-full">
-        {/* Enhanced Search box - takes more space */}
         <div className="flex-1 lg:flex-[2]">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Tìm kiếm theo tên"
+              placeholder={placeholder}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-12 pr-12 py-3 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200 rounded-lg shadow-sm"
@@ -74,7 +75,6 @@ const FilterBar: FC<FilterBarProps> = ({
           </div>
         </div>
 
-        {/* Compact filters section */}
         <div className="flex items-center gap-3 lg:flex-shrink-0">
           {filters.length > 0 && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
