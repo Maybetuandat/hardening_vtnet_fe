@@ -6,13 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Workload } from "@/types/workload";
+
 import { WorkloadSelector } from "./workload-selector";
-import {
-  ServerUploadWithWorkload,
-  ServerUploadWithWorkloadRef,
-} from "./server-upload-with-workload";
+import { ServerUpload, ServerUploadWithWorkloadRef } from "./server-upload";
 import { ConfirmCancelDialog } from "../ui/confirm-cancel-dialog";
+import { WorkloadResponse } from "@/types/workload";
 
 interface ServerUploadDialogWithWorkloadProps {
   open: boolean;
@@ -26,9 +24,8 @@ export const ServerUploadDialogWithWorkload: React.FC<
   const [step, setStep] = useState<"select-workload" | "upload-servers">(
     "select-workload"
   );
-  const [selectedWorkload, setSelectedWorkload] = useState<Workload | null>(
-    null
-  );
+  const [selectedWorkload, setSelectedWorkload] =
+    useState<WorkloadResponse | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const serverUploadRef = useRef<ServerUploadWithWorkloadRef | null>(null);
@@ -54,7 +51,7 @@ export const ServerUploadDialogWithWorkload: React.FC<
     return () => clearInterval(interval);
   }, [step, selectedWorkload, isDirty]);
 
-  const handleWorkloadSelected = useCallback((workload: Workload) => {
+  const handleWorkloadSelected = useCallback((workload: WorkloadResponse) => {
     setSelectedWorkload(workload);
     setStep("upload-servers");
   }, []);
@@ -144,7 +141,7 @@ export const ServerUploadDialogWithWorkload: React.FC<
             />
           ) : (
             selectedWorkload && (
-              <ServerUploadWithWorkload
+              <ServerUpload
                 selectedWorkload={selectedWorkload}
                 onBack={handleBackToWorkloadSelection}
                 onComplete={handleUploadComplete}

@@ -25,10 +25,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Workload } from "@/types/workload";
+
 import { useServerTemplate } from "@/utils/excel-template-server";
 import { useServerUpload } from "@/hooks/server/use-server-upload";
 import { ServerUploadData } from "@/types/server";
+import { WorkloadResponse } from "@/types/workload";
 
 export interface ServerUploadWithWorkloadRef {
   cancelAllOperations: () => void;
@@ -36,12 +37,12 @@ export interface ServerUploadWithWorkloadRef {
 }
 
 interface ServerUploadWithWorkloadProps {
-  selectedWorkload: Workload;
+  selectedWorkload: WorkloadResponse;
   onBack: () => void;
   onComplete: () => void;
 }
 
-export const ServerUploadWithWorkload = forwardRef<
+export const ServerUpload = forwardRef<
   ServerUploadWithWorkloadRef,
   ServerUploadWithWorkloadProps
 >(({ selectedWorkload, onBack, onComplete }, ref) => {
@@ -447,4 +448,4 @@ export const ServerUploadWithWorkload = forwardRef<
   );
 });
 
-ServerUploadWithWorkload.displayName = "ServerUploadWithWorkload";
+ServerUpload.displayName = "ServerUpload";

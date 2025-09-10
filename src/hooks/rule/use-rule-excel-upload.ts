@@ -46,7 +46,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   );
 
   const { parseExcelFile: parseExcel } = useExcelParser();
-  const { createRule } = useRules();
+  const { createBulkRules } = useRules();
 
   const parseExcelFile = useCallback(
     async (file: File): Promise<ExcelUploadResult> => {
@@ -137,7 +137,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   const createUniqueRules = useCallback(
     async (workloadId: number): Promise<void> => {
       if (!checkResults) {
-        toast.error("Vui lòng kiểm tra rule existence trước");
+        toast.error("Please check rules existence first");
         return;
       }
 
@@ -150,42 +150,44 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         );
 
         if (uniqueResults.length === 0) {
-          toast.error("Không có rules mới để tạo");
+          toast.error("Do not have unique rules to add");
           return;
         }
 
-        console.log(" Creating unique rules:", {
+        console.log("Creating unique rules:", {
           workloadId,
           uniqueCount: uniqueResults.length,
         });
 
-        // Tạo rules
-        const createdRules = [];
-        for (const result of uniqueResults) {
-          const ruleData = {
-            name: result.name,
-            description: result.description || "",
-            workload_id: workloadId,
-            parameters: result.parameters || {},
-            is_active: result.is_active,
-            command: result.command,
-          };
+        // Build list of rules from unique results
+        const ruleDataList: RuleCreate[] = uniqueResults.map((result) => ({
+          name: result.name,
+          description: result.description || "",
+          workload_id: workloadId,
+          parameters: result.parameters || {},
+          is_active: result.is_active,
+          command: result.command,
+        }));
 
-          console.log("Creating rule with command:", result.command); // Debug log
+        console.log(" Rule data to create:", ruleDataList);
+        // Call bulk API
+        const createdRules = await createBulkRules?.(ruleDataList);
 
-          const createdRule = await createRule(ruleData);
-          createdRules.push(createdRule);
+        if (createdRules) {
+          toast.success(
+            `Created  ${createdRules.length} new rules successfully`
+          );
         }
       } catch (err: any) {
-        console.error(" Error creating rules:", err);
-        const errorMessage = err.message || "Không thể tạo rules";
+        console.error("Error creating rules:", err);
+        const errorMessage = err.message || "Cannot create new rules";
         setError(errorMessage);
-        throw new Error(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
     },
-    [checkResults, createRule]
+    [checkResults, createBulkRules]
   );
 
   const resetState = useCallback(() => {

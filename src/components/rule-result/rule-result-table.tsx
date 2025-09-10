@@ -95,29 +95,15 @@ export function RuleResultTable({
     });
   };
 
-  const formatExecutionTime = (seconds: number | null) => {
-    if (seconds === null || seconds === undefined) return "N/A";
-    if (seconds < 1) return "< 1s";
-    return `${seconds}s`;
-  };
-
-  const formatOutput = (output: Record<string, any> | null | undefined) => {
+  const formatOutput = (
+    output: Record<string, any> | null | undefined
+  ): string => {
     if (!output) return "No output";
 
-    if (output.single_value) {
-      return output.single_value;
-    }
+    const values = Object.values(output);
+    if (values.length === 0) return "No values";
 
-    if (output.all_values) {
-      return output.all_values;
-    }
-
-    if (output.error || output.parse_error) {
-      return `Error: ${output.error || output.parse_error}`;
-    }
-
-    const keyCount = Object.keys(output).length;
-    return `${keyCount} values`;
+    return values.map((v) => JSON.stringify(v)).join(", ");
   };
 
   const getOutputTooltip = (output: Record<string, any> | null | undefined) => {
@@ -201,73 +187,79 @@ export function RuleResultTable({
     <Card>
       {ruleResults && ruleResults.length > 0 ? (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead className="min-w-[250px]">Rule Name</TableHead>
-                <TableHead className="w-[120px]">Status</TableHead>
-                <TableHead className="w-[200px]">Output</TableHead>
-                <TableHead className="w-[100px]">Thời gian</TableHead>
-                <TableHead className="w-[180px]">Ngày tạo</TableHead>
-                <TableHead className="w-[100px] text-center">Toggle</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ruleResults.map((ruleResult, index) => (
-                <TableRow key={ruleResult.id} className="hover:bg-muted/50">
-                  <TableCell className="font-mono text-sm text-muted-foreground">
-                    {(currentPage - 1) * pageSize + index + 1}
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium text-foreground">
-                        {ruleResult.rule_name || `Rule ${ruleResult.rule_id}`}
-                      </div>
-                      {ruleResult.message && (
-                        <div className="text-sm text-muted-foreground">
-                          {ruleResult.message}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(ruleResult.status)}</TableCell>
-                  <TableCell>
-                    <div className="max-w-[200px]">
-                      <div
-                        className="truncate text-sm font-mono"
-                        title={getOutputTooltip(ruleResult.output)}
-                      >
-                        {formatOutput(ruleResult.output)}
-                      </div>
-                      {ruleResult.details && (
-                        <div
-                          className="text-xs text-muted-foreground truncate mt-1"
-                          title={ruleResult.details}
-                        >
-                          {ruleResult.details}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Clock className="h-3 w-3 text-muted-foreground" />
-                      {formatExecutionTime(ruleResult.execution_time)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {formatDate(ruleResult.created_at)}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {getToggleButton(ruleResult)}
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">#</TableHead>
+                  <TableHead className="min-w-[200px]">Rule Name</TableHead>
+                  <TableHead className="w-[120px]">Status</TableHead>
+                  <TableHead className="min-w-[250px]">Parameter</TableHead>
+                  <TableHead className="min-w-[250px]">Output</TableHead>
+                  <TableHead className="w-[180px]">Ngày tạo</TableHead>
+                  <TableHead className="w-[100px] text-center">
+                    Toggle
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {ruleResults.map((ruleResult, index) => (
+                  <TableRow key={ruleResult.id} className="hover:bg-muted/50">
+                    <TableCell className="font-mono text-sm text-muted-foreground align-top">
+                      {(currentPage - 1) * pageSize + index + 1}
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="space-y-1">
+                        <div className="font-medium text-foreground break-words">
+                          {ruleResult.rule_name || `Rule ${ruleResult.rule_id}`}
+                        </div>
+                        {ruleResult.message && (
+                          <div className="text-sm text-muted-foreground break-words">
+                            {ruleResult.message}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      {getStatusBadge(ruleResult.status)}
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="max-w-[250px]">
+                        <div className="text-sm font-mono break-words whitespace-pre-wrap">
+                          {formatOutput(ruleResult.parameters)}
+                        </div>
+                        {ruleResult.details && (
+                          <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
+                            {ruleResult.details}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="max-w-[250px]">
+                        <div className="text-sm font-mono break-words whitespace-pre-wrap">
+                          {formatOutput(ruleResult.output)}
+                        </div>
+                        {ruleResult.details && (
+                          <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
+                            {ruleResult.details}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <div className="text-sm whitespace-nowrap">
+                        {formatDate(ruleResult.created_at)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center align-top">
+                      {getToggleButton(ruleResult)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination */}
           <Pagination

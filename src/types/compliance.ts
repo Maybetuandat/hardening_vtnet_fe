@@ -7,7 +7,7 @@ export interface ComplianceResult {
   failed_rules: number;
   score: number;
   scan_date: string;
-  created_at: string;
+
   updated_at: string;
   detail_error?: string;
   server_ip?: string;
@@ -39,7 +39,7 @@ export interface ComplianceResultUpdate {
 
 export interface ComplianceSearchParams {
   keyword?: string;
-  list_workload_id ?: number[],
+  list_workload_id?: number[];
   status?: string;
   page: number;
   page_size: number;

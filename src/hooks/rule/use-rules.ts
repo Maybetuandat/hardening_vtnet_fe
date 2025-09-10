@@ -15,6 +15,7 @@ interface UseRulesReturn {
   totalRules: number;
   totalPages: number;
   currentPage: number;
+  createBulkRules?: (data: RuleCreate[]) => Promise<RuleResponse[]>;
   fetchRules: (params: RuleSearchParams) => Promise<void>;
   createRule: (data: RuleCreate) => Promise<RuleResponse>;
   updateRule: (ruleId: number, data: RuleCreate) => Promise<RuleResponse>;
@@ -81,6 +82,21 @@ export function useRules(): UseRulesReturn {
     []
   );
 
+  const createBulkRules = useCallback(
+    async (data: RuleCreate[]): Promise<RuleResponse[]> => {
+      try {
+        console.log("Creating bulk rules with data:", data);
+        const response = await api.post<RuleResponse[]>("/rules/bulk", data);
+        toast.success("Tạo nhiều rule thành công");
+        return response;
+      } catch (err: any) {
+        console.error("API error details:", err.response?.data || err);
+        toast.error(JSON.stringify(err.response?.data || err));
+        throw err;
+      }
+    },
+    []
+  );
   const updateRule = useCallback(
     async (ruleId: number, data: RuleCreate): Promise<RuleResponse> => {
       try {
@@ -133,6 +149,7 @@ export function useRules(): UseRulesReturn {
     createRule,
     updateRule,
     deleteRule,
+    createBulkRules,
     getRuleById,
   };
 }

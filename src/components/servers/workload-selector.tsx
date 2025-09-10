@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, ArrowRight, AlertCircle } from "lucide-react";
-import { Workload } from "@/types/workload";
+
 import { useWorkloads } from "@/hooks/workload/use-workloads";
+import { WorkloadResponse } from "@/types/workload";
 
 interface WorkloadSelectorProps {
-  onWorkloadSelected: (workload: Workload) => void;
+  onWorkloadSelected: (workload: WorkloadResponse) => void;
   onCancel: () => void;
 }
 
@@ -23,9 +24,8 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
   onCancel,
 }) => {
   const [selectedWorkloadId, setSelectedWorkloadId] = useState<string>("");
-  const [selectedWorkload, setSelectedWorkload] = useState<Workload | null>(
-    null
-  );
+  const [selectedWorkload, setSelectedWorkload] =
+    useState<WorkloadResponse | null>(null);
 
   const { workloads, loading, error, fetchWorkloads } = useWorkloads();
 
@@ -86,33 +86,12 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
                 >
                   <div className="flex flex-col">
                     <span className="font-medium">{workload.name}</span>
-                    {workload.description && (
-                      <span className="text-sm text-muted-foreground">
-                        {workload.description}
-                      </span>
-                    )}
                   </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-
-        {selectedWorkload && (
-          <Alert>
-            <AlertDescription>
-              <div className="space-y-1">
-                <p className="font-medium">Workload đã chọn:</p>
-                <p className="text-sm">{selectedWorkload.name}</p>
-                {selectedWorkload.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {selectedWorkload.description}
-                  </p>
-                )}
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className="flex justify-between gap-3">
           <Button variant="outline" onClick={onCancel} className="flex-1">

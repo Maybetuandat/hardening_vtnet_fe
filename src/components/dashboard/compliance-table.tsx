@@ -205,7 +205,7 @@ export function ComplianceTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">STT</TableHead>
+                <TableHead className="w-16">#</TableHead>
                 <TableHead>Server IP</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-center">Workload</TableHead>

@@ -8,6 +8,7 @@ export interface RuleResult {
   details: string | null;
   execution_time: number | null;
   output: Record<string, any> | null;
+  parameters: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
