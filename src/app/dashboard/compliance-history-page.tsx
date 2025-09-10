@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import { ComplianceHistoryTable } from "@/components/dashboard/compliance-histor
 import { useHistoryCompliance } from "@/hooks/compliance/use-history-compliance";
 
 export default function ServerHardeningHistoryPage() {
+  const { t } = useTranslation("compliance");
   const { serverIp } = useParams<{ serverIp: string }>();
   const navigate = useNavigate();
 
@@ -29,7 +31,6 @@ export default function ServerHardeningHistoryPage() {
     totalPages,
     pageSize,
     fetchComplianceResults,
-
     refreshData,
   } = useHistoryCompliance();
 
@@ -40,7 +41,6 @@ export default function ServerHardeningHistoryPage() {
     const timeoutId = setTimeout(() => {
       fetchComplianceResults(
         searchTerm || serverIp,
-
         status === "all" ? undefined : status,
         1,
         pageSize
@@ -58,8 +58,8 @@ export default function ServerHardeningHistoryPage() {
 
   const handleRefresh = useCallback(() => {
     refreshData();
-    toast.success("Dữ liệu đã được làm mới");
-  }, [refreshData]);
+    toast.success(t("history.messages.dataRefreshed"));
+  }, [refreshData, t]);
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -100,8 +100,10 @@ export default function ServerHardeningHistoryPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-destructive mb-4">Server IP không hợp lệ</p>
-          <Button onClick={handleBack}>Quay lại danh sách server</Button>
+          <p className="text-destructive mb-4">
+            {t("history.invalidServerIp")}
+          </p>
+          <Button onClick={handleBack}>{t("history.backToServerList")}</Button>
         </div>
       </div>
     );
@@ -118,14 +120,14 @@ export default function ServerHardeningHistoryPage() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Quay lại
+            {t("history.backButton")}
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Lịch sử Hardening
+              {t("history.title")}
             </h1>
             <p className="text-muted-foreground mt-2 italic">
-              Server: {serverIp}
+              {t("history.subtitle", { serverIp })}
             </p>
           </div>
         </div>
@@ -137,7 +139,7 @@ export default function ServerHardeningHistoryPage() {
             disabled={loading}
             className="flex items-center gap-2"
           >
-            Làm mới
+            {t("history.refresh")}
           </Button>
         </div>
       </div>
@@ -151,13 +153,13 @@ export default function ServerHardeningHistoryPage() {
             value: status,
             onChange: setStatus,
             options: [
-              { value: "all", label: "Tất cả trạng thái" },
-              { value: "completed", label: "Hoàn thành" },
-              { value: "failed", label: "Thất bại" },
-              { value: "pending", label: "Đang xử lý" },
-              { value: "running", label: "Đang chạy" },
+              { value: "all", label: t("history.filters.allStatus") },
+              { value: "completed", label: t("history.filters.completed") },
+              { value: "failed", label: t("history.filters.failed") },
+              { value: "pending", label: t("history.filters.pending") },
+              { value: "running", label: t("history.filters.running") },
             ],
-            placeholder: "Trạng thái",
+            placeholder: t("history.filters.status"),
             widthClass: "w-40",
           },
         ]}

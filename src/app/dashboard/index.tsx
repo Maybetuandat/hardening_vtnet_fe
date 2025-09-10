@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import { useSSENotifications } from "@/hooks/notifications/use-sse-notifications
 import { ComplianceResult } from "@/types/compliance";
 
 export default function SystemHardeningDashboard() {
+  const { t } = useTranslation("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState("all");
 
@@ -52,11 +54,11 @@ export default function SystemHardeningDashboard() {
 
   useEffect(() => {
     if (connectionError) {
-      toast.error(`Lỗi kết nối realtime: ${connectionError}`, {
+      toast.error(t("realtime.connectionError", { error: connectionError }), {
         duration: 5000,
       });
     }
-  }, [connectionError]);
+  }, [connectionError, t]);
 
   // Event handlers
   const handleSearchChange = useCallback((value: string) => {
@@ -75,8 +77,8 @@ export default function SystemHardeningDashboard() {
 
   const handleRefresh = useCallback(() => {
     refreshData();
-    toast.success("Dữ liệu đã được làm mới");
-  }, [refreshData]);
+    toast.success(t("messages.dataRefreshed"));
+  }, [refreshData, t]);
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -107,13 +109,12 @@ export default function SystemHardeningDashboard() {
     {
       value: status,
       onChange: setStatus,
-      placeholder: "Trạng thái",
+      placeholder: t("filters.status"),
       options: [
-        { value: "all", label: "Tất cả" },
-        { value: "completed", label: "Hoàn thành" },
-        { value: "running", label: "Đang chạy" },
-        { value: "pending", label: "Chờ xử lý" },
-        { value: "failed", label: "Thất bại" },
+        { value: "all", label: t("filters.all") },
+        { value: "completed", label: t("filters.completed") },
+
+        { value: "failed", label: t("filters.failed") },
       ],
       widthClass: "w-36",
     },
@@ -123,7 +124,6 @@ export default function SystemHardeningDashboard() {
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
       <HeaderDashBoard onRefreshCompliance={handleRefreshCompliance} />
 
-      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
@@ -132,7 +132,7 @@ export default function SystemHardeningDashboard() {
             }`}
           />
           <span className="text-sm text-muted-foreground">
-            {isConnected ? "Realtime connected" : "Realtime disconnected"}
+            {isConnected ? t("realtime.connected") : t("realtime.disconnected")}
           </span>
         </div>
       </div>

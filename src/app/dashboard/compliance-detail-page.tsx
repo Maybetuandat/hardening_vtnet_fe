@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ import { useRuleResults } from "@/hooks/rule-result/use-rule-result";
 import { ComplianceResultDetail } from "@/types/compliance";
 
 export default function ComplianceDetailPage() {
+  const { t } = useTranslation("compliance");
   const { complianceId: id } = useParams<{ complianceId: string }>();
   const navigate = useNavigate();
   const complianceId = parseInt(id || "0", 10);
@@ -52,11 +54,11 @@ export default function ComplianceDetailPage() {
       const detail = await getComplianceDetail(complianceId);
       setComplianceDetail(detail);
     } catch (err) {
-      toast.error("Không thể tải chi tiết compliance");
+      toast.error(t("detail.messages.loadDetailError"));
     } finally {
       setLoadingDetail(false);
     }
-  }, [complianceId, getComplianceDetail]);
+  }, [complianceId, getComplianceDetail, t]);
 
   // Load rule results with debounce
   useEffect(() => {
@@ -125,25 +127,28 @@ export default function ComplianceDetailPage() {
       const success = await updateRuleStatus(ruleResultId, newStatus);
 
       if (success) {
+        const statusText =
+          newStatus === "passed"
+            ? t("detail.status.passed")
+            : t("detail.status.failed");
+
         toast.success(
-          `Đã cập nhật trạng thái thành ${
-            newStatus === "passed" ? "Đạt" : "Lỗi"
-          }`
+          t("detail.messages.updateStatusSuccess", { status: statusText })
         );
         // Refresh compliance detail to update scores
         await loadComplianceDetail();
       } else {
-        toast.error("Có lỗi xảy ra khi cập nhật trạng thái");
+        toast.error(t("detail.messages.updateStatusError"));
       }
     },
-    [updateRuleStatus, loadComplianceDetail]
+    [updateRuleStatus, loadComplianceDetail, t]
   );
 
   const handleRefresh = useCallback(() => {
     refreshData();
     loadComplianceDetail();
-    toast.success("Dữ liệu đã được làm mới");
-  }, [refreshData, loadComplianceDetail]);
+    toast.success(t("detail.messages.dataRefreshed"));
+  }, [refreshData, loadComplianceDetail, t]);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -161,11 +166,11 @@ export default function ComplianceDetailPage() {
         <HeaderDashBoard />
         <div className="text-center py-12">
           <p className="text-destructive">
-            ID compliance không hợp lệ (ID: {id}, Parsed: {complianceId})
+            {t("detail.invalidId", { id, parsedId: complianceId })}
           </p>
           <Button onClick={handleBack} className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Quay lại
+            {t("detail.backButton")}
           </Button>
         </div>
       </div>
@@ -182,7 +187,7 @@ export default function ComplianceDetailPage() {
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Quay lại
+          {t("detail.backButton")}
         </Button>
       </div>
 
@@ -202,11 +207,11 @@ export default function ComplianceDetailPage() {
               {
                 value: status,
                 onChange: setStatus,
-                placeholder: "Chọn trạng thái",
+                placeholder: t("detail.filters.status"),
                 options: [
-                  { value: "all", label: "Tất cả trạng thái" },
-                  { value: "passed", label: "Đạt" },
-                  { value: "failed", label: "Không đạt" },
+                  { value: "all", label: t("detail.filters.allStatus") },
+                  { value: "passed", label: t("detail.filters.passed") },
+                  { value: "failed", label: t("detail.filters.failed") },
                 ],
                 widthClass: "w-40",
               },
@@ -222,7 +227,7 @@ export default function ComplianceDetailPage() {
                 onClick={handleClearFilters}
                 className="text-sm"
               >
-                Xóa bộ lọc
+                {t("detail.actions.clearFilters")}
               </Button>
               <Button
                 variant="outline"
@@ -230,7 +235,7 @@ export default function ComplianceDetailPage() {
                 onClick={handleRefresh}
                 className="text-sm"
               >
-                Làm mới
+                {t("detail.actions.refresh")}
               </Button>
             </div>
           )}

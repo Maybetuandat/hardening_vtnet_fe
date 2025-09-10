@@ -26,45 +26,47 @@ interface HeaderDashBoardProps {
 export default function HeaderDashBoard({
   onRefreshCompliance,
 }: HeaderDashBoardProps) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("dashboard");
   const { stats, loading, error, refreshData } = useDashboard();
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
-  const [exportDialogOpen, setExportDialogOpen] = useState(false); // Thêm state cho export dialog
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   // Format dữ liệu cho dashboard cards
   const dashboardData = useMemo(() => {
     const data = [
       {
-        title: "Tổng số server",
+        title: t("header.cards.totalServers.title"),
         value: loading ? "..." : stats.total_nodes.toString(),
-        subtitle: "Số lượng server hoạt động",
+        subtitle: t("header.cards.totalServers.subtitle"),
         icon: <Server className="h-4 w-4" />,
         variant: "default" as const,
         isLoading: loading,
       },
       {
-        title: "Đánh giá chung",
+        title: t("header.cards.overallAssessment.title"),
         value: loading ? "..." : `${stats.compliance_rate}%`,
-        subtitle: "",
+        subtitle: t("header.cards.overallAssessment.subtitle"),
         icon: <Shield className="h-4 w-4" />,
         variant: "success" as const,
         isLoading: loading,
       },
       {
-        title: "Vấn đề",
+        title: t("header.cards.issues.title"),
         value: loading ? "..." : stats.critical_issues.toString(),
-        subtitle: "Số lượng tham số không tuân thủ",
+        subtitle: t("header.cards.issues.subtitle"),
         icon: <AlertTriangle className="h-4 w-4" />,
         variant: "warning" as const,
         isLoading: loading,
       },
       {
-        title: "Quét lần cuối",
-        value: loading ? "..." : stats.last_audit || "Chưa có lần quét nào ",
+        title: t("header.cards.lastScan.title"),
+        value: loading
+          ? "..."
+          : stats.last_audit || t("header.cards.lastScan.value.never"),
         subtitle: stats.last_audit
-          ? "Quét toàn hệ thống đã hoàn thành"
-          : "Chưa có lần quét nào",
+          ? t("header.cards.lastScan.subtitle.completed")
+          : t("header.cards.lastScan.subtitle.never"),
         icon: <Clock className="h-4 w-4" />,
         variant: "info" as const,
         isLoading: loading,
@@ -72,7 +74,7 @@ export default function HeaderDashBoard({
     ];
 
     return data;
-  }, [stats, loading]);
+  }, [stats, loading, t]);
 
   const handleExport = () => {
     // Mở dialog xuất báo cáo thay vì toast
@@ -96,7 +98,7 @@ export default function HeaderDashBoard({
   };
 
   if (error) {
-    toast.error(`Lỗi tải dashboard: ${error}`);
+    toast.error(t("messages.dashboardLoadError", { error }));
   }
 
   return (
@@ -104,12 +106,8 @@ export default function HeaderDashBoard({
       {/* Header and action buttons */}
       <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t("dashboard.title")}
-          </h1>
-          <p className="text-muted-foreground mt-2 italic">
-            {t("dashboard.subtitle")}
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground mt-2 italic">{t("subtitle")}</p>
         </div>
 
         <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
@@ -120,7 +118,7 @@ export default function HeaderDashBoard({
             onClick={handleSchedule}
           >
             <Calendar className="h-4 w-4" />
-            <span>Đặt lịch scan</span>
+            <span>{t("header.actions.schedule")}</span>
           </Button>
 
           <Button
@@ -130,7 +128,7 @@ export default function HeaderDashBoard({
             disabled={loading}
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            <span>Làm mới</span>
+            <span>{t("header.actions.refresh")}</span>
           </Button>
 
           {/* Nút xuất báo cáo - Cập nhật để mở dialog */}
@@ -140,7 +138,7 @@ export default function HeaderDashBoard({
             onClick={handleExport}
           >
             <Download className="h-4 w-4" />
-            <span>{t("dashboard.actions.export")}</span>
+            <span>{t("header.actions.export")}</span>
           </Button>
 
           <Button
@@ -148,7 +146,7 @@ export default function HeaderDashBoard({
             onClick={handleRunAudit}
           >
             <Play className="h-4 w-4" />
-            <span>{t("dashboard.actions.run")}</span>
+            <span>{t("header.actions.run")}</span>
           </Button>
         </div>
       </div>

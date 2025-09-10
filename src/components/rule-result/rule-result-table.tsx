@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -48,18 +49,20 @@ export function RuleResultTable({
   onPageSizeChange,
   onStatusToggle,
 }: RuleResultTableProps) {
+  const { t } = useTranslation("compliance");
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       passed: {
         variant: "success",
         icon: CheckCircle,
-        label: "Đạt",
+        label: t("table.status.passed"),
         color: "text-green-600",
       },
       failed: {
         variant: "destructive",
         icon: XCircle,
-        label: "Không đạt",
+        label: t("table.status.failed"),
         color: "text-red-600",
       },
     };
@@ -85,7 +88,7 @@ export function RuleResultTable({
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return t("table.values.notAvailable");
     return new Date(dateString).toLocaleString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
@@ -98,16 +101,16 @@ export function RuleResultTable({
   const formatOutput = (
     output: Record<string, any> | null | undefined
   ): string => {
-    if (!output) return "No output";
+    if (!output) return t("table.values.noOutput");
 
     const values = Object.values(output);
-    if (values.length === 0) return "No values";
+    if (values.length === 0) return t("table.values.noValues");
 
     return values.map((v) => JSON.stringify(v)).join(", ");
   };
 
   const getOutputTooltip = (output: Record<string, any> | null | undefined) => {
-    if (!output) return "No output";
+    if (!output) return t("table.values.noOutput");
     return JSON.stringify(output, null, 2);
   };
 
@@ -124,10 +127,16 @@ export function RuleResultTable({
     if (!isToggleable) {
       return (
         <div className="w-14 h-7 bg-gray-200 rounded-full flex items-center justify-center">
-          <span className="text-xs text-gray-500">N/A</span>
+          <span className="text-xs text-gray-500">
+            {t("table.values.notAvailable")}
+          </span>
         </div>
       );
     }
+
+    const toggleAction = isPassed
+      ? t("table.actions.toggleToFailed")
+      : t("table.actions.toggleToPassed");
 
     return (
       <button
@@ -140,7 +149,7 @@ export function RuleResultTable({
               : "bg-gray-200 hover:bg-gray-300"
           }
         `}
-        title={`Chuyển trạng thái thành ${isPassed ? "Failed" : "Passed"}`}
+        title={toggleAction}
       >
         <span
           className={`
@@ -163,7 +172,7 @@ export function RuleResultTable({
       <Card>
         <div className="p-8 text-center">
           <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Đang tải rule results...</p>
+          <p className="text-muted-foreground">{t("table.loading")}</p>
         </div>
       </Card>
     );
@@ -175,7 +184,7 @@ export function RuleResultTable({
         <div className="p-8 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-destructive mb-2">
-            Có lỗi xảy ra
+            {t("table.error")}
           </h3>
           <p className="text-muted-foreground">{error}</p>
         </div>
@@ -191,14 +200,26 @@ export function RuleResultTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">#</TableHead>
-                  <TableHead className="min-w-[200px]">Rule Name</TableHead>
-                  <TableHead className="w-[120px]">Status</TableHead>
-                  <TableHead className="min-w-[250px]">Parameter</TableHead>
-                  <TableHead className="min-w-[250px]">Output</TableHead>
-                  <TableHead className="w-[180px]">Ngày tạo</TableHead>
+                  <TableHead className="w-[50px]">
+                    {t("table.headers.index")}
+                  </TableHead>
+                  <TableHead className="min-w-[200px]">
+                    {t("table.headers.ruleName")}
+                  </TableHead>
+                  <TableHead className="w-[120px]">
+                    {t("table.headers.status")}
+                  </TableHead>
+                  <TableHead className="min-w-[250px]">
+                    {t("table.headers.parameter")}
+                  </TableHead>
+                  <TableHead className="min-w-[250px]">
+                    {t("table.headers.output")}
+                  </TableHead>
+                  <TableHead className="w-[180px]">
+                    {t("table.headers.createdDate")}
+                  </TableHead>
                   <TableHead className="w-[100px] text-center">
-                    Toggle
+                    {t("table.headers.toggle")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -277,9 +298,7 @@ export function RuleResultTable({
         </>
       ) : (
         <div className="p-8 text-center">
-          <div className="text-muted-foreground">
-            Không tìm thấy rule results nào
-          </div>
+          <div className="text-muted-foreground">{t("table.empty")}</div>
         </div>
       )}
     </Card>

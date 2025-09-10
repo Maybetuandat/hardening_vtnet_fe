@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui for add osversion "
+git commit -m "update api before code multianguage"
 git push origin main 

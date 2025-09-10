@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,17 +22,29 @@ export function ComplianceDetailInfo({
   compliance,
   loading,
 }: ComplianceDetailInfoProps) {
+  const { t } = useTranslation("compliance");
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       completed: {
         variant: "success",
-        label: "Hoàn thành",
+        label: t("info.status.completed"),
         className: "bg-green-100 text-green-800 border-green-300",
       },
       failed: {
         variant: "destructive",
-        label: "Thất bại",
+        label: t("info.status.failed"),
         className: "bg-red-100 text-red-800 border-red-300",
+      },
+      running: {
+        variant: "secondary",
+        label: t("info.status.running"),
+        className: "bg-blue-100 text-blue-800 border-blue-300",
+      },
+      pending: {
+        variant: "secondary",
+        label: t("info.status.pending"),
+        className: "bg-yellow-100 text-yellow-800 border-yellow-300",
       },
     };
 
@@ -107,9 +120,7 @@ export function ComplianceDetailInfo({
       <Card>
         <CardContent className="p-8 text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">
-            Không tìm thấy thông tin compliance
-          </p>
+          <p className="text-muted-foreground">{t("info.notFound")}</p>
         </CardContent>
       </Card>
     );
@@ -124,19 +135,19 @@ export function ComplianceDetailInfo({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Server className="h-5 w-5" />
-                Compliance Result
+                {t("info.title")}
               </CardTitle>
               <p className="text-muted-foreground mt-1">
-                Server IP: {compliance.server_ip}
+                {t("info.serverIP", { ip: compliance.server_ip })}
               </p>
               {compliance.server_hostname && (
                 <p className="text-sm text-muted-foreground">
-                  Hostname: {compliance.server_hostname}
+                  {t("info.hostname", { hostname: compliance.server_hostname })}
                 </p>
               )}
               {compliance.workload_name && (
                 <p className="text-sm text-muted-foreground">
-                  Workload: {compliance.workload_name}
+                  {t("info.workload", { workload: compliance.workload_name })}
                 </p>
               )}
             </div>
@@ -152,7 +163,7 @@ export function ComplianceDetailInfo({
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <span className="font-medium text-muted-foreground">
-                  Điểm số
+                  {t("info.metrics.score")}
                 </span>
               </div>
               {getScoreBadge(compliance.score)}
@@ -163,7 +174,7 @@ export function ComplianceDetailInfo({
               <div className="flex items-center justify-center mb-2">
                 <Cpu className="h-4 w-4 text-muted-foreground mr-1" />
                 <span className="font-medium text-muted-foreground">
-                  Tổng Rules
+                  {t("info.metrics.totalRules")}
                 </span>
               </div>
               <div className="text-2xl font-bold text-blue-600">
@@ -175,7 +186,9 @@ export function ComplianceDetailInfo({
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                <span className="font-medium text-muted-foreground">Đạt</span>
+                <span className="font-medium text-muted-foreground">
+                  {t("info.metrics.passed")}
+                </span>
               </div>
               <div className="text-2xl font-bold text-green-600">
                 {compliance.passed_rules}
@@ -186,7 +199,9 @@ export function ComplianceDetailInfo({
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <AlertCircle className="h-4 w-4 text-red-600 mr-1" />
-                <span className="font-medium text-muted-foreground">Lỗi</span>
+                <span className="font-medium text-muted-foreground">
+                  {t("info.metrics.failed")}
+                </span>
               </div>
               <div className="text-2xl font-bold text-red-600">
                 {compliance.failed_rules}
@@ -198,11 +213,11 @@ export function ComplianceDetailInfo({
               <div className="flex items-center justify-center mb-2">
                 <Clock className="h-4 w-4 text-muted-foreground mr-1" />
                 <span className="font-medium text-muted-foreground">
-                  Scan Date
+                  {t("info.metrics.scanDate")}
                 </span>
               </div>
               <div className="text-sm font-medium">
-                {formatDate(compliance.scan_date || compliance.created_at)}
+                {formatDate(compliance.scan_date)}
               </div>
             </div>
           </div>
@@ -210,7 +225,7 @@ export function ComplianceDetailInfo({
           {/* Progress Bar */}
           <div className="mt-6">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span>Tiến độ hoàn thành</span>
+              <span>{t("info.progress")}</span>
               <span>{compliance.score.toFixed(1)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -237,7 +252,7 @@ export function ComplianceDetailInfo({
           <CardHeader className="bg-red-50 border-b border-red-200">
             <CardTitle className="flex items-center gap-2 text-red-800">
               <XCircle className="h-5 w-5" />
-              Chi tiết lỗi
+              {t("info.error.title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
@@ -246,7 +261,7 @@ export function ComplianceDetailInfo({
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h4 className="font-medium text-red-900 mb-2">
-                    Thông tin lỗi:
+                    {t("info.error.info")}
                   </h4>
                   <div className="text-sm text-red-800 whitespace-pre-wrap break-words font-mono bg-red-50 p-3 rounded border">
                     {compliance.detail_error}

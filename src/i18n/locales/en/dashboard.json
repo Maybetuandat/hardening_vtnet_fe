@@ -1,0 +1,88 @@
+{
+  "title": "System Hardening Dashboard",
+  "subtitle": "Monitor and manage security compliance across your infrastructure",
+  "realtime": {
+    "connected": "Realtime connected",
+    "disconnected": "Realtime disconnected",
+    "connectionError": "Realtime connection error: {{error}}"
+  },
+  "filters": {
+    "status": "Status",
+    "all": "All",
+    "completed": "Completed",
+    "running": "Running",
+    "pending": "Pending",
+    "failed": "Failed"
+  },
+  "messages": {
+    "dataRefreshed": "Data has been refreshed",
+    "dashboardLoadError": "Dashboard loading error: {{error}}"
+  },
+  "header": {
+    "actions": {
+      "schedule": "Schedule scan",
+      "refresh": "Refresh",
+      "export": "Export Report",
+      "run": "Scan"
+    },
+    "cards": {
+      "totalServers": {
+        "title": "Total servers",
+        "subtitle": "Number of active servers"
+      },
+      "overallAssessment": {
+        "title": "Overall assessment",
+        "subtitle": ""
+      },
+      "issues": {
+        "title": "Issues",
+        "subtitle": "Number of non-compliant parameters"
+      },
+      "lastScan": {
+        "title": "Last scan",
+        "subtitle": {
+          "completed": "System-wide scan completed",
+          "never": "No scan performed yet"
+        },
+        "value": {
+          "never": "No scan yet"
+        }
+      }
+    }
+  },
+  "table": {
+    "loading": "Loading compliance results...",
+    "retry": "Retry",
+    "empty": {
+      "title": "No compliance results",
+      "description": "No scan results found. Please run a scan to see results."
+    },
+    "headers": {
+      "index": "#",
+      "serverIP": "Server IP",
+      "status": "Status",
+      "workload": "Workload",
+      "totalRules": "Total rules",
+      "passed": "Passed",
+      "failed": "Failed",
+      "score": "Score",
+      "scanDate": "Scan date",
+      "actions": "Actions"
+    },
+    "status": {
+      "completed": "Completed",
+      "running": "Running",
+      "pending": "Pending",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "copyIP": "Copy IP address",
+      "viewHistory": "View hardening history"
+    },
+    "messages": {
+      "ipCopied": "IP address copied!",
+      "ipCopyFailed": "Failed to copy IP address!"
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Bảng điều khiển System Hardening",
+  "subtitle": "Giám sát và quản lý tuân thủ bảo mật trên toàn bộ hạ tầng",
+  "realtime": {
+    "connected": "Kết nối realtime",
+    "disconnected": "Mất kết nối realtime",
+    "connectionError": "Lỗi kết nối realtime: {{error}}"
+  },
+  "filters": {
+    "status": "Trạng thái",
+    "all": "Tất cả",
+    "completed": "Hoàn thành",
+    "running": "Đang chạy",
+    "pending": "Chờ xử lý",
+    "failed": "Thất bại"
+  },
+  "messages": {
+    "dataRefreshed": "Dữ liệu đã được làm mới",
+    "dashboardLoadError": "Lỗi tải dashboard: {{error}}"
+  },
+  "header": {
+    "actions": {
+      "schedule": "Đặt lịch scan",
+      "refresh": "Làm mới",
+      "export": "Xuất báo cáo",
+      "run": "Quét"
+    },
+    "cards": {
+      "totalServers": {
+        "title": "Tổng số server",
+        "subtitle": "Số lượng server hoạt động"
+      },
+      "overallAssessment": {
+        "title": "Đánh giá chung",
+        "subtitle": ""
+      },
+      "issues": {
+        "title": "Vấn đề",
+        "subtitle": "Số lượng tham số không tuân thủ"
+      },
+      "lastScan": {
+        "title": "Quét lần cuối",
+        "subtitle": {
+          "completed": "Quét toàn hệ thống đã hoàn thành",
+          "never": "Chưa có lần quét nào"
+        },
+        "value": {
+          "never": "Chưa có lần quét nào"
+        }
+      }
+    }
+  },
+  "table": {
+    "loading": "Đang tải kết quả compliance...",
+    "retry": "Thử lại",
+    "empty": {
+      "title": "Chưa có kết quả compliance",
+      "description": "Chưa có kết quả scan nào được tìm thấy. Hãy thực hiện scan để xem kết quả."
+    },
+    "headers": {
+      "index": "#",
+      "serverIP": "Server IP",
+      "status": "Trạng thái",
+      "workload": "Workload",
+      "totalRules": "Tổng rules",
+      "passed": "Đạt",
+      "failed": "Lỗi",
+      "score": "Điểm số",
+      "scanDate": "Ngày scan",
+      "actions": "Hành động"
+    },
+    "status": {
+      "completed": "Hoàn thành",
+      "running": "Đang chạy",
+      "pending": "Chờ xử lý",
+      "failed": "Thất bại",
+      "cancelled": "Đã hủy"
+    },
+    "actions": {
+      "copyIP": "Copy địa chỉ IP",
+      "viewHistory": "Xem lịch sử hardening"
+    },
+    "messages": {
+      "ipCopied": "Đã copy địa chỉ IP!",
+      "ipCopyFailed": "Không thể copy địa chỉ IP!"
+    }
+  }
+}

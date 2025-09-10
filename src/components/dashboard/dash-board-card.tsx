@@ -50,7 +50,8 @@ export default function DashboardCard({
   };
 
   const styles = getVariantStyles();
-  const isComplianceRate = title === "Đánh giá chung";
+  const isComplianceRate =
+    title === "Đánh giá chung" || title === "Overall assessment";
 
   if (isLoading) {
     return (

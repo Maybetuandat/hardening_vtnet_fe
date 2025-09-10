@@ -1,0 +1,98 @@
+{
+  "detail": {
+    "title": "Compliance Detail",
+    "backButton": "Back",
+    "invalidId": "Invalid compliance ID (ID: {{id}}, Parsed: {{parsedId}})",
+    "filters": {
+      "status": "Select status",
+      "allStatus": "All status",
+      "passed": "Passed",
+      "failed": "Failed"
+    },
+    "actions": {
+      "clearFilters": "Clear filters",
+      "refresh": "Refresh"
+    },
+    "messages": {
+      "loadDetailError": "Unable to load compliance detail",
+      "updateStatusSuccess": "Status updated to {{status}}",
+      "updateStatusError": "Error occurred while updating status",
+      "dataRefreshed": "Data has been refreshed"
+    },
+    "status": {
+      "passed": "Passed",
+      "failed": "Failed"
+    }
+  },
+  "info": {
+    "title": "Compliance Result",
+    "serverIP": "Server IP: {{ip}}",
+    "hostname": "Hostname: {{hostname}}",
+    "workload": "Workload: {{workload}}",
+    "notFound": "Compliance information not found",
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "running": "Running",
+      "pending": "Pending"
+    },
+    "metrics": {
+      "score": "Score",
+      "totalRules": "Total Rules",
+      "passed": "Passed",
+      "failed": "Failed",
+      "scanDate": "Scan Date"
+    },
+    "progress": "Completion Progress",
+    "error": {
+      "title": "Error Details",
+      "info": "Error Information:"
+    }
+  },
+  "table": {
+    "loading": "Loading rule results...",
+    "error": "An error occurred",
+    "empty": "No rule results found",
+    "headers": {
+      "index": "#",
+      "ruleName": "Rule Name",
+      "status": "Status",
+      "parameter": "Parameter",
+      "output": "Output",
+      "createdDate": "Created Date",
+      "toggle": "Toggle"
+    },
+    "status": {
+      "passed": "Passed",
+      "failed": "Failed"
+    },
+    "actions": {
+      "toggleToFailed": "Switch status to Failed",
+      "toggleToPassed": "Switch status to Passed"
+    },
+    "values": {
+      "noOutput": "No output",
+      "noValues": "No values",
+      "notAvailable": "N/A"
+    }
+  },
+  "history": {
+    "title": "Hardening History",
+    "subtitle": "Server: {{serverIp}}",
+    "backButton": "Back",
+    "refresh": "Refresh",
+    "invalidServerIp": "Invalid Server IP",
+    "backToServerList": "Back to server list",
+    "filters": {
+      "status": "Status",
+      "allStatus": "All status",
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "running": "Running"
+    },
+    "messages": {
+      "dataRefreshed": "Data has been refreshed"
+    }
+  }
+}

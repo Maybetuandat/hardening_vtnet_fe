@@ -8,6 +8,12 @@ import enCommon from "./locales/en/common.json";
 
 import enWorkload from "./locales/en/workload.json";
 import viWorkload from "./locales/vi/workload.json";
+import enNotfound from "./locales/en/notfound.json";
+import viNotfound from "./locales/vi/notfound.json";
+import enDashboard from "./locales/en/dashboard.json";
+import viDashboard from "./locales/vi/dashboard.json";
+import enCompliance from "./locales/en/compliance.json";
+import viCompliance from "./locales/vi/compliance.json";
 // Configuration
 i18n.use(initReactI18next).init({
   // Default language
@@ -15,7 +21,7 @@ i18n.use(initReactI18next).init({
   fallbackLng: "en",
 
   // Namespaces
-  ns: ["common"],
+  ns: ["common", "workload", "notfound", "dashboard", "compliance"],
   defaultNS: "common",
 
   // Resources
@@ -24,11 +30,17 @@ i18n.use(initReactI18next).init({
       common: viCommon,
 
       workload: viWorkload,
+      notfound: viNotfound,
+      dashboard: viDashboard,
+      compliance: viCompliance,
     },
     en: {
       common: enCommon,
 
       workload: enWorkload,
+      notfound: enNotfound,
+      dashboard: enDashboard,
+      compliance: enCompliance,
     },
   },
 

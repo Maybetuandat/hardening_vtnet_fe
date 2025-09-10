@@ -1,0 +1,98 @@
+{
+  "detail": {
+    "title": "Chi tiết Compliance",
+    "backButton": "Quay lại",
+    "invalidId": "ID compliance không hợp lệ (ID: {{id}}, Parsed: {{parsedId}})",
+    "filters": {
+      "status": "Chọn trạng thái",
+      "allStatus": "Tất cả trạng thái",
+      "passed": "Đạt",
+      "failed": "Không đạt"
+    },
+    "actions": {
+      "clearFilters": "Xóa bộ lọc",
+      "refresh": "Làm mới"
+    },
+    "messages": {
+      "loadDetailError": "Không thể tải chi tiết compliance",
+      "updateStatusSuccess": "Đã cập nhật trạng thái thành {{status}}",
+      "updateStatusError": "Có lỗi xảy ra khi cập nhật trạng thái",
+      "dataRefreshed": "Dữ liệu đã được làm mới"
+    },
+    "status": {
+      "passed": "Đạt",
+      "failed": "Lỗi"
+    }
+  },
+  "info": {
+    "title": "Kết quả Compliance",
+    "serverIP": "Server IP: {{ip}}",
+    "hostname": "Hostname: {{hostname}}",
+    "workload": "Workload: {{workload}}",
+    "notFound": "Không tìm thấy thông tin compliance",
+    "status": {
+      "completed": "Hoàn thành",
+      "failed": "Thất bại",
+      "running": "Đang chạy",
+      "pending": "Chờ xử lý"
+    },
+    "metrics": {
+      "score": "Điểm số",
+      "totalRules": "Tổng Rules",
+      "passed": "Đạt",
+      "failed": "Lỗi",
+      "scanDate": "Ngày Scan"
+    },
+    "progress": "Tiến độ hoàn thành",
+    "error": {
+      "title": "Chi tiết lỗi",
+      "info": "Thông tin lỗi:"
+    }
+  },
+  "table": {
+    "loading": "Đang tải rule results...",
+    "error": "Có lỗi xảy ra",
+    "empty": "Không tìm thấy rule results nào",
+    "headers": {
+      "index": "#",
+      "ruleName": "Rule Name",
+      "status": "Status",
+      "parameter": "Parameter",
+      "output": "Output",
+      "createdDate": "Ngày tạo",
+      "toggle": "Toggle"
+    },
+    "status": {
+      "passed": "Đạt",
+      "failed": "Không đạt"
+    },
+    "actions": {
+      "toggleToFailed": "Chuyển trạng thái thành Failed",
+      "toggleToPassed": "Chuyển trạng thái thành Passed"
+    },
+    "values": {
+      "noOutput": "No output",
+      "noValues": "No values",
+      "notAvailable": "N/A"
+    }
+  },
+  "history": {
+    "title": "Lịch sử Hardening",
+    "subtitle": "Server: {{serverIp}}",
+    "backButton": "Quay lại",
+    "refresh": "Làm mới",
+    "invalidServerIp": "Server IP không hợp lệ",
+    "backToServerList": "Quay lại danh sách server",
+    "filters": {
+      "status": "Trạng thái",
+      "allStatus": "Tất cả trạng thái",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại",
+      "pending": "Đang xử lý",
+      "running": "Đang chạy"
+    },
+    "messages": {
+      "dataRefreshed": "Dữ liệu đã được làm mới"
+    }
+  }
+}

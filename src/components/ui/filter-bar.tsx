@@ -1,4 +1,3 @@
-// src/components/ui/filter-bar.tsx
 import { FC } from "react";
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -67,7 +66,6 @@ const FilterBar: FC<FilterBarProps> = ({
                 size="sm"
                 onClick={handleClear}
                 className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-full"
-                title="Xóa tìm kiếm"
               >
                 <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
               </Button>
@@ -79,7 +77,6 @@ const FilterBar: FC<FilterBarProps> = ({
           {filters.length > 0 && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Lọc</span>
             </div>
           )}
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
@@ -94,7 +91,7 @@ const FilterBar: FC<FilterBarProps> = ({
                     filter.widthClass || "w-36"
                   } border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200`}
                 >
-                  <SelectValue placeholder={filter.placeholder || "Chọn"} />
+                  <SelectValue placeholder={filter.placeholder} />
                 </SelectTrigger>
                 <SelectContent>
                   {filter.options.map((opt) => (
