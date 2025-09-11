@@ -13,7 +13,9 @@
     "previous": "Trước",
     "clear": "Xóa",
     "close": "Đóng",
-    "update": "Cập nhật"
+    "update": "Cập nhật",
+    "saving": "Đang lưu...",
+    "saveChanges": "Lưu thay đổi"
   },
   "workloads": {
     "title": "Workloads",
@@ -263,5 +265,29 @@
         "noRulesWorkload": "Workload này chưa có rule nào"
       }
     }
+  },
+  "ruleDialog": {
+    "title": "Chỉnh sửa Rule",
+    "description": "Cập nhật thông tin rule. Nhấn lưu để áp dụng thay đổi.",
+    "nameLabel": "Tên rule",
+    "namePlaceholder": "Nhập tên rule",
+    "descriptionLabel": "Mô tả",
+    "descriptionPlaceholder": "Nhập mô tả cho rule (tùy chọn)",
+    "commandLabel": "Lệnh thực thi",
+    "commandPlaceholder": "Nhập lệnh sẽ được thực thi khi rule được kích hoạt",
+    "commandHelp": "Lệnh này sẽ được thực thi khi rule được kích hoạt. Ví dụ: bash script, API call, etc.",
+    "parametersLabel": "Tham số (JSON)",
+    "parametersHelp": "Nhập tham số dưới dạng JSON. Ví dụ: {\"key\": \"value\"}",
+    "statusLabel": "Trạng thái hoạt động",
+    "statusHelp": "Bật/tắt trạng thái hoạt động của rule"
+  },
+  "ruleDeleteDialog": {
+    "title": "Xác nhận xóa Rule",
+    "description": "Bạn có chắc chắn muốn xóa rule <strong>\"{{ruleName}}\"</strong> không?",
+    "warningTitle": "Cảnh báo:",
+    "warningBullet1": "Xóa vĩnh viễn rule này",
+    "warningBullet2": "Không thể hoàn tác",
+    "deleting": "Đang xóa...",
+    "deleteButton": "Xóa Rule"
   }
 }

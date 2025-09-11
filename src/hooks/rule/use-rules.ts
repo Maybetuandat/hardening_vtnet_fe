@@ -70,12 +70,12 @@ export function useRules(): UseRulesReturn {
       try {
         console.log("Creating rule with data:", data);
         const response = await api.post<RuleResponse>("/rules", data);
-        toast.success("Tạo rule thành công");
+        toast.success("Create rule successfully");
         return response;
       } catch (err: any) {
         console.error("Error creating rule:", err);
         const errorMessage = err.message || "Failed to create rule";
-        toast.error(`Có lỗi xảy ra khi tạo rule: ${errorMessage}`);
+        toast.error(`Failed to create rule: ${errorMessage}`);
         throw err;
       }
     },
@@ -87,7 +87,7 @@ export function useRules(): UseRulesReturn {
       try {
         console.log("Creating bulk rules with data:", data);
         const response = await api.post<RuleResponse[]>("/rules/bulk", data);
-        toast.success("Tạo nhiều rule thành công");
+        toast.success("Create bulk rules successfully");
         return response;
       } catch (err: any) {
         console.error("API error details:", err.response?.data || err);
@@ -101,12 +101,12 @@ export function useRules(): UseRulesReturn {
     async (ruleId: number, data: RuleCreate): Promise<RuleResponse> => {
       try {
         const response = await api.put<RuleResponse>(`/rules/${ruleId}`, data);
-        toast.success("Cập nhật rule thành công");
+        toast.success("update rule successfully");
         return response;
       } catch (err: any) {
         console.error("Error updating rule:", err);
         const errorMessage = err.message || "Failed to update rule";
-        toast.error(`Có lỗi xảy ra khi cập nhật rule: ${errorMessage}`);
+        toast.error(`Failed to update rule: ${errorMessage}`);
         throw err;
       }
     },
@@ -116,11 +116,11 @@ export function useRules(): UseRulesReturn {
   const deleteRule = useCallback(async (ruleId: number): Promise<void> => {
     try {
       await api.delete(`/rules/${ruleId}`);
-      toast.success("Xóa rule thành công");
+      toast.success("delete rule successfully");
     } catch (err: any) {
       console.error("Error deleting rule:", err);
       const errorMessage = err.message || "Failed to delete rule";
-      toast.error(`Có lỗi xảy ra khi xóa rule: ${errorMessage}`);
+      toast.error(`Failed to delete rule: ${errorMessage}`);
       throw err;
     }
   }, []);

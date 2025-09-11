@@ -13,7 +13,9 @@
     "previous": "Previous",
     "clear": "Clear",
     "close": "Close",
-    "update": "Update"
+    "update": "Update",
+    "saving": "Saving...",
+    "saveChanges": "Save changes"
   },
   "workloads": {
     "title": "Workloads",
@@ -263,5 +265,29 @@
         "noRulesWorkload": "This workload has no rules yet"
       }
     }
+  },
+  "ruleDialog": {
+    "title": "Edit Rule",
+    "description": "Update rule information. Click save to apply changes.",
+    "nameLabel": "Rule Name",
+    "namePlaceholder": "Enter rule name",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Enter rule description (optional)",
+    "commandLabel": "Execution Command",
+    "commandPlaceholder": "Enter the command to be executed when the rule is triggered",
+    "commandHelp": "This command will be executed when the rule is triggered. For example: bash script, API call, etc.",
+    "parametersLabel": "Parameters (JSON)",
+    "parametersHelp": "Enter parameters as JSON. For example: {\"key\": \"value\"}",
+    "statusLabel": "Active Status",
+    "statusHelp": "Toggle the active status of the rule"
+  },
+  "ruleDeleteDialog": {
+    "title": "Confirm Rule Deletion",
+    "description": "Are you sure you want to delete the rule <strong>\"{{ruleName}}\"</strong>?",
+    "warningTitle": "Warning:",
+    "warningBullet1": "Permanently delete this rule",
+    "warningBullet2": "This action cannot be undone",
+    "deleting": "Deleting...",
+    "deleteButton": "Delete Rule"
   }
 }

@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-
 import { Switch } from "@/components/ui/switch";
 import { Save, X, Terminal } from "lucide-react";
 import { useRules } from "@/hooks/rule/use-rules";
 import { RuleCreate, RuleResponse } from "@/types/rule";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface EditRuleDialogProps {
   rule: RuleResponse;
@@ -29,6 +29,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   onOpenChange,
   onSuccess,
 }) => {
+  const { t } = useTranslation("workload");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<RuleCreate>({
     name: rule.name,
@@ -90,18 +91,17 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Terminal className="h-5 w-5" />
-            Chỉnh sửa Rule
+            {t("ruleDialog.title")}
           </DialogTitle>
-          <DialogDescription>
-            Cập nhật thông tin rule. Nhấn lưu để áp dụng thay đổi.
-          </DialogDescription>
+          <DialogDescription>{t("ruleDialog.description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Tên rule <span className="text-red-500">*</span>
+              {t("ruleDialog.nameLabel")}{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
@@ -110,7 +110,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder="Nhập tên rule"
+              placeholder={t("ruleDialog.namePlaceholder")}
               disabled={loading}
               required
             />
@@ -118,7 +118,9 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
 
           {/* Description Field */}
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
+            <Label htmlFor="description">
+              {t("ruleDialog.descriptionLabel")}
+            </Label>{" "}
             <Textarea
               id="description"
               value={formData.description}
@@ -128,7 +130,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                   description: e.target.value,
                 }))
               }
-              placeholder="Nhập mô tả cho rule (tùy chọn)"
+              placeholder={t("ruleDialog.descriptionPlaceholder")}
               rows={3}
               disabled={loading}
             />
@@ -137,7 +139,8 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
           {/* Command Field - NEW */}
           <div className="space-y-2">
             <Label htmlFor="command">
-              Lệnh thực thi <span className="text-red-500">*</span>
+              {t("ruleDialog.commandLabel")}{" "}
+              <span className="text-red-500">*</span> {/* Translated */}
             </Label>
             <Textarea
               id="command"
@@ -145,21 +148,23 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, command: e.target.value }))
               }
-              placeholder="Nhập lệnh sẽ được thực thi khi rule được kích hoạt"
+              placeholder={t("ruleDialog.commandPlaceholder")}
               rows={4}
               disabled={loading}
               className="font-mono text-sm"
               required
             />
             <p className="text-xs text-muted-foreground">
-              Lệnh này sẽ được thực thi khi rule được kích hoạt. Ví dụ: bash
-              script, API call, etc.
+              {t("ruleDialog.commandHelp")} {/* Translated */}
             </p>
           </div>
 
           {/* Parameters Field */}
           <div className="space-y-2">
-            <Label htmlFor="parameters">Tham số (JSON)</Label>
+            <Label htmlFor="parameters">
+              {t("ruleDialog.parametersLabel")}
+            </Label>{" "}
+            {/* Translated */}
             <Textarea
               id="parameters"
               value={JSON.stringify(formData.parameters, null, 2)}
@@ -177,16 +182,17 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Nhập tham số dưới dạng JSON. Ví dụ: {"{"}"key": "value"{"}"}
+              {t("ruleDialog.parametersHelp")} {/* Translated */}
             </p>
           </div>
 
           {/* Is Active Field */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="is_active">Trạng thái hoạt động</Label>
+              <Label htmlFor="is_active">{t("ruleDialog.statusLabel")}</Label>{" "}
+              {/* Translated */}
               <p className="text-sm text-muted-foreground">
-                Bật/tắt trạng thái hoạt động của rule
+                {t("ruleDialog.statusHelp")} {/* Translated */}
               </p>
             </div>
             <Switch
@@ -208,7 +214,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               disabled={loading}
             >
               <X className="h-4 w-4 mr-2" />
-              Hủy
+              {t("common.cancel")} {/* Translated */}
             </Button>
             <Button
               type="submit"
@@ -217,7 +223,8 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               }
             >
               <Save className="h-4 w-4 mr-2" />
-              {loading ? "Đang lưu..." : "Lưu thay đổi"}
+              {loading ? t("common.saving") : t("common.saveChanges")}{" "}
+              {/* Translated */}
             </Button>
           </div>
         </form>

@@ -12,6 +12,7 @@ import {
 import { Trash2, AlertTriangle } from "lucide-react";
 import { useRules } from "@/hooks/rule/use-rules";
 import { RuleResponse } from "@/types/rule";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface DeleteRuleDialogProps {
   rule: RuleResponse;
@@ -26,6 +27,7 @@ export const DeleteRuleDialog: React.FC<DeleteRuleDialogProps> = ({
   onOpenChange,
   onSuccess,
 }) => {
+  const { t } = useTranslation("workload");
   const [loading, setLoading] = useState(false);
   const { deleteRule } = useRules();
 
@@ -35,7 +37,6 @@ export const DeleteRuleDialog: React.FC<DeleteRuleDialogProps> = ({
       await deleteRule(rule.id);
       onSuccess();
     } catch (error) {
-      // Error is already handled in the hook
     } finally {
       setLoading(false);
     }
@@ -49,34 +50,41 @@ export const DeleteRuleDialog: React.FC<DeleteRuleDialogProps> = ({
             <div className="p-2 bg-red-100 rounded-full">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
-            <AlertDialogTitle>Xác nhận xóa Rule</AlertDialogTitle>
+            <AlertDialogTitle>{t("ruleDeleteDialog.title")}</AlertDialogTitle>{" "}
           </div>
           <AlertDialogDescription className="text-left space-y-2">
-            <p>
-              Bạn có chắc chắn muốn xóa rule <strong>"{rule.name}"</strong>{" "}
-              không?
-            </p>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: t("ruleDeleteDialog.description", {
+                  ruleName: rule.name,
+                }),
+              }}
+            />
             <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
               <p className="text-sm text-amber-800">
-                <strong>Cảnh báo:</strong> Hành động này sẽ:
+                <strong>{t("ruleDeleteDialog.warningTitle")}</strong>{" "}
               </p>
               <ul className="text-sm text-amber-700 mt-1 space-y-1">
-                <li>• Xóa vĩnh viễn rule này</li>
-
-                <li>• Không thể hoàn tác</li>
+                <li>• {t("ruleDeleteDialog.warningBullet1")}</li>{" "}
+                <li>• {t("ruleDeleteDialog.warningBullet2")}</li>{" "}
               </ul>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Hủy</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>
+            {t("common.cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading}
             className="bg-red-600 hover:bg-red-700"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            {loading ? "Đang xóa..." : "Xóa Rule"}
+            {loading
+              ? t("ruleDeleteDialog.deleting")
+              : t("ruleDeleteDialog.deleteButton")}{" "}
+            {/* Translated */}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
