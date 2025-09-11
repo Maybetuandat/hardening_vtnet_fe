@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ export default function ScanDialog({
   onOpenChange,
   onScanComplete,
 }: ScanDialogProps) {
+  const { t } = useTranslation("dashboard");
   const [scanType, setScanType] = useState<"all" | "selected">("all");
   const [servers, setServers] = useState<Server[]>([]);
   const [selectedServers, setSelectedServers] = useState<Set<number>>(
@@ -65,11 +67,11 @@ export default function ScanDialog({
       setServers(response.servers || []);
     } catch (error) {
       console.error("Error fetching servers:", error);
-      toast.error("Không thể tải danh sách server");
+      toast.error(t("scanDialog.messages.loadServersError"));
     } finally {
       setLoading(false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, t]);
 
   // Load servers when dialog opens or search changes
   useEffect(() => {
@@ -114,8 +116,10 @@ export default function ScanDialog({
 
       toast.success(
         scanType === "all"
-          ? "Đã khởi động scan cho toàn bộ server"
-          : `Đã khởi động scan cho ${selectedServers.size} server được chọn`
+          ? t("scanDialog.messages.scanStartedAll")
+          : t("scanDialog.messages.scanStartedSelected", {
+              count: selectedServers.size,
+            })
       );
 
       onOpenChange(false);
@@ -125,18 +129,22 @@ export default function ScanDialog({
         .post("/compliance/scan", scanRequest)
         .then((response) => {
           console.log("Scan started:", response);
-          toast.success("Yêu cầu scan đã được gửi thành công.");
+          toast.success(t("scanDialog.messages.scanRequestSent"));
         })
         .catch((error) => {
           console.error("Error starting scan:", error);
           const errorMessage =
-            error.response?.data?.message || "Không thể khởi động scan";
-          toast.error(`Lỗi: ${errorMessage}`);
+            error.response?.data?.message || "Unable to start scan";
+          toast.error(
+            t("scanDialog.messages.scanError", { message: errorMessage })
+          );
         });
     } catch (error: any) {
       console.error("Error starting scan:", error);
-      const errorMessage = error.message || "Không thể khởi động scan";
-      toast.error(`Lỗi: ${errorMessage}`);
+      const errorMessage = error.message || "Unable to start scan";
+      toast.error(
+        t("scanDialog.messages.scanError", { message: errorMessage })
+      );
     } finally {
       setScanning(false);
     }
@@ -157,7 +165,7 @@ export default function ScanDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Play className="h-5 w-5" />
-            <span>Khởi động Compliance Scan</span>
+            <span>{t("scanDialog.title")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -165,7 +173,7 @@ export default function ScanDialog({
           {/* Scan Type Selection */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Chọn phương thức scan:
+              {t("scanDialog.scanMethod")}
             </Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
@@ -175,7 +183,7 @@ export default function ScanDialog({
                   onCheckedChange={() => setScanType("all")}
                 />
                 <Label htmlFor="scan-all" className="cursor-pointer">
-                  Scan toàn bộ server
+                  {t("scanDialog.scanAll")}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
@@ -185,7 +193,7 @@ export default function ScanDialog({
                   onCheckedChange={() => setScanType("selected")}
                 />
                 <Label htmlFor="scan-selected" className="cursor-pointer">
-                  Scan server được chọn
+                  {t("scanDialog.scanSelected")}
                 </Label>
               </div>
             </div>
@@ -196,7 +204,7 @@ export default function ScanDialog({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">
-                  Chọn server để scan:
+                  {t("scanDialog.selectServers")}
                 </Label>
                 <div className="flex space-x-2">
                   <Button
@@ -205,7 +213,7 @@ export default function ScanDialog({
                     onClick={handleSelectAll}
                     disabled={servers.length === 0}
                   >
-                    Chọn tất cả
+                    {t("scanDialog.selectAll")}
                   </Button>
                   <Button
                     variant="outline"
@@ -213,7 +221,7 @@ export default function ScanDialog({
                     onClick={handleSelectNone}
                     disabled={selectedServers.size === 0}
                   >
-                    Bỏ chọn
+                    {t("scanDialog.deselectAll")}
                   </Button>
                 </div>
               </div>
@@ -222,7 +230,7 @@ export default function ScanDialog({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Tìm kiếm server theo IP hoặc hostname..."
+                  placeholder={t("scanDialog.searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -233,7 +241,9 @@ export default function ScanDialog({
               {selectedServers.size > 0 && (
                 <div className="flex items-center space-x-2">
                   <Badge variant="secondary">
-                    {selectedServers.size} server được chọn
+                    {t("scanDialog.selectedCount", {
+                      count: selectedServers.size,
+                    })}
                   </Badge>
                 </div>
               )}
@@ -243,13 +253,13 @@ export default function ScanDialog({
                 <div className="p-3 space-y-2">
                   {loading ? (
                     <div className="text-center py-4 text-muted-foreground">
-                      Đang tải danh sách server...
+                      {t("scanDialog.loading")}
                     </div>
                   ) : servers.length === 0 ? (
                     <div className="text-center py-4 text-muted-foreground">
                       {searchTerm.trim()
-                        ? "Không tìm thấy server nào phù hợp"
-                        : "Không có server nào hoạt động"}
+                        ? t("scanDialog.noResults")
+                        : t("scanDialog.noServers")}
                     </div>
                   ) : (
                     servers.map((server) => (
@@ -283,7 +293,9 @@ export default function ScanDialog({
                               variant={server.status ? "default" : "secondary"}
                               className="text-xs"
                             >
-                              {server.status ? "Active" : "Inactive"}
+                              {server.status
+                                ? t("scanDialog.serverStatus.active")
+                                : t("scanDialog.serverStatus.inactive")}
                             </Badge>
                           </div>
                           <div className="text-sm text-muted-foreground">
@@ -306,7 +318,7 @@ export default function ScanDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={scanning}>
-            Hủy
+            {t("scanDialog.actions.cancel")}
           </Button>
           <Button
             onClick={handleStartScan}
@@ -320,12 +332,14 @@ export default function ScanDialog({
             <Play className="h-4 w-4" />
             <span>
               {scanning
-                ? "Đang khởi động..."
+                ? t("scanDialog.actions.starting")
                 : scanType === "all"
-                ? "Scan Toàn Bộ"
+                ? t("scanDialog.actions.scanAll")
                 : selectedServers.size > 0
-                ? `Scan ${selectedServers.size} Server`
-                : "Chọn Server để Scan"}
+                ? t("scanDialog.actions.scanSelected", {
+                    count: selectedServers.size,
+                  })
+                : t("scanDialog.actions.selectToScan")}
             </span>
           </Button>
         </DialogFooter>

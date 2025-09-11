@@ -84,5 +84,100 @@
       "ipCopied": "IP address copied!",
       "ipCopyFailed": "Failed to copy IP address!"
     }
+  },
+  "scanDialog": {
+    "title": "Start Compliance Scan",
+    "scanMethod": "Select scan method:",
+    "scanAll": "Scan all servers",
+    "scanSelected": "Scan selected servers",
+    "selectServers": "Select servers to scan:",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect",
+    "searchPlaceholder": "Search servers by IP or hostname...",
+    "selectedCount": "{{count}} servers selected",
+    "loading": "Loading server list...",
+    "noServers": "No active servers",
+    "noResults": "No servers found matching criteria",
+    "serverStatus": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "scanAll": "Scan All",
+      "scanSelected": "Scan {{count}} Servers",
+      "selectToScan": "Select Servers to Scan",
+      "starting": "Starting..."
+    },
+    "messages": {
+      "scanStartedAll": "Started scan for all servers",
+      "scanStartedSelected": "Started scan for {{count}} selected servers",
+      "scanRequestSent": "Scan request sent successfully",
+      "scanError": "Error: {{message}}",
+      "loadServersError": "Unable to load server list"
+    }
+  },
+  "exportDialog": {
+    "title": "Export Report",
+    "description": "Empty fields will export all data",
+    "todayReport": "Report for {{date}}",
+    "todayDescription": "Only exports compliance data scanned today",
+    "fields": {
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Search by server IP (e.g.: 192.168.1)",
+      "status": "Status",
+      "statusPlaceholder": "Select status...",
+      "allStatus": "All status",
+      "completedStatus": "Completed",
+      "failedStatus": "Failed"
+    },
+    "preview": {
+      "title": "Excel file will contain:",
+      "content": [
+        "ID, Server IP, Workload Name",
+        "Status, Total Rules, Passed/Failed Rules, Score",
+        "Scan Date, Created At, Updated At",
+        "Auto-formatted and can be opened with Excel/LibreOffice"
+      ],
+      "selectedWorkloads": "Only export data from {{count}} selected workloads"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "export": "Export Report",
+      "exporting": "Exporting..."
+    }
+  },
+  "scheduleDialog": {
+    "title": "Schedule Scan",
+    "currentStatus": "Current status:",
+    "statusActive": "Active",
+    "statusInactive": "Disabled",
+    "nextRun": "Next run:",
+    "lastRun": "Last run:",
+    "noData": "No data",
+    "selectTime": "Select scan time:",
+    "enable": "Enable",
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save Schedule",
+      "disable": "Disable Schedule"
+    },
+    "messages": {
+      "updateSuccess": "Scan schedule updated successfully!",
+      "updateError": "Unable to update scan schedule",
+      "disableSuccess": "Automatic scan schedule disabled",
+      "disableError": "Unable to disable scan schedule"
+    }
+  },
+  "workloadSelection": {
+    "label": "Workload",
+    "noSelection": "No workloads selected",
+    "addWorkload": "Add workload",
+    "searchPlaceholder": "Search workloads...",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "loading": "Loading...",
+    "noWorkloads": "No workloads",
+    "noResults": "No workloads found"
   }
 }

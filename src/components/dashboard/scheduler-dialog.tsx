@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Clock, Save, Pause, AlertCircle, CheckCircle } from "lucide-react";
 
 import { useScheduler } from "../../hooks/scheduler/use-scheduler";
@@ -14,13 +15,13 @@ interface ScheduleDialogProps {
 }
 
 const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation("dashboard");
   const {
     loading,
     error,
     scheduleInfo,
     getScanSchedule,
     updateScanSchedule,
-
     disableScanSchedule,
     clearError,
   } = useScheduler();
@@ -48,25 +49,25 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
   const handleSave = async () => {
     const success = await updateScanSchedule(formData);
     if (success) {
-      toast.success("Cập nhật lịch scan thành công!");
+      toast.success(t("scheduleDialog.messages.updateSuccess"));
       onClose();
     } else {
-      toast.error("Không thể cập nhật lịch scan");
+      toast.error(t("scheduleDialog.messages.updateError"));
     }
   };
 
   const handleDisable = async () => {
     const success = await disableScanSchedule();
     if (success) {
-      toast.success("Đã tắt lịch scan tự động");
+      toast.success(t("scheduleDialog.messages.disableSuccess"));
       onClose();
     } else {
-      toast.error("Không thể tắt lịch scan");
+      toast.error(t("scheduleDialog.messages.disableError"));
     }
   };
 
   const formatDateTime = (isoString?: string) => {
-    if (!isoString) return "Chưa có dữ liệu";
+    if (!isoString) return t("scheduleDialog.noData");
     const date = new Date(isoString);
     return date.toLocaleString("vi-VN");
   };
@@ -78,7 +79,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-blue-500" />
-              Đặt Lịch Scan
+              {t("scheduleDialog.title")}
             </DialogTitle>
           </DialogHeader>
 
@@ -105,7 +106,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
               <div className="bg-muted rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">
-                    Trạng thái hiện tại:
+                    {t("scheduleDialog.currentStatus")}
                   </span>
                   <div
                     className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
@@ -119,14 +120,16 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
                     ) : (
                       <Pause className="w-4 h-4" />
                     )}
-                    {scheduleInfo.is_enabled ? "Đang hoạt động" : "Đã tắt"}
+                    {scheduleInfo.is_enabled
+                      ? t("scheduleDialog.statusActive")
+                      : t("scheduleDialog.statusInactive")}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground">
-                      Lần chạy tiếp theo:
+                      {t("scheduleDialog.nextRun")}
                     </span>
                     <p className="font-medium">
                       {formatDateTime(scheduleInfo.next_run)}
@@ -134,7 +137,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
                   </div>
                   <div>
                     <span className="text-muted-foreground">
-                      Lần chạy gần nhất:
+                      {t("scheduleDialog.lastRun")}
                     </span>
                     <p className="font-medium">
                       {formatDateTime(scheduleInfo.last_run)}
@@ -148,7 +151,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium">
-                  Chọn thời gian scan:
+                  {t("scheduleDialog.selectTime")}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
@@ -164,7 +167,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
                     className="rounded border-input"
                   />
                   <label htmlFor="enabled" className="text-sm">
-                    Kích hoạt
+                    {t("scheduleDialog.enable")}
                   </label>
                 </div>
               </div>
@@ -188,7 +191,7 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
                   className="w-full"
                 >
                   <Pause className="w-4 h-4 mr-2" />
-                  Tắt Lịch Scan
+                  {t("scheduleDialog.actions.disable")}
                 </Button>
               )}
             </div>
@@ -196,11 +199,11 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
             {/* Footer Buttons */}
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={onClose} disabled={loading}>
-                Hủy
+                {t("scheduleDialog.actions.cancel")}
               </Button>
               <Button onClick={handleSave} disabled={loading}>
                 <Save className="w-4 h-4 mr-2" />
-                Lưu Lịch
+                {t("scheduleDialog.actions.save")}
               </Button>
             </div>
           </div>

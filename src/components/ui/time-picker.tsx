@@ -380,20 +380,6 @@ const TimePicker: React.FC<TimePickerProps> = ({
       >
         {isAM ? "AM" : "PM"}
       </button>
-
-      {/* Instructions */}
-      {!disabled && (
-        <p className="text-sm text-gray-600 text-center max-w-xs">
-          Click vào số để chỉnh sửa trực tiếp hoặc kéo kim giờ/phút để đặt thời
-          gian
-        </p>
-      )}
-
-      {disabled && (
-        <p className="text-sm text-gray-400 text-center max-w-xs">
-          Vui lòng kích hoạt để chỉnh sửa thời gian
-        </p>
-      )}
     </div>
   );
 };

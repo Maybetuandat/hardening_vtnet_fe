@@ -25,15 +25,15 @@ import { cn } from "@/lib/utils";
 
 import { RulePreviewDialog } from "./rule-preview-dialog";
 import { ExcelTemplateGenerator } from "@/utils/excel-template-rule";
-import { Rule } from "@/types/rule";
+import { RuleCreate } from "@/types/rule";
 import { ExcelUploadResult } from "@/types/workload";
 
 interface ExcelUploadFormProps {
-  rules: Rule[];
+  rules: RuleCreate[];
 
   loading: boolean;
   onFileUpload: (file: File) => Promise<ExcelUploadResult>;
-  onRulesChange: (rules: Rule[]) => void;
+  onRulesChange: (rules: RuleCreate[]) => void;
 }
 
 export function ExcelUploadForm({

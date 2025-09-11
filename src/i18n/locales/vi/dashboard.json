@@ -84,5 +84,100 @@
       "ipCopied": "Đã copy địa chỉ IP!",
       "ipCopyFailed": "Không thể copy địa chỉ IP!"
     }
+  },
+  "scanDialog": {
+    "title": "Khởi động Compliance Scan",
+    "scanMethod": "Chọn phương thức scan:",
+    "scanAll": "Scan toàn bộ server",
+    "scanSelected": "Scan server được chọn",
+    "selectServers": "Chọn server để scan:",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn",
+    "searchPlaceholder": "Tìm kiếm server theo IP hoặc hostname...",
+    "selectedCount": "{{count}} server được chọn",
+    "loading": "Đang tải danh sách server...",
+    "noServers": "Không có server nào hoạt động",
+    "noResults": "Không tìm thấy server nào phù hợp",
+    "serverStatus": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "scanAll": "Scan Toàn Bộ",
+      "scanSelected": "Scan {{count}} Server",
+      "selectToScan": "Chọn Server để Scan",
+      "starting": "Đang khởi động..."
+    },
+    "messages": {
+      "scanStartedAll": "Đã khởi động scan cho toàn bộ server",
+      "scanStartedSelected": "Đã khởi động scan cho {{count}} server được chọn",
+      "scanRequestSent": "Yêu cầu scan đã được gửi thành công",
+      "scanError": "Lỗi: {{message}}",
+      "loadServersError": "Không thể tải danh sách server"
+    }
+  },
+  "exportDialog": {
+    "title": "Xuất báo cáo",
+    "description": "Các trường thuộc tính để trống thì sẽ xuất ra toàn bộ dữ liệu",
+    "todayReport": "Báo cáo ngày {{date}}",
+    "todayDescription": "Chỉ xuất dữ liệu compliance được quét trong ngày hôm nay",
+    "fields": {
+      "keyword": "Từ khóa",
+      "keywordPlaceholder": "Tìm theo IP server (vd: 192.168.1)",
+      "status": "Trạng thái",
+      "statusPlaceholder": "Chọn trạng thái...",
+      "allStatus": "Tất cả trạng thái",
+      "completedStatus": "Completed - Hoàn thành",
+      "failedStatus": "Failed - Lỗi"
+    },
+    "preview": {
+      "title": "File Excel sẽ chứa:",
+      "content": [
+        "ID, Server IP, Workload Name",
+        "Status, Total Rules, Passed/Failed Rules, Score",
+        "Scan Date, Created At, Updated At",
+        "Tự động format và có thể mở bằng Excel/LibreOffice"
+      ],
+      "selectedWorkloads": "Chỉ xuất dữ liệu của {{count}} workload được chọn"
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "export": "Xuất báo cáo",
+      "exporting": "Đang xuất..."
+    }
+  },
+  "scheduleDialog": {
+    "title": "Đặt Lịch Scan",
+    "currentStatus": "Trạng thái hiện tại:",
+    "statusActive": "Đang hoạt động",
+    "statusInactive": "Đã tắt",
+    "nextRun": "Lần chạy tiếp theo:",
+    "lastRun": "Lần chạy gần nhất:",
+    "noData": "Chưa có dữ liệu",
+    "selectTime": "Chọn thời gian scan:",
+    "enable": "Kích hoạt",
+    "actions": {
+      "cancel": "Hủy",
+      "save": "Lưu Lịch",
+      "disable": "Tắt Lịch Scan"
+    },
+    "messages": {
+      "updateSuccess": "Cập nhật lịch scan thành công!",
+      "updateError": "Không thể cập nhật lịch scan",
+      "disableSuccess": "Đã tắt lịch scan tự động",
+      "disableError": "Không thể tắt lịch scan"
+    }
+  },
+  "workloadSelection": {
+    "label": "Workload",
+    "noSelection": "Chưa chọn workload nào",
+    "addWorkload": "Thêm workload",
+    "searchPlaceholder": "Tìm kiếm workload...",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn tất cả",
+    "loading": "Đang tải...",
+    "noWorkloads": "Không có workload nào",
+    "noResults": "Không tìm thấy workload"
   }
 }

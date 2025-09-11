@@ -19,12 +19,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Rule } from "@/types/rule";
+import { RuleCreate } from "@/types/rule";
 
 interface RulePreviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  rules: Rule[];
+  rules: RuleCreate[];
 }
 
 const renderParameters = (parameters: any) => {
