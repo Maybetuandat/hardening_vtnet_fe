@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "react-i18next";
 
 import { Search, X, FileSpreadsheet } from "lucide-react";
 
@@ -26,6 +27,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   onRuleSelect,
   selectedRuleId,
 }) => {
+  const { t } = useTranslation("workload");
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -131,9 +133,9 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const getTitle = () => {
     if (isSearching) {
-      return `Tìm kiếm Rules (${totalRules})`;
+      return t("workloadDetail.rules.title.searching", { count: totalRules });
     }
-    return `Rules của Workload (${totalRules})`;
+    return t("workloadDetail.rules.title.workload", { count: totalRules });
   };
 
   return (
@@ -149,7 +151,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
               className="h-8 flex items-center gap-2"
             >
               <FileSpreadsheet className="h-4 w-4" />
-              Thêm Rules từ Excel
+              {t("workloadDetail.rules.actions.addFromExcel")}
             </Button>
           </div>
 
@@ -158,8 +160,8 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             <Input
               placeholder={
                 isSearching
-                  ? "Nhấn Enter để tìm kiếm trong tất cả rules..."
-                  : "Nhấn Enter để tìm kiếm rules của workload này..."
+                  ? t("workloadDetail.rules.search.placeholderAll")
+                  : t("workloadDetail.rules.search.placeholderWorkload")
               }
               value={searchInput}
               onChange={(e) => handleSearchInputChange(e.target.value)}
@@ -182,7 +184,11 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
           {searchInput && searchInput !== searchKeyword && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground bg-yellow-50 border border-yellow-200 rounded-lg p-2">
               <Search className="h-4 w-4 text-yellow-600" />
-              <span>Nhấn Enter để tìm kiếm "{searchInput}"</span>
+              <span>
+                {t("workloadDetail.rules.search.pressEnter", {
+                  query: searchInput,
+                })}
+              </span>
             </div>
           )}
 
@@ -191,18 +197,11 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
               <div className="flex items-center space-x-2">
                 <Search className="h-4 w-4 text-blue-600" />
                 <span className="text-sm text-blue-800">
-                  Đang tìm kiếm trong tất cả rules với từ khóa: "{searchKeyword}
-                  "
+                  {t("workloadDetail.rules.search.searching", {
+                    keyword: searchKeyword,
+                  })}
                 </span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearSearch}
-                className="h-7"
-              >
-                Xóa tìm kiếm
-              </Button>
             </div>
           )}
         </CardHeader>
@@ -216,20 +215,26 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <p className="text-red-500">Có lỗi xảy ra: {error}</p>
+              <p className="text-red-500">
+                {t("workloadDetail.rules.error", { error })}
+              </p>
             </div>
           ) : rules.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 {searchKeyword
-                  ? `Không tìm thấy rule nào với từ khóa "${searchKeyword}"`
+                  ? t("workloadDetail.rules.empty.noRulesFound", {
+                      keyword: searchKeyword,
+                    })
                   : isSearching
-                  ? "Không có rule nào trong hệ thống"
-                  : "Workload này chưa có rule nào"}
+                  ? t("workloadDetail.rules.empty.noRulesSystem")
+                  : t("workloadDetail.rules.empty.noRulesWorkload")}
               </p>
               {searchInput && searchInput !== searchKeyword && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Nhấn Enter để tìm kiếm "{searchInput}"
+                  {t("workloadDetail.rules.search.pressEnterSearch", {
+                    query: searchInput,
+                  })}
                 </p>
               )}
             </div>

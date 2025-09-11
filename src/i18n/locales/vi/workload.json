@@ -17,7 +17,7 @@
   },
   "workloads": {
     "title": "Workloads",
-    "subtitle": "Quản lý workload hạ tầng và cấu hình triển khai",
+    "subtitle": "Quản lý workloads hạ tầng và cấu hình triển khai",
     "loading": "Đang tải workloads...",
     "addWorkload": "Thêm Workload",
     "refresh": "Làm mới",
@@ -27,26 +27,58 @@
     "all": "Tất cả",
     "deleteWorkload": "Xóa Workload",
     "confirmDelete": "Bạn có chắc chắn muốn xóa workload này?",
-    "deleteWarning": "Hành động này không thể hoàn tác. Tất cả server và cấu hình liên quan sẽ bị xóa.",
+    "deleteWarning": "Hành động này không thể hoàn tác. Tất cả servers và cấu hình liên quan sẽ bị xóa.",
     "workloadCreated": "Tạo workload thành công",
     "workloadUpdated": "Cập nhật workload thành công",
     "workloadDeleted": "Xóa workload thành công",
     "refreshed": "Đã làm mới workloads",
+    "table": {
+      "name": "Tên",
+      "description": "Mô tả",
+      "createdDate": "Ngày tạo",
+      "status": "Trạng thái",
+      "actions": "Thao tác",
+      "editTooltip": "Chỉnh sửa",
+      "deleteTooltip": "Xóa",
+      "noDescription": "Không có mô tả",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "pagination": {
+      "showing": "Hiển thị {{start}} đến {{end}} trong tổng số {{total}} workload",
+      "page": "Trang {{current}} / {{total}}",
+      "itemsPerPage": "Số mục mỗi trang",
+      "firstPage": "Trang đầu",
+      "previousPage": "Trang trước",
+      "nextPage": "Trang sau",
+      "lastPage": "Trang cuối"
+    },
     "form": {
       "createWorkload": "Tạo Workload",
       "editWorkload": "Chỉnh sửa Workload",
       "basicInformation": "Thông tin cơ bản",
+      "basicInformationDescription": "Nhập thông tin cơ bản cho workload của bạn",
+      "excelUploadDescription": "Tải lên file Excel chứa các quy tắc cho workload",
+      "excelUpload": "Tải lên file Excel",
       "name": "Tên",
       "namePlaceholder": "production-oracle-cluster",
-      "nameHelp": "Định danh duy nhất cho workload này",
+      "nameHelp": "Mã định danh duy nhất cho workload này",
       "displayName": "Tên hiển thị",
-      "displayNamePlaceholder": "Cụm Oracle Database Production",
+      "displayNamePlaceholder": "Production Oracle Database Cluster",
       "displayNameHelp": "Tên thân thiện hiển thị trong giao diện",
       "description": "Mô tả",
-      "descriptionPlaceholder": "Cụm cơ sở dữ liệu Oracle cho môi trường production",
+      "descriptionPlaceholder": "Oracle database cluster cho môi trường production",
       "workloadType": "Loại Workload",
       "isActive": "Hoạt động",
-      "activeHelp": "Kích hoạt workload này để triển khai"
+      "activeHelp": "Kích hoạt workload này để triển khai",
+      "delete": {
+        "noDescription": "Không có mô tả",
+        "createdDate": "Ngày tạo",
+        "deleteButton": "Xóa workload",
+        "messages": {
+          "deleteError": "Có lỗi xảy ra khi xóa workload"
+        }
+      }
     },
     "validation": {
       "nameRequired": "Tên là bắt buộc",
@@ -57,6 +89,179 @@
     "empty": {
       "noWorkloads": "Không tìm thấy workload nào",
       "addFirst": "Tạo workload đầu tiên để bắt đầu"
+    }
+  },
+  "add": {
+    "title": "Tạo Workload Mới",
+    "subtitle": "Tạo workload với cấu hình rules và commands từ file Excel",
+    "cancel": "Hủy",
+    "backToList": "Quay lại danh sách",
+    "previousStep": "Bước trước",
+    "next": "Tiếp theo",
+    "createWorkload": "Tạo Workload",
+    "processing": "Đang xử lý...",
+    "validating": "Đang kiểm tra...",
+    "steps": {
+      "progress": "Tiến trình tạo workload"
+    },
+    "basicInfo": {
+      "title": "Thông tin cơ bản",
+      "subtitle": "Nhập thông tin cơ bản cho workload của bạn",
+      "nameLabel": "Tên workload",
+      "nameRequired": "bắt buộc",
+      "namePlaceholder": "Nhập tên workload (ví dụ: ubuntu-24-04)",
+      "osLabel": "Hệ điều hành",
+      "osPlaceholder": "Chọn hệ điều hành...",
+      "osRequired": "Vui lòng chọn hệ điều hành",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả cho workload (tùy chọn)",
+      "nameValidation": {
+        "checking": "Đang kiểm tra tên...",
+        "valid": "Tên hợp lệ",
+        "invalid": "Tên không hợp lệ",
+        "waitValidation": "Vui lòng chờ kiểm tra tên workload hoặc sửa lỗi validation"
+      }
+    },
+    "excel": {
+      "title": "Tải lên cấu hình Rules",
+      "subtitle": "Tải lên file Excel chứa các quy tắc và lệnh cho workload. Tải xuống template mẫu để xem định dạng yêu cầu.",
+      "downloadTemplate": "Tải xuống Template mẫu",
+      "dragDrop": "Kéo thả file Excel vào đây",
+      "orClick": "hoặc nhấp để chọn file (chỉ chấp nhận .xlsx, .xls)",
+      "selectFile": "Chọn file",
+      "processing": "Đang xử lý file...",
+      "pleaseWait": "Vui lòng chờ",
+      "uploadSuccess": "Tải file thành công!",
+      "rulesCount": "{{count}} quy tắc",
+      "preview": "Xem trước",
+      "remove": "Xóa",
+      "uploadFailed": "Tải file thất bại",
+      "invalidFile": "Vui lòng tải lên file Excel hợp lệ (.xlsx hoặc .xls)",
+      "processError": "Không thể xử lý file. Vui lòng thử lại."
+    },
+    "preview": {
+      "title": "Xem trước Rules và Commands",
+      "searchPlaceholder": "Tìm kiếm quy tắc hoặc command...",
+      "noRules": "Không có quy tắc nào phù hợp",
+      "tryFilters": "Thử thay đổi bộ lọc để xem thêm kết quả",
+      "inactive": "Không hoạt động",
+      "command": "Command:",
+      "parameters": "Tham số:",
+      "noParameters": "Không có tham số",
+      "close": "Đóng"
+    },
+    "messages": {
+      "createSuccess": "Tạo workload thành công!",
+      "createError": "Không thể tạo workload"
+    }
+  },
+  "osSelector": {
+    "label": "Hệ điều hành",
+    "required": "bắt buộc",
+    "placeholder": "Chọn hệ điều hành...",
+    "searchPlaceholder": "Tìm kiếm hệ điều hành...",
+    "loading": "Đang tải danh sách hệ điều hành...",
+    "loadingMore": "Đang tải thêm...",
+    "scrollToLoadMore": "Cuộn xuống để tải thêm",
+    "noData": "Không có dữ liệu",
+    "noResults": "Không tìm thấy hệ điều hành nào"
+  },
+  "workloadDetail": {
+    "actions": {
+      "back": "Quay lại",
+      "backToList": "Quay lại danh sách"
+    },
+    "info": {
+      "title": "Thông tin Workload",
+      "actions": {
+        "edit": "Chỉnh sửa"
+      },
+      "fields": {
+        "name": "Tên",
+        "operatingSystem": "Hệ điều hành",
+        "description": "Mô tả",
+        "createdDate": "Ngày tạo",
+        "lastUpdated": "Cập nhật lần cuối"
+      }
+    },
+    "errors": {
+      "notFound": "Không tìm thấy workload",
+      "loadError": "Có lỗi xảy ra khi tải thông tin workload",
+      "invalidId": "ID workload không hợp lệ"
+    },
+    "messages": {
+      "loadError": "Không thể tải thông tin workload"
+    },
+    "notFound": {
+      "title": "Không tìm thấy workload",
+      "description": "Workload bạn đang tìm kiếm không tồn tại hoặc đã bị xóa."
+    },
+    "editDialog": {
+      "title": "Chỉnh sửa Workload",
+      "description": "Cập nhật thông tin workload. Nhấn lưu để áp dụng thay đổi.",
+      "fields": {
+        "name": "Tên workload",
+        "description": "Mô tả"
+      },
+      "placeholders": {
+        "name": "Nhập tên workload",
+        "os": "Chọn hệ điều hành...",
+        "description": "Nhập mô tả cho workload (tùy chọn)"
+      },
+      "actions": {
+        "cancel": "Hủy",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu..."
+      },
+      "validation": {
+        "nameRequired": "Tên workload không được để trống",
+        "osRequired": "Vui lòng chọn hệ điều hành"
+      },
+      "messages": {
+        "updateSuccess": "Cập nhật workload thành công!",
+        "updateError": "Có lỗi xảy ra khi cập nhật workload"
+      }
+    },
+    "rules": {
+      "title": {
+        "searching": "Tìm kiếm Rules ({{count}})",
+        "workload": "Rules của Workload ({{count}})"
+      },
+      "actions": {
+        "addFromExcel": "Thêm Rules từ Excel"
+      },
+      "table": {
+        "columns": {
+          "name": "Tên",
+          "command": "Command",
+          "parameters": "Parameters",
+          "status": "Trạng thái",
+          "actions": "Thao tác"
+        },
+        "noParameters": "Không có tham số",
+        "status": {
+          "active": "Hoạt động",
+          "inactive": "Tạm dừng"
+        },
+        "actions": {
+          "edit": "Chỉnh sửa",
+          "delete": "Xóa"
+        }
+      },
+      "search": {
+        "placeholderAll": "Nhấn Enter để tìm kiếm trong tất cả rules...",
+        "placeholderWorkload": "Nhấn Enter để tìm kiếm rules của workload này...",
+        "pressEnter": "Nhấn Enter để tìm kiếm \"{{query}}\"",
+        "searching": "Đang tìm kiếm trong tất cả rules với từ khóa: \"{{keyword}}\"",
+        "clearSearch": "Xóa tìm kiếm",
+        "pressEnterSearch": "Nhấn Enter để tìm kiếm \"{{query}}\""
+      },
+      "error": "Có lỗi xảy ra: {{error}}",
+      "empty": {
+        "noRulesFound": "Không tìm thấy rule nào với từ khóa \"{{keyword}}\"",
+        "noRulesSystem": "Không có rule nào trong hệ thống",
+        "noRulesWorkload": "Workload này chưa có rule nào"
+      }
     }
   }
 }

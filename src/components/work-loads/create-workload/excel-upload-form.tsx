@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -30,7 +31,6 @@ import { ExcelUploadResult } from "@/types/workload";
 
 interface ExcelUploadFormProps {
   rules: RuleCreate[];
-
   loading: boolean;
   onFileUpload: (file: File) => Promise<ExcelUploadResult>;
   onRulesChange: (rules: RuleCreate[]) => void;
@@ -38,11 +38,11 @@ interface ExcelUploadFormProps {
 
 export function ExcelUploadForm({
   rules,
-
   loading,
   onFileUpload,
   onRulesChange,
 }: ExcelUploadFormProps) {
+  const { t } = useTranslation("workload");
   const [dragActive, setDragActive] = useState(false);
   const [uploadResult, setUploadResult] = useState<ExcelUploadResult | null>(
     null
@@ -77,7 +77,7 @@ export function ExcelUploadForm({
       setUploadResult({
         success: false,
         rules: [],
-        errors: ["Vui lòng tải lên file Excel hợp lệ (.xlsx hoặc .xls)"],
+        errors: [t("add.excel.invalidFile")],
       });
       return;
     }
@@ -93,7 +93,7 @@ export function ExcelUploadForm({
       setUploadResult({
         success: false,
         rules: [],
-        errors: ["Không thể xử lý file. Vui lòng thử lại."],
+        errors: [t("add.excel.processError")],
       });
     }
   };
@@ -130,11 +130,10 @@ export function ExcelUploadForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
-            Tải lên cấu hình Rules
+            {t("add.excel.title")}
           </CardTitle>
           <CardDescription>
-            Tải lên file Excel chứa các quy tắc và lệnh cho workload. Tải xuống
-            template mẫu để xem định dạng yêu cầu.
+            {t("add.excel.subtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -152,7 +151,7 @@ export function ExcelUploadForm({
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              Tải xuống Template mẫu
+              {t("add.excel.downloadTemplate")}
             </Button>
           </div>
 
@@ -183,11 +182,11 @@ export function ExcelUploadForm({
                 <div className="space-y-2">
                   <p className="text-lg font-medium">
                     {loading
-                      ? "Đang xử lý file..."
-                      : "Kéo thả file Excel vào đây"}
+                      ? t("add.excel.processing")
+                      : t("add.excel.dragDrop")}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    hoặc nhấp để chọn file (chỉ chấp nhận .xlsx, .xls)
+                    {t("add.excel.orClick")}
                   </p>
                 </div>
 
@@ -201,7 +200,7 @@ export function ExcelUploadForm({
                 />
                 <label htmlFor="file-upload">
                   <Button variant="outline" disabled={loading} asChild>
-                    <span className="cursor-pointer">Chọn file</span>
+                    <span className="cursor-pointer">{t("add.excel.selectFile")}</span>
                   </Button>
                 </label>
               </div>
@@ -212,8 +211,8 @@ export function ExcelUploadForm({
           {loading && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Đang xử lý {uploadedFileName}...</span>
-                <span>Vui lòng chờ</span>
+                <span>{t("add.excel.processing")} {uploadedFileName}...</span>
+                <span>{t("add.excel.pleaseWait")}</span>
               </div>
               <Progress value={66} className="w-full" />
             </div>
@@ -227,12 +226,12 @@ export function ExcelUploadForm({
                   <CheckCircle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-2">
-                      <p className="font-medium">Tải file thành công!</p>
+                      <p className="font-medium">{t("add.excel.uploadSuccess")}</p>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-4 text-sm">
                           <span className="flex items-center gap-1">
                             <FileSpreadsheet className="h-4 w-4" />
-                            {rules.length} quy tắc
+                            {t("add.excel.rulesCount", { count: rules.length })}
                           </span>
                         </div>
                         <div className="flex gap-2">
@@ -243,7 +242,7 @@ export function ExcelUploadForm({
                             className="flex items-center gap-1"
                           >
                             <Eye className="h-3 w-3" />
-                            Xem trước
+                            {t("add.excel.preview")}
                           </Button>
                           <Button
                             variant="outline"
@@ -252,7 +251,7 @@ export function ExcelUploadForm({
                             className="flex items-center gap-1"
                           >
                             <X className="h-3 w-3" />
-                            Xóa
+                            {t("add.excel.remove")}
                           </Button>
                         </div>
                       </div>
@@ -264,7 +263,7 @@ export function ExcelUploadForm({
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-2">
-                      <p className="font-medium">Tải file thất bại</p>
+                      <p className="font-medium">{t("add.excel.uploadFailed")}</p>
                       {uploadResult.errors?.map((error, index) => (
                         <p key={index} className="text-sm">
                           {error}

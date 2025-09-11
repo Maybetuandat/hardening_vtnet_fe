@@ -10,6 +10,7 @@ import {
   Clock,
   Monitor,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { EditWorkloadDialog } from "./edit-workload-dialog";
 
 import type { WorkloadResponse } from "@/types/workload";
@@ -23,11 +24,14 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
   workload,
   onUpdate,
 }) => {
+  const { t, i18n } = useTranslation("workload");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const formatDateTime = (dateString: string): string => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat("vi-VN", {
+    const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
+
+    return new Intl.DateTimeFormat(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -46,7 +50,9 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
       <Card className="h-fit">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">Thông tin Workload</CardTitle>
+            <CardTitle className="text-xl">
+              {t("workloadDetail.info.title")}
+            </CardTitle>
             <Button
               variant="outline"
               size="sm"
@@ -54,7 +60,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
               className="h-8"
             >
               <Edit className="h-4 w-4 mr-2" />
-              Chỉnh sửa
+              {t("workloadDetail.info.actions.edit")}
             </Button>
           </div>
         </CardHeader>
@@ -65,7 +71,9 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
             <div className="flex items-start space-x-3">
               <Settings className="h-5 w-5 text-muted-foreground mt-1" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Tên</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("workloadDetail.info.fields.name")}
+                </p>
                 <p className="text-lg font-semibold break-words">
                   {workload.name}
                 </p>
@@ -77,7 +85,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
               <Monitor className="h-5 w-5 text-muted-foreground mt-1" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Hệ điều hành
+                  {t("workloadDetail.info.fields.operatingSystem")}
                 </p>
                 <p className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md inline-block">
                   {workload.os_version}
@@ -90,7 +98,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
                 <FileText className="h-5 w-5 text-muted-foreground mt-1" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-muted-foreground">
-                    Mô tả
+                    {t("workloadDetail.info.fields.description")}
                   </p>
                   <p className="text-sm leading-relaxed break-words">
                     {workload.description}
@@ -108,7 +116,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Ngày tạo
+                  {t("workloadDetail.info.fields.createdDate")}
                 </p>
                 <p className="text-sm truncate">
                   {formatDateTime(workload.created_at)}
@@ -120,7 +128,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
               <Clock className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Cập nhật lần cuối
+                  {t("workloadDetail.info.fields.lastUpdated")}
                 </p>
                 <p className="text-sm truncate">
                   {formatDateTime(workload.updated_at)}

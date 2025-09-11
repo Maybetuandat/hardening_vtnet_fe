@@ -10,20 +10,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Workload } from "@/types/workload";
+import { Pagination } from "@/components/ui/pagination";
+import { WorkloadResponse } from "@/types/workload";
 import { Edit, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 interface WorkloadTableProps {
-  workloads: Workload[];
+  workloads: WorkloadResponse[];
   loading: boolean;
   error: string | null;
   totalItems: number;
   currentPage: number;
   totalPages: number;
-  onEdit: (workload: Workload) => void;
-  onDelete: (workload: Workload) => void;
+  pageSize: number;
+  onEdit: (workload: WorkloadResponse) => void;
+  onDelete: (workload: WorkloadResponse) => void;
   onPageChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 export function WorkloadTable({
@@ -33,20 +38,27 @@ export function WorkloadTable({
   totalItems,
   currentPage,
   totalPages,
+  pageSize = 10,
   onEdit,
   onDelete,
   onPageChange,
+  onPageSizeChange,
 }: WorkloadTableProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation("workload");
 
-  // Format date
+  // Format date with locale
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("vi-VN");
+    const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
+    return new Date(dateString).toLocaleDateString(locale);
   };
 
   // Handle row click to navigate to detail page
-  const handleRowClick = (workload: Workload, event: React.MouseEvent) => {
+  const handleRowClick = (
+    workload: WorkloadResponse,
+    event: React.MouseEvent
+  ) => {
     // Prevent navigation if clicking on action buttons
     const target = event.target as HTMLElement;
     if (target.closest("button") || target.closest('[role="button"]')) {
@@ -57,49 +69,56 @@ export function WorkloadTable({
   };
 
   // Handle action clicks with event stopping
-  const handleEdit = (workload: Workload, event: React.MouseEvent) => {
+  const handleEdit = (workload: WorkloadResponse, event: React.MouseEvent) => {
     event.stopPropagation();
     onEdit(workload);
   };
 
-  const handleDelete = (workload: Workload, event: React.MouseEvent) => {
+  const handleDelete = (
+    workload: WorkloadResponse,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
     onDelete(workload);
   };
 
   return (
-    <Card>
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">Đang tải workloads...</p>
+    <div className="space-y-4">
+      <Card>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">{t("workloads.loading")}</p>
+            </div>
           </div>
-        </div>
-      ) : error ? (
-        <div className="p-6">
-          <div className="flex items-center space-x-2 text-destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <span>{error}</span>
+        ) : error ? (
+          <div className="p-6">
+            <div className="flex items-center space-x-2 text-destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <span>{error}</span>
+            </div>
           </div>
-        </div>
-      ) : !workloads || workloads.length === 0 ? (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">Chưa có workload nào</h3>
-          <p className="text-muted-foreground mb-4">
-            Tạo workload đầu tiên của bạn để bắt đầu
-          </p>
-        </div>
-      ) : (
-        <>
+        ) : !workloads || workloads.length === 0 ? (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold mb-2">
+              {t("workloads.empty.noWorkloads")}
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              {t("workloads.empty.addFirst")}
+            </p>
+          </div>
+        ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tên</TableHead>
-                <TableHead>Mô tả</TableHead>
-                <TableHead>Ngày tạo</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
+                <TableHead>{t("workloads.table.name")}</TableHead>
+                <TableHead>{t("workloads.table.description")}</TableHead>
+                <TableHead>{t("workloads.table.createdDate")}</TableHead>
+                <TableHead>{t("workloads.table.status")}</TableHead>
+                <TableHead className="text-right">
+                  {t("workloads.table.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,7 +137,9 @@ export function WorkloadTable({
                           : workload.description}
                       </span>
                     ) : (
-                      <span className="text-sm text-muted-foreground">-</span>
+                      <span className="text-sm text-muted-foreground">
+                        {t("workloads.table.noDescription")}
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -131,7 +152,7 @@ export function WorkloadTable({
                       variant="outline"
                       className="bg-green-100 text-green-800 border-green-300"
                     >
-                      Hoạt động
+                      {t("workloads.table.active")}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -141,7 +162,7 @@ export function WorkloadTable({
                         size="sm"
                         onClick={(event) => handleEdit(workload, event)}
                         className="h-8 w-8 p-0"
-                        title="Chỉnh sửa"
+                        title={t("workloads.table.editTooltip")}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -150,7 +171,7 @@ export function WorkloadTable({
                         size="sm"
                         onClick={(event) => handleDelete(workload, event)}
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        title="Xóa"
+                        title={t("workloads.table.deleteTooltip")}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -160,69 +181,24 @@ export function WorkloadTable({
               ))}
             </TableBody>
           </Table>
+        )}
+      </Card>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                Hiển thị {workloads.length} trong số {totalItems} workload -
-                Trang {currentPage} / {totalPages}
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onPageChange(currentPage - 1)}
-                  disabled={currentPage <= 1 || loading}
-                >
-                  Trước
-                </Button>
-
-                <div className="flex items-center space-x-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else {
-                      if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-                    }
-
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={
-                          currentPage === pageNum ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => onPageChange(pageNum)}
-                        disabled={loading}
-                        className="w-8 h-8 p-0"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onPageChange(currentPage + 1)}
-                  disabled={currentPage >= totalPages || loading}
-                >
-                  Sau
-                </Button>
-              </div>
-            </div>
-          )}
-        </>
+      {/* Pagination - Luôn hiển thị khi có dữ liệu và không loading/error */}
+      {!loading && !error && totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalElements={totalItems}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          loading={loading}
+          showInfo={true}
+          showPageSizeSelector={!!onPageSizeChange}
+          pageSizeOptions={[5, 10, 20, 50]}
+        />
       )}
-    </Card>
+    </div>
   );
 }

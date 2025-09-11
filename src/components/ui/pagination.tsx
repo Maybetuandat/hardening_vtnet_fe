@@ -42,10 +42,6 @@ export const Pagination: React.FC<PaginationProps> = ({
   className,
   pageSizeOptions = [5, 10, 20, 50, 100],
 }) => {
-  // Tính toán chỉ số bắt đầu và kết thúc
-  const startIndex = (currentPage - 1) * pageSize + 1;
-  const endIndex = Math.min(currentPage * pageSize, totalElements || 0);
-
   // Tạo danh sách số trang
   const generatePageNumbers = () => {
     const pages = [];
@@ -70,7 +66,6 @@ export const Pagination: React.FC<PaginationProps> = ({
         }
       }
 
-      // Thêm trang đầu và dấu ... nếu cần
       if (startPage > 1) {
         pages.push(1);
         if (startPage > 2) {
@@ -78,12 +73,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         }
       }
 
-      // Thêm các trang ở giữa
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
 
-      // Thêm dấu ... và trang cuối nếu cần
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
           pages.push("...");
@@ -94,11 +87,6 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     return pages;
   };
-
-  // // Không hiển thị nếu chỉ có 1 trang hoặc ít hơn
-  // if (totalPages <= 1) {
-  //   return null;
-  // }
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages && page !== currentPage && !loading) {
@@ -119,7 +107,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         {/* Selector số lượng item mỗi trang */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Hiển thị</span>
+            <span className="text-sm text-muted-foreground">Show</span>
             <Select
               value={pageSize.toString()}
               onValueChange={handlePageSizeChange}
@@ -136,7 +124,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-sm text-muted-foreground">mục</span>
+            <span className="text-sm text-muted-foreground">items</span>
           </div>
         )}
 
@@ -149,10 +137,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1 || loading}
             className="h-8 w-8 p-0"
-            title="Trang đầu"
           >
             <ChevronsLeft className="h-4 w-4" />
-            <span className="sr-only">Trang đầu</span>
           </Button>
 
           {/* Nút trang trước */}
@@ -162,10 +148,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || loading}
             className="h-8 w-8 p-0"
-            title="Trang trước"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Trang trước</span>
           </Button>
 
           {/* Các số trang */}
@@ -208,10 +192,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages || loading}
             className="h-8 w-8 p-0"
-            title="Trang sau"
           >
             <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Trang sau</span>
           </Button>
 
           {/* Nút cuối trang */}
@@ -221,10 +203,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages || loading}
             className="h-8 w-8 p-0"
-            title="Trang cuối"
           >
             <ChevronsRight className="h-4 w-4" />
-            <span className="sr-only">Trang cuối</span>
           </Button>
         </div>
       </div>

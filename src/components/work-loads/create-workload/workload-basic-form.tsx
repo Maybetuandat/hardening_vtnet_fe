@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -12,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Info, Loader2 } from "lucide-react";
 
 import { useWorkloadNameValidation } from "@/hooks/workload/use-workload-name-validation";
-import { OSSelector } from "./os-selector";
+import { OSSelector } from "./os-selector/os-selector";
 import { CreateWorkloadRequest } from "@/types/workload";
 
 interface WorkloadBasicFormProps {
@@ -26,14 +27,13 @@ export function WorkloadBasicForm({
   onUpdateFormData,
   errors,
 }: WorkloadBasicFormProps) {
+  const { t } = useTranslation("workload");
   const {
     validatingWorkloadName,
     workloadNameValidation,
     debouncedValidateWorkloadName,
     resetValidation,
   } = useWorkloadNameValidation();
-
-  const prevNameRef = useRef(formData.workload.name);
 
   const handleFieldChange = (
     field: keyof CreateWorkloadRequest,
@@ -92,24 +92,23 @@ export function WorkloadBasicForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5" />
-            Thông tin cơ bản
+            {t("add.basicInfo.title")}
           </CardTitle>
-          <CardDescription>
-            Nhập thông tin cơ bản cho workload của bạn
-          </CardDescription>
+          <CardDescription>{t("add.basicInfo.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Tên workload <span className="text-red-500">*</span>
+              {t("add.basicInfo.nameLabel")}{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <div className="relative">
               <Input
                 id="name"
                 value={formData.workload.name}
                 onChange={handleNameChange}
-                placeholder="Nhập tên workload (ví dụ: ubuntu-24-04)"
+                placeholder={t("add.basicInfo.namePlaceholder")}
                 className={getInputClassName()}
               />
               {validatingWorkloadName && (
@@ -144,13 +143,15 @@ export function WorkloadBasicForm({
           <OSSelector
             value={formData.workload.os_id}
             onValueChange={handleOSVersionChange}
-            placeholder="Chọn hệ điều hành..."
+            placeholder={t("add.basicInfo.osPlaceholder")}
             error={errors?.os_id}
           />
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
+            <Label htmlFor="description">
+              {t("add.basicInfo.descriptionLabel")}
+            </Label>
             <Textarea
               id="description"
               value={formData.workload.description || ""}
@@ -160,7 +161,7 @@ export function WorkloadBasicForm({
                   description: e.target.value,
                 })
               }
-              placeholder="Nhập mô tả cho workload (tùy chọn)"
+              placeholder={t("add.basicInfo.descriptionPlaceholder")}
               rows={4}
             />
             {errors?.description && (

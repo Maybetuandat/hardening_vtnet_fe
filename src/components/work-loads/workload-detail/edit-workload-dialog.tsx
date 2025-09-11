@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Save, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { useWorkloads } from "@/hooks/workload/use-workloads";
-import { OSSelector } from "@/components/work-loads/create-workload/os-selector";
+import { OSSelector } from "@/components/work-loads/create-workload/os-selector/os-selector";
 import { useOS } from "@/hooks/os/use-os";
 import { toast } from "sonner";
 import { WorkloadUpdate, WorkloadResponse } from "@/types/workload";
@@ -31,6 +32,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
   onOpenChange,
   onSuccess,
 }) => {
+  const { t } = useTranslation("workload");
   const [loading, setLoading] = useState(false);
   const [selectedOSVersionId, setSelectedOSVersionId] = useState<number>(0);
   const [formData, setFormData] = useState<WorkloadUpdate>({
@@ -87,12 +89,12 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
     e.preventDefault();
 
     if (!formData.name?.trim()) {
-      toast.error("Tên workload không được để trống");
+      toast.error(t("workloadDetail.editDialog.validation.nameRequired"));
       return;
     }
 
     if (!formData.os_id) {
-      toast.error("Vui lòng chọn hệ điều hành");
+      toast.error(t("workloadDetail.editDialog.validation.osRequired"));
       return;
     }
 
@@ -103,7 +105,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       await updateWorkload(workload.id, formData);
 
       // Hiển thị thông báo thành công
-      toast.success("Cập nhật workload thành công!");
+      toast.success(t("workloadDetail.editDialog.messages.updateSuccess"));
 
       // Đóng dialog
       onOpenChange(false);
@@ -112,7 +114,9 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       onSuccess();
     } catch (error: any) {
       // Hiển thị lỗi nếu có
-      toast.error(error.message || "Có lỗi xảy ra khi cập nhật workload");
+      toast.error(
+        error.message || t("workloadDetail.editDialog.messages.updateError")
+      );
     } finally {
       setLoading(false);
     }
@@ -143,9 +147,9 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Chỉnh sửa Workload</DialogTitle>
+          <DialogTitle>{t("workloadDetail.editDialog.title")}</DialogTitle>
           <DialogDescription>
-            Cập nhật thông tin workload. Nhấn lưu để áp dụng thay đổi.
+            {t("workloadDetail.editDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -153,7 +157,8 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Tên workload <span className="text-red-500">*</span>
+              {t("workloadDetail.editDialog.fields.name")}{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
@@ -162,7 +167,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder="Nhập tên workload"
+              placeholder={t("workloadDetail.editDialog.placeholders.name")}
               disabled={loading}
               required
             />
@@ -172,13 +177,15 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
           <OSSelector
             value={selectedOSVersionId}
             onValueChange={handleOSChange}
-            placeholder="Chọn hệ điều hành..."
+            placeholder={t("workloadDetail.editDialog.placeholders.os")}
             disabled={loading}
           />
 
           {/* Description Field */}
           <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
+            <Label htmlFor="description">
+              {t("workloadDetail.editDialog.fields.description")}
+            </Label>
             <Textarea
               id="description"
               value={formData.description || ""}
@@ -188,7 +195,9 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
                   description: e.target.value,
                 }))
               }
-              placeholder="Nhập mô tả cho workload (tùy chọn)"
+              placeholder={t(
+                "workloadDetail.editDialog.placeholders.description"
+              )}
               rows={4}
               disabled={loading}
             />
@@ -203,14 +212,16 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
               disabled={loading}
             >
               <X className="h-4 w-4 mr-2" />
-              Hủy
+              {t("workloadDetail.editDialog.actions.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={loading || !formData.name?.trim() || !formData.os_id}
             >
               <Save className="h-4 w-4 mr-2" />
-              {loading ? "Đang lưu..." : "Lưu thay đổi"}
+              {loading
+                ? t("workloadDetail.editDialog.actions.saving")
+                : t("workloadDetail.editDialog.actions.save")}
             </Button>
           </div>
         </form>

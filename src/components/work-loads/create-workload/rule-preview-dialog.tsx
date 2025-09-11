@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -85,9 +86,8 @@ export function RulePreviewDialog({
   onOpenChange,
   rules,
 }: RulePreviewDialogProps) {
+  const { t } = useTranslation("workload");
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [expandedRules, setExpandedRules] = useState<Set<number>>(new Set());
 
   const filteredRules = rules.filter((rule) => {
     const matchesSearch =
@@ -105,7 +105,7 @@ export function RulePreviewDialog({
         <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <FileText className="h-5 w-5" />
-            Xem trước Rules và Commands
+            {t("add.preview.title")}
           </DialogTitle>
         </DialogHeader>
 
@@ -115,7 +115,7 @@ export function RulePreviewDialog({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm quy tắc hoặc command..."
+                placeholder={t("add.preview.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -124,98 +124,94 @@ export function RulePreviewDialog({
           </div>
         </div>
 
-        {/* Rules List - Đây là phần quan trọng nhất để có thể cuộn */}
+        
         <div className="flex-1 min-h-0 overflow-hidden">
           <ScrollArea className="h-full w-full">
             <div className="space-y-4 pr-4 pb-4">
               {filteredRules.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg mb-2">Không có quy tắc nào phù hợp</p>
+                  <p className="text-lg mb-2">{t("add.preview.noRules")}</p>
                   <p className="text-sm">
-                    Thử thay đổi bộ lọc để xem thêm kết quả
+                    {t("add.preview.tryFilters")}
                   </p>
                 </div>
               ) : (
-                filteredRules.map((rule, index) => {
-                  const isExpanded = expandedRules.has(index);
-
-                  return (
-                    <Card
-                      key={`rule-${index}`}
-                      className={cn(
-                        "transition-all duration-200 hover:shadow-md border",
-                        !rule.is_active && "opacity-60 bg-muted/30"
-                      )}
-                    >
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center space-x-3 min-w-0 flex-1">
-                            <Shield className="h-5 w-5 text-primary flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <CardTitle className="text-lg leading-tight break-words">
-                                {rule.name}
-                              </CardTitle>
-                              <div className="flex items-center gap-2 mt-1">
-                                {!rule.is_active && (
-                                  <Badge variant="secondary">
-                                    Không hoạt động
-                                  </Badge>
-                                )}
-                              </div>
+                filteredRules.map((rule, index) => (
+                  <Card
+                    key={`rule-${index}`}
+                    className={cn(
+                      "transition-all duration-200 hover:shadow-md border",
+                      !rule.is_active && "opacity-60 bg-muted/30"
+                    )}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center space-x-3 min-w-0 flex-1">
+                          <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-lg leading-tight break-words">
+                              {rule.name}
+                            </CardTitle>
+                            <div className="flex items-center gap-2 mt-1">
+                              {!rule.is_active && (
+                                <Badge variant="secondary">
+                                  {t("add.preview.inactive")}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </div>
-                      </CardHeader>
+                      </div>
+                    </CardHeader>
 
-                      <CardContent className="pt-0 space-y-4">
-                        {/* Description */}
-                        {rule.description && (
-                          <div>
-                            <p className="text-sm text-muted-foreground leading-relaxed break-words">
-                              {rule.description}
-                            </p>
-                          </div>
-                        )}
+                    <CardContent className="pt-0 space-y-4">
+                      {/* Description */}
+                      {rule.description && (
+                        <div>
+                          <p className="text-sm text-muted-foreground leading-relaxed break-words">
+                            {rule.description}
+                          </p>
+                        </div>
+                      )}
 
-                        {/* Command */}
-                        {rule.command && (
-                          <div>
-                            <p className="font-medium text-sm mb-2 flex items-center gap-2">
-                              <Terminal className="h-4 w-4" />
-                              <span>Command:</span>
-                            </p>
-                            <div className="bg-slate-900 text-slate-100 p-3 rounded-md border">
-                              <code className="text-sm font-mono whitespace-pre-wrap break-all">
-                                {rule.command}
-                              </code>
-                            </div>
+                      {/* Command */}
+                      {rule.command && (
+                        <div>
+                          <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                            <Terminal className="h-4 w-4" />
+                            <span>{t("add.preview.command")}</span>
+                          </p>
+                          <div className="bg-slate-900 text-slate-100 p-3 rounded-md border">
+                            <code className="text-sm font-mono whitespace-pre-wrap break-all">
+                              {rule.command}
+                            </code>
                           </div>
-                        )}
+                        </div>
+                      )}
 
-                        {/* Parameters - Hiển thị đơn giản */}
-                        {rule.parameters && (
-                          <div>
-                            <p className="font-medium text-sm mb-2 flex items-center gap-2">
-                              <span>Tham số:</span>
-                            </p>
-                            {renderParameters(rule.parameters)}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })
+                      
+                      {rule.parameters && (
+                        <div>
+                          <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                            <span>{t("add.preview.parameters")}</span>
+                          </p>
+                          {renderParameters(rule.parameters)}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
               )}
             </div>
           </ScrollArea>
         </div>
 
-        {/* Footer - Fixed at bottom */}
+        
         <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t bg-background">
           <div className="text-sm text-muted-foreground"></div>
           <Button onClick={() => onOpenChange(false)} size="sm">
-            Đóng
+            {t("add.preview.close")}
           </Button>
         </div>
       </DialogContent>

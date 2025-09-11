@@ -28,7 +28,7 @@ interface FilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onSearchClear?: () => void;
-  filters: DropdownFilter[];
+  filters?: DropdownFilter[];
   placeholder?: string;
 }
 
@@ -74,13 +74,13 @@ const FilterBar: FC<FilterBarProps> = ({
         </div>
 
         <div className="flex items-center gap-3 lg:flex-shrink-0">
-          {filters.length > 0 && (
+          {(filters?.length ?? 0) > 0 && (
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Filter className="h-4 w-4" />
             </div>
           )}
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-            {filters.map((filter, idx) => (
+            {(filters ?? []).map((filter, idx) => (
               <Select
                 key={idx}
                 value={filter.value}

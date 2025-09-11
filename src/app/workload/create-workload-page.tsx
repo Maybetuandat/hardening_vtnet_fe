@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -19,6 +20,7 @@ import { useAddWorkload } from "@/hooks/workload/use-add-workload";
 import { CreateWorkloadRequest } from "@/types/workload";
 
 export default function AddWorkloadPage() {
+  const { t } = useTranslation("workload");
   const navigate = useNavigate();
 
   const {
@@ -60,10 +62,10 @@ export default function AddWorkloadPage() {
 
       await createWorkloadWithRules(requestData);
 
-      toast.success("Tạo workload thành công!");
+      toast.success(t("add.messages.createSuccess"));
       navigate("/workloads");
     } catch (error: any) {
-      toast.error(error.message || "Không thể tạo workload");
+      toast.error(error.message || t("add.messages.createError"));
     }
   };
 
@@ -72,15 +74,13 @@ export default function AddWorkloadPage() {
     // Kiểm tra validation trước khi tiếp tục
     if (currentStep === 0) {
       if (!workloadNameValidation.isValid || validatingWorkloadName) {
-        toast.error(
-          "Vui lòng chờ kiểm tra tên workload hoặc sửa lỗi validation"
-        );
+        toast.error(t("add.basicInfo.nameValidation.waitValidation"));
         return;
       }
 
       // Kiểm tra os_version
       if (!formData.workload.os_id) {
-        toast.error("Vui lòng chọn hệ điều hành");
+        toast.error(t("add.basicInfo.osRequired"));
         return;
       }
     }
@@ -121,10 +121,10 @@ export default function AddWorkloadPage() {
   };
 
   const getNextButtonText = () => {
-    if (loading) return "Đang xử lý...";
-    if (validatingWorkloadName && currentStep === 0) return "Đang kiểm tra...";
-    if (currentStep === steps.length - 1) return "Tạo Workload";
-    return "Tiếp theo";
+    if (loading) return t("add.processing");
+    if (validatingWorkloadName && currentStep === 0) return t("add.validating");
+    if (currentStep === steps.length - 1) return t("add.createWorkload");
+    return t("add.next");
   };
 
   const isNextButtonDisabled = () => {
@@ -144,23 +144,23 @@ export default function AddWorkloadPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Package className="h-8 w-8" />
-              Tạo Workload Mới
+              {t("add.title")}
             </h1>
             <p className="text-gray-600">
-              Tạo workload với cấu hình rules và commands từ file Excel
+              {t("add.subtitle")}
             </p>
           </div>
         </div>
 
         <Button variant="outline" onClick={handleCancel}>
-          Hủy
+          {t("add.cancel")}
         </Button>
       </div>
 
       {/* Steps */}
       <Card>
         <CardHeader>
-          <CardTitle>Tiến trình tạo workload</CardTitle>
+          <CardTitle>{t("add.steps.progress")}</CardTitle>
         </CardHeader>
         <CardContent>
           <StepIndicator steps={steps} currentStep={currentStep} />
@@ -200,7 +200,7 @@ export default function AddWorkloadPage() {
               disabled={loading || validatingWorkloadName}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {currentStep === 0 ? "Quay lại danh sách" : "Bước trước"}
+              {currentStep === 0 ? t("add.backToList") : t("add.previousStep")}
             </Button>
 
             <div className="flex items-center gap-2">
@@ -211,19 +211,19 @@ export default function AddWorkloadPage() {
                     <>
                       <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                       <span className="text-blue-600">
-                        Đang kiểm tra tên...
+                        {t("add.basicInfo.nameValidation.checking")}
                       </span>
                     </>
                   ) : workloadNameValidation.message ? (
                     workloadNameValidation.isValid ? (
                       <>
                         <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-green-600">Tên hợp lệ</span>
+                        <span className="text-green-600">{t("add.basicInfo.nameValidation.valid")}</span>
                       </>
                     ) : (
                       <>
                         <AlertTriangle className="h-4 w-4 text-red-500" />
-                        <span className="text-red-600">Tên không hợp lệ</span>
+                        <span className="text-red-600">{t("add.basicInfo.nameValidation.invalid")}</span>
                       </>
                     )
                   ) : null}

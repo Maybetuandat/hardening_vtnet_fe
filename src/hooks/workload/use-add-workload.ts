@@ -11,8 +11,10 @@ import {
 import { api } from "@/lib/api";
 
 import { RuleCreate } from "@/types/rule";
+import { useTranslation } from "react-i18next";
 
 export function useAddWorkload() {
+  const { t } = useTranslation("workload");
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,15 +64,15 @@ export function useAddWorkload() {
   const steps: WorkloadStep[] = [
     {
       id: 1,
-      title: "Thông tin cơ bản",
-      description: "Cấu hình tên và mô tả workload",
+      title: t("workloads.form.basicInformation"),
+      description: t("workloads.form.basicInformationDescription"),
       isCompleted: false,
       isActive: currentStep === 0,
     },
     {
       id: 2,
-      title: "Upload Rules",
-      description: "Tải lên file Excel chứa cấu hình rules",
+      title: t("workloads.form.excelUpload"),
+      description: t("workloads.form.excelUploadDescription"),
       isCompleted: false,
       isActive: currentStep === 1,
     },
@@ -96,12 +98,6 @@ export function useAddWorkload() {
         const result = await parseExcel(file);
 
         if (result.success) {
-          console.log("✅ Excel parsing successful:", {
-            rules: result.rules.length,
-
-            warnings: result.warnings?.length || 0,
-          });
-
           // Update form data với rules và commands đã được deduplicated
           setFormData((prev) => ({
             ...prev,
@@ -116,21 +112,14 @@ export function useAddWorkload() {
             );
             setDuplicateWarnings(duplicateWarnings);
           }
-
-          // Log thành công với chi tiết
-          console.log("📊 Form data updated:", {
-            totalRules: result.rules.length,
-
-            duplicateWarnings: duplicateWarnings.length,
-          });
         } else {
-          console.error("❌ Excel parsing failed:", result.errors);
+          console.error(" Excel parsing failed:", result.errors);
           setError(result.errors?.[0] || "Không thể parse file Excel");
         }
 
         return result;
       } catch (err: any) {
-        console.error("💥 Exception during Excel parsing:", err);
+        console.error(" Exception during Excel parsing:", err);
         setError(err.message || "Không thể đọc file Excel");
         return {
           success: false,
@@ -158,7 +147,6 @@ export function useAddWorkload() {
   }, []);
 
   const resetForm = useCallback(() => {
-    console.log("🔄 Resetting form data");
     setFormData({
       workload: {
         name: "",
@@ -209,20 +197,20 @@ export function useAddWorkload() {
         };
 
         console.log(
-          "📤 Sending workload creation request:",
+          " Sending workload creation request:",
           JSON.stringify(requestData, null, 2)
         );
 
         const response = await createWorkloadWithRulesAndCommands(requestData);
 
-        console.log("🎉 Workload creation completed successfully:", response);
+        console.log(" Workload creation completed successfully:", response);
 
         // Reset form sau khi tạo thành công
         resetForm();
 
         return Promise.resolve();
       } catch (err: any) {
-        console.error("❌ Error creating workload:", err);
+        console.error(" Error creating workload:", err);
         setError(err.message || "Có lỗi xảy ra khi tạo workload");
         throw err;
       } finally {

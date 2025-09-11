@@ -32,10 +32,34 @@
     "workloadUpdated": "Workload updated successfully",
     "workloadDeleted": "Workload deleted successfully",
     "refreshed": "Workloads refreshed",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "createdDate": "Created Date",
+      "status": "Status",
+      "actions": "Actions",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete",
+      "noDescription": "No description",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "pagination": {
+      "showing": "Showing {{start}} to {{end}} of {{total}} workloads",
+      "page": "Page {{current}} of {{total}}",
+      "itemsPerPage": "Items per page",
+      "firstPage": "First page",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page"
+    },
     "form": {
       "createWorkload": "Create Workload",
       "editWorkload": "Edit Workload",
       "basicInformation": "Basic Information",
+      "basicInformationDescription": "Enter the basic details for your workload",
+      "excelUploadDescription": "Upload an Excel file containing rules for the workload",
+      "excelUpload": "Upload Excel File",
       "name": "Name",
       "namePlaceholder": "production-oracle-cluster",
       "nameHelp": "Unique identifier for this workload",
@@ -46,7 +70,15 @@
       "descriptionPlaceholder": "Oracle database cluster for production environment",
       "workloadType": "Workload Type",
       "isActive": "Active",
-      "activeHelp": "Enable this workload for deployment"
+      "activeHelp": "Enable this workload for deployment",
+      "delete": {
+        "noDescription": "No description",
+        "createdDate": "Created date",
+        "deleteButton": "Delete workload",
+        "messages": {
+          "deleteError": "An error occurred while deleting workload"
+        }
+      }
     },
     "validation": {
       "nameRequired": "Name is required",
@@ -57,6 +89,179 @@
     "empty": {
       "noWorkloads": "No workloads found",
       "addFirst": "Create your first workload to get started"
+    }
+  },
+  "add": {
+    "title": "Create New Workload",
+    "subtitle": "Create workload with rules and commands configuration from Excel file",
+    "cancel": "Cancel",
+    "backToList": "Back to list",
+    "previousStep": "Previous step",
+    "next": "Next",
+    "createWorkload": "Create Workload",
+    "processing": "Processing...",
+    "validating": "Validating...",
+    "steps": {
+      "progress": "Workload creation progress"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "subtitle": "Enter basic information for your workload",
+      "nameLabel": "Workload name",
+      "nameRequired": "required",
+      "namePlaceholder": "Enter workload name (e.g.: ubuntu-24-04)",
+      "osLabel": "Operating System",
+      "osPlaceholder": "Select operating system...",
+      "osRequired": "Please select an operating system",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter workload description (optional)",
+      "nameValidation": {
+        "checking": "Checking name...",
+        "valid": "Name is valid",
+        "invalid": "Name is invalid",
+        "waitValidation": "Please wait for name validation or fix validation errors"
+      }
+    },
+    "excel": {
+      "title": "Upload Rules Configuration",
+      "subtitle": "Upload Excel file containing rules and commands for the workload. Download sample template to see required format.",
+      "downloadTemplate": "Download Sample Template",
+      "dragDrop": "Drag and drop Excel file here",
+      "orClick": "or click to select file (only .xlsx, .xls)",
+      "selectFile": "Select file",
+      "processing": "Processing file...",
+      "pleaseWait": "Please wait",
+      "uploadSuccess": "File uploaded successfully!",
+      "rulesCount": "{{count}} rules",
+      "preview": "Preview",
+      "remove": "Remove",
+      "uploadFailed": "File upload failed",
+      "invalidFile": "Please upload a valid Excel file (.xlsx or .xls)",
+      "processError": "Unable to process file. Please try again."
+    },
+    "preview": {
+      "title": "Preview Rules and Commands",
+      "searchPlaceholder": "Search rules or commands...",
+      "noRules": "No matching rules",
+      "tryFilters": "Try changing filters to see more results",
+      "inactive": "Inactive",
+      "command": "Command:",
+      "parameters": "Parameters:",
+      "noParameters": "No parameters",
+      "close": "Close"
+    },
+    "messages": {
+      "createSuccess": "Workload created successfully!",
+      "createError": "Unable to create workload"
+    }
+  },
+  "osSelector": {
+    "label": "Operating System",
+    "required": "required",
+    "placeholder": "Select operating system...",
+    "searchPlaceholder": "Search operating systems...",
+    "loading": "Loading operating systems...",
+    "loadingMore": "Loading more...",
+    "scrollToLoadMore": "Scroll down to load more",
+    "noData": "No data",
+    "noResults": "No operating systems found"
+  },
+  "workloadDetail": {
+    "actions": {
+      "back": "Back",
+      "backToList": "Back to list"
+    },
+    "errors": {
+      "notFound": "Workload not found",
+      "loadError": "An error occurred while loading workload information",
+      "invalidId": "Invalid workload ID"
+    },
+    "info": {
+      "title": "Workload Information",
+      "actions": {
+        "edit": "Edit"
+      },
+      "fields": {
+        "name": "Name",
+        "operatingSystem": "Operating System",
+        "description": "Description",
+        "createdDate": "Created Date",
+        "lastUpdated": "Last Updated"
+      }
+    },
+    "messages": {
+      "loadError": "Unable to load workload information"
+    },
+    "notFound": {
+      "title": "Workload not found",
+      "description": "The workload you are looking for does not exist or has been deleted."
+    },
+    "editDialog": {
+      "title": "Edit Workload",
+      "description": "Update workload information. Click save to apply changes.",
+      "fields": {
+        "name": "Workload name",
+        "description": "Description"
+      },
+      "placeholders": {
+        "name": "Enter workload name",
+        "os": "Select operating system...",
+        "description": "Enter workload description (optional)"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "saving": "Saving..."
+      },
+      "validation": {
+        "nameRequired": "Workload name cannot be empty",
+        "osRequired": "Please select an operating system"
+      },
+      "messages": {
+        "updateSuccess": "Workload updated successfully!",
+        "updateError": "An error occurred while updating workload"
+      }
+    },
+    "rules": {
+      "table": {
+        "columns": {
+          "name": "Name",
+          "command": "Command",
+          "parameters": "Parameters",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "noParameters": "No parameters",
+        "status": {
+          "active": "Active",
+          "inactive": "Paused"
+        },
+        "actions": {
+          "edit": "Edit",
+          "delete": "Delete"
+        }
+      },
+      "title": {
+        "searching": "Search Rules ({{count}})",
+        "workload": "Workload Rules ({{count}})"
+      },
+      "actions": {
+        "addFromExcel": "Add Rules from Excel"
+      },
+      "search": {
+        "placeholderAll": "Press Enter to search in all rules...",
+        "placeholderWorkload": "Press Enter to search rules of this workload...",
+        "pressEnter": "Press Enter to search \"{{query}}\"",
+        "searching": "Searching in all rules with keyword: \"{{keyword}}\"",
+        "clearSearch": "Clear search",
+        "pressEnterSearch": "Press Enter to search \"{{query}}\""
+      },
+      "error": "An error occurred: {{error}}",
+      "empty": {
+        "noRulesFound": "No rules found with keyword \"{{keyword}}\"",
+        "noRulesSystem": "No rules in the system",
+        "noRulesWorkload": "This workload has no rules yet"
+      }
     }
   }
 }

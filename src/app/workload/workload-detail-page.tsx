@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import { useWorkloads } from "@/hooks/workload/use-workloads";
 import { WorkloadResponse } from "@/types/workload";
 
 export const WorkloadDetailPage: React.FC = () => {
+  const { t } = useTranslation("workload");
   const { workloadId } = useParams<{ workloadId: string }>();
   const navigate = useNavigate();
   const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
@@ -31,12 +33,12 @@ export const WorkloadDetailPage: React.FC = () => {
       if (workloadData) {
         setWorkload(workloadData);
       } else {
-        setError("Không tìm thấy workload");
+        setError(t("workloadDetail.errors.notFound"));
       }
     } catch (err: any) {
       console.error("Error fetching workload detail:", err);
-      setError(err.message || "Có lỗi xảy ra khi tải thông tin workload");
-      toast.error("Không thể tải thông tin workload");
+      setError(err.message || t("workloadDetail.errors.loadError"));
+      toast.error(t("workloadDetail.messages.loadError"));
     } finally {
       setLoading(false);
     }
@@ -52,14 +54,14 @@ export const WorkloadDetailPage: React.FC = () => {
 
     const id = Number(workloadId);
     if (isNaN(id) || id <= 0) {
-      toast.error("ID workload không hợp lệ");
+      toast.error(t("workloadDetail.errors.invalidId"));
       navigate("/workloads");
       return;
     }
 
     fetchWorkloadDetail(id);
     hasInitialized.current = true;
-  }, [workloadId, navigate, getWorkloadById]);
+  }, [workloadId, navigate, getWorkloadById, t]);
 
   const handleBack = () => {
     navigate("/workloads");
@@ -91,15 +93,14 @@ export const WorkloadDetailPage: React.FC = () => {
       <div className="p-6">
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold mb-2">
-            Không tìm thấy workload
+            {t("workloadDetail.notFound.title")}
           </h2>
           <p className="text-muted-foreground mb-4">
-            {error ||
-              "Workload bạn đang tìm kiếm không tồn tại hoặc đã bị xóa."}
+            {error || t("workloadDetail.notFound.description")}
           </p>
           <Button onClick={handleBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Quay lại danh sách
+            {t("workloadDetail.actions.backToList")}
           </Button>
         </div>
       </div>
@@ -118,7 +119,7 @@ export const WorkloadDetailPage: React.FC = () => {
             className="hover:bg-muted"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Quay lại
+            {t("workloadDetail.actions.back")}
           </Button>
         </div>
       </div>
