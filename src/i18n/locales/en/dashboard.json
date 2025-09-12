@@ -12,7 +12,8 @@
     "completed": "Completed",
     "running": "Running",
     "pending": "Pending",
-    "failed": "Failed"
+    "failed": "Failed",
+    "placeholder": "Search by server IP "
   },
   "messages": {
     "dataRefreshed": "Data has been refreshed",

@@ -9,6 +9,8 @@ import { OSFormDialog } from "@/components/os/os-form-dialog";
 import { OSDeleteDialog } from "@/components/os/os-delete-dialog";
 import { useOS } from "@/hooks/os/use-os";
 import { OSVersion, OSCreate, OSUpdate } from "@/types/os";
+import { use } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function OSPage() {
   const {
@@ -35,6 +37,7 @@ export default function OSPage() {
   const [deletingOS, setDeletingOS] = useState<OSVersion | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
+  const { t } = useTranslation("os");
   // Handle search input change (chỉ update input, chưa search)
   const handleSearchInputChange = useCallback(
     (value: string) => {
@@ -53,7 +56,7 @@ export default function OSPage() {
     setCurrentSearchTerm("");
     searchOSVersions("", 1, pageSize); // Fetch với keyword rỗng
   }, [searchOSVersions, pageSize]);
-  
+
   // Handle actual search (khi ấn Enter hoặc form submit)
   const handleSearchSubmit = useCallback(() => {
     setCurrentSearchTerm(searchInput);
@@ -156,14 +159,9 @@ export default function OSPage() {
             />
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">Ấn Enter để tìm kiếm</p>
-            <button
-              type="button"
-              onClick={handleSearchSubmit}
-              className="text-xs text-blue-600 hover:text-blue-800 underline"
-            >
-              Tìm kiếm ngay
-            </button>
+            <p className="text-xs text-gray-500">
+              {t("os:search.placeholder")}
+            </p>
           </div>
         </div>
       </Card>

@@ -12,7 +12,8 @@
     "completed": "Hoàn thành",
     "running": "Đang chạy",
     "pending": "Chờ xử lý",
-    "failed": "Thất bại"
+    "failed": "Thất bại",
+    "placeholder": "Tìm kiếm theo IP server "
   },
   "messages": {
     "dataRefreshed": "Dữ liệu đã được làm mới",

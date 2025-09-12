@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,8 +29,11 @@ export const OSTable: React.FC<OSTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { t, i18n } = useTranslation("os");
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("vi-VN", {
+    const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
+    return new Date(dateString).toLocaleString(locale, {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -44,18 +48,20 @@ export const OSTable: React.FC<OSTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="font-semibold text-gray-900">ID</TableHead>
               <TableHead className="font-semibold text-gray-900">
-                Phiên bản
+                {t("osTable.headers.id")}
               </TableHead>
               <TableHead className="font-semibold text-gray-900">
-                Ngày tạo
+                {t("osTable.headers.version")}
               </TableHead>
               <TableHead className="font-semibold text-gray-900">
-                Cập nhật cuối
+                {t("osTable.headers.createdAt")}
+              </TableHead>
+              <TableHead className="font-semibold text-gray-900">
+                {t("osTable.headers.updatedAt")}
               </TableHead>
               <TableHead className="font-semibold text-gray-900 text-right">
-                Thao tác
+                {t("osTable.headers.actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -65,14 +71,16 @@ export const OSTable: React.FC<OSTableProps> = ({
                 <TableCell colSpan={5} className="text-center py-8">
                   <div className="flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Đang tải...
+                    {t("osTable.states.loading")}
                   </div>
                 </TableCell>
               </TableRow>
             ) : osVersions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8">
-                  <div className="text-gray-500">Không có dữ liệu</div>
+                  <div className="text-gray-500">
+                    {t("osTable.states.noData")}
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

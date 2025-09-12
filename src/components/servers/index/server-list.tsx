@@ -28,6 +28,7 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface ServerListProps {
   servers: Server[];
@@ -44,8 +45,8 @@ export const ServerList: React.FC<ServerListProps> = ({
   error,
   onEdit,
   onDelete,
-  onViewHardeningHistory,
 }) => {
+  const { t } = useTranslation("server");
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
   const getStatusBadge = (status?: boolean) => {
@@ -56,20 +57,20 @@ export const ServerList: React.FC<ServerListProps> = ({
           className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-100"
         >
           <Circle className="h-2 w-2 fill-green-500 text-green-500" />
-          Online
+          {t("serverList.status.online")}
         </Badge>
       );
     } else {
       return (
         <Badge variant="destructive" className="bg-red-100 text-red-800">
-          Offline
+          {t("serverList.status.offline")}
         </Badge>
       );
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
+    return new Date(dateString).toLocaleDateString(t("locale"), {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -82,12 +83,12 @@ export const ServerList: React.FC<ServerListProps> = ({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toast.success("Đã copy địa chỉ IP!");
+      toast.success(t("serverList.toast.copySuccess"));
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toast.error("Không thể copy địa chỉ IP");
+      toast.error(t("serverList.toast.copyFail"));
     }
   };
 
@@ -95,7 +96,7 @@ export const ServerList: React.FC<ServerListProps> = ({
     if (onEdit) {
       onEdit(server);
     } else {
-      toast.info("Chức năng sửa server sẽ được triển khai sau");
+      toast.info(t("serverList.toast.editNotImplemented"));
     }
   };
 
@@ -103,15 +104,7 @@ export const ServerList: React.FC<ServerListProps> = ({
     if (onDelete) {
       onDelete(server);
     } else {
-      toast.info("Chức năng xóa server sẽ được triển khai sau");
-    }
-  };
-
-  const handleViewHardeningHistory = (server: Server) => {
-    if (onViewHardeningHistory) {
-      onViewHardeningHistory(server);
-    } else {
-      toast.info("Chức năng xem lịch sử hardening sẽ được triển khai sau");
+      toast.info(t("serverList.toast.deleteNotImplemented"));
     }
   };
 
@@ -119,13 +112,13 @@ export const ServerList: React.FC<ServerListProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Danh sách Server</CardTitle>
+          <CardTitle>{t("serverList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+              <p className="text-muted-foreground">{t("serverList.loading")}</p>
             </div>
           </div>
         </CardContent>
@@ -137,12 +130,14 @@ export const ServerList: React.FC<ServerListProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Danh sách Server</CardTitle>
+          <CardTitle>{t("serverList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <p className="text-destructive mb-2">Có lỗi xảy ra:</p>
+              <p className="text-destructive mb-2">
+                {t("serverList.errorOccurred")}
+              </p>
               <p className="text-muted-foreground">{error}</p>
             </div>
           </div>
@@ -155,13 +150,13 @@ export const ServerList: React.FC<ServerListProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Danh sách Server</CardTitle>
+          <CardTitle>{t("serverList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-muted-foreground">
-                Không có server nào được tìm thấy.
+                {t("serverList.noServersFound")}
               </p>
             </div>
           </div>
@@ -173,20 +168,22 @@ export const ServerList: React.FC<ServerListProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Danh sách Server</CardTitle>
+        <CardTitle>{t("serverList.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Hostname</TableHead>
-                <TableHead>IP Address</TableHead>
-                <TableHead>OS Version</TableHead>
-                <TableHead>WorkLoad</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Ngày tạo</TableHead>
-                <TableHead className="text-center">Hành động</TableHead>
+                <TableHead>{t("serverList.tableHeader.hostname")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.ipAddress")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.osVersion")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.workload")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.status")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.createdAt")}</TableHead>
+                <TableHead className="text-center">
+                  {t("serverList.tableHeader.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -205,7 +202,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                         size="sm"
                         className="h-6 w-6 p-0 hover:bg-muted"
                         onClick={() => handleCopyIP(server.ip_address)}
-                        title="Copy IP address"
+                        title={t("serverList.copyIpTooltip")}
                       >
                         {copiedIP === server.ip_address ? (
                           <Check className="h-3 w-3 text-green-600" />
@@ -215,9 +212,11 @@ export const ServerList: React.FC<ServerListProps> = ({
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>{server.os_version || "Không xác định"}</TableCell>
                   <TableCell>
-                    {server.workload_name || "Không xác định"}
+                    {server.os_version || t("serverList.unknown")}
+                  </TableCell>
+                  <TableCell>
+                    {server.workload_name || t("serverList.unknown")}
                   </TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
@@ -227,9 +226,11 @@ export const ServerList: React.FC<ServerListProps> = ({
                         <Button
                           variant="ghost"
                           className="h-8 w-8 p-0"
-                          title="Xem thêm hành động"
+                          title={t("serverList.actionsMenuTooltip")}
                         >
-                          <span className="sr-only">Mở menu hành động</span>
+                          <span className="sr-only">
+                            {t("serverList.openActionsMenu")}
+                          </span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -239,7 +240,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                           className="cursor-pointer"
                         >
                           <Edit className="mr-2 h-4 w-4" />
-                          Sửa server
+                          {t("serverList.action.editServer")}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -247,7 +248,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                           className="cursor-pointer text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa server
+                          {t("serverList.action.deleteServer")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

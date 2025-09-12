@@ -1,0 +1,57 @@
+{
+  "osHeader": {
+    "title": "Quản lý hệ điều hành",
+    "description": "Quản lý các phiên bản hệ điều hành trong hệ thống",
+    "refreshButton": "Làm mới",
+    "addButton": "Thêm hệ điều hành"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm theo tên hệ điều hành",
+    "submit": "Tìm kiếm"
+  },
+  "osTable": {
+    "headers": {
+      "id": "ID",
+      "version": "Phiên bản",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Cập nhật cuối",
+      "actions": "Thao tác"
+    },
+    "states": {
+      "loading": "Đang tải...",
+      "noData": "Không có dữ liệu"
+    }
+  },
+  "osFormDialog": {
+    "titles": {
+      "edit": "Chỉnh sửa hệ điều hành",
+      "add": "Thêm hệ điều hành mới"
+    },
+    "descriptions": {
+      "edit": "Cập nhật thông tin phiên bản hệ điều hành",
+      "add": "Nhập thông tin phiên bản hệ điều hành mới"
+    },
+    "fields": {
+      "version": "Phiên bản *"
+    },
+    "placeholders": {
+      "version": "VD: Ubuntu 22.04, CentOS 7, Windows Server 2019"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "create": "Tạo mới",
+      "update": "Cập nhật",
+      "creating": "Đang tạo...",
+      "updating": "Đang cập nhật..."
+    }
+  },
+  "osDeleteDialog": {
+    "title": "Xác nhận xóa",
+    "description": "Bạn có chắc chắn muốn xóa hệ điều hành {{version}} không? Hành động này không thể hoàn tác.",
+    "buttons": {
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa..."
+    }
+  }
+}

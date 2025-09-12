@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ export const OSDeleteDialog: React.FC<OSDeleteDialogProps> = ({
   osVersion,
   onConfirm,
 }) => {
+  const { t } = useTranslation("os");
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -52,12 +54,10 @@ export const OSDeleteDialog: React.FC<OSDeleteDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
             <Trash2 className="h-5 w-5" />
-            Xác nhận xóa
+            {t("osDeleteDialog.title")}
           </DialogTitle>
           <DialogDescription>
-            Bạn có chắc chắn muốn xóa hệ điều hành{" "}
-            <span className="font-semibold">{osVersion?.version}</span> không?
-            Hành động này không thể hoàn tác.
+            {t("osDeleteDialog.description", { version: osVersion?.version })}
           </DialogDescription>
         </DialogHeader>
 
@@ -68,7 +68,7 @@ export const OSDeleteDialog: React.FC<OSDeleteDialogProps> = ({
             onClick={handleClose}
             disabled={loading}
           >
-            Hủy
+            {t("osDeleteDialog.buttons.cancel")}
           </Button>
           <Button
             variant="destructive"
@@ -78,10 +78,10 @@ export const OSDeleteDialog: React.FC<OSDeleteDialogProps> = ({
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang xóa...
+                {t("osDeleteDialog.buttons.deleting")}
               </>
             ) : (
-              "Xóa"
+              t("osDeleteDialog.buttons.delete")
             )}
           </Button>
         </DialogFooter>

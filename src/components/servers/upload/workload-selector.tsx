@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -23,6 +24,7 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
   onWorkloadSelected,
   onCancel,
 }) => {
+  const { t } = useTranslation("server");
   const [selectedWorkloadId, setSelectedWorkloadId] = useState<string>("");
   const [selectedWorkload, setSelectedWorkload] =
     useState<WorkloadResponse | null>(null);
@@ -49,7 +51,9 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-center">Chọn Workload</CardTitle>
+        <CardTitle className="text-center">
+          {t("workloadSelector.title")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
@@ -61,7 +65,7 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
 
         <div className="space-y-2">
           <label className="text-sm font-medium">
-            Workload áp dụng cho các server:
+            {t("workloadSelector.label")}:
           </label>
           <Select
             value={selectedWorkloadId}
@@ -72,10 +76,10 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Đang tải...</span>
+                  <span>{t("workloadSelector.loading")}</span>
                 </div>
               ) : (
-                <SelectValue placeholder="Chọn workload..." />
+                <SelectValue placeholder={t("workloadSelector.placeholder")} />
               )}
             </SelectTrigger>
             <SelectContent>
@@ -95,14 +99,14 @@ export const WorkloadSelector: React.FC<WorkloadSelectorProps> = ({
 
         <div className="flex justify-between gap-3">
           <Button variant="outline" onClick={onCancel} className="flex-1">
-            Hủy
+            {t("workloadSelector.buttons.cancel")}
           </Button>
           <Button
             onClick={handleContinue}
             disabled={!selectedWorkload || loading}
             className="flex-1"
           >
-            Tiếp tục
+            {t("workloadSelector.buttons.continue")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

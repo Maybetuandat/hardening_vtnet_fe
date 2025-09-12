@@ -1,0 +1,57 @@
+{
+  "osHeader": {
+    "title": "Operating System Management",
+    "description": "Manage operating system versions in the system",
+    "refreshButton": "Refresh",
+    "addButton": "Add Operating System"
+  },
+  "search": {
+    "placeholder": "Search by operating system name",
+    "submit": "Search"
+  },
+  "osTable": {
+    "headers": {
+      "id": "ID",
+      "version": "Version",
+      "createdAt": "Created At",
+      "updatedAt": "Last Updated",
+      "actions": "Actions"
+    },
+    "states": {
+      "loading": "Loading...",
+      "noData": "No data available"
+    }
+  },
+  "osFormDialog": {
+    "titles": {
+      "edit": "Edit Operating System",
+      "add": "Add New Operating System"
+    },
+    "descriptions": {
+      "edit": "Update operating system version information",
+      "add": "Enter new operating system version information"
+    },
+    "fields": {
+      "version": "Version *"
+    },
+    "placeholders": {
+      "version": "E.g: Ubuntu 22.04, CentOS 7, Windows Server 2019"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "creating": "Creating...",
+      "updating": "Updating..."
+    }
+  },
+  "osDeleteDialog": {
+    "title": "Confirm Deletion",
+    "description": "Are you sure you want to delete operating system {{version}}? This action cannot be undone.",
+    "buttons": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { ComplianceResult } from "@/types/compliance";
 export default function SystemHardeningDashboard() {
   const { t } = useTranslation("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
   const [status, setStatus] = useState("all");
 
   // Hook for compliance data
@@ -38,19 +39,25 @@ export default function SystemHardeningDashboard() {
     )
   );
 
-  // Initial data load and search effect
+  // Initial data load
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchComplianceResults(
-        searchTerm || undefined,
-        status === "all" ? undefined : status,
-        1,
-        pageSize
-      );
-    }, 500); // Debounce search
+    fetchComplianceResults(
+      undefined,
+      status === "all" ? undefined : status,
+      1,
+      pageSize
+    );
+  }, [fetchComplianceResults]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, status, pageSize, fetchComplianceResults]);
+  // Effect khi searchKeyword hoặc status thay đổi
+  useEffect(() => {
+    fetchComplianceResults(
+      searchKeyword || undefined,
+      status === "all" ? undefined : status,
+      1,
+      pageSize
+    );
+  }, [searchKeyword, status, pageSize, fetchComplianceResults]);
 
   useEffect(() => {
     if (connectionError) {
@@ -63,17 +70,30 @@ export default function SystemHardeningDashboard() {
   // Event handlers
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
+    // KHÔNG tự động search gì cả, chỉ update UI
+  }, []);
+
+  // Xử lý khi nhấn Enter hoặc xóa hết text
+  const handleSearchSubmit = useCallback(() => {
+    const trimmedSearch = searchTerm.trim();
+    setSearchKeyword(trimmedSearch);
+  }, [searchTerm]);
+
+  // Xử lý khi clear search
+  const handleSearchClear = useCallback(() => {
+    setSearchTerm("");
+    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
   }, []);
 
   // Refresh compliance data function for dashboard
   const handleRefreshCompliance = useCallback(async () => {
     await fetchComplianceResults(
-      searchTerm || undefined,
+      searchKeyword || undefined,
       status === "all" ? undefined : status,
       currentPage,
       pageSize
     );
-  }, [fetchComplianceResults, searchTerm, status, currentPage, pageSize]);
+  }, [fetchComplianceResults, searchKeyword, status, currentPage, pageSize]);
 
   const handleRefresh = useCallback(() => {
     refreshData();
@@ -83,25 +103,25 @@ export default function SystemHardeningDashboard() {
   const handlePageChange = useCallback(
     (page: number) => {
       fetchComplianceResults(
-        searchTerm || undefined,
+        searchKeyword || undefined,
         status === "all" ? undefined : status,
         page,
         pageSize
       );
     },
-    [fetchComplianceResults, searchTerm, status, pageSize]
+    [fetchComplianceResults, searchKeyword, status, pageSize]
   );
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       fetchComplianceResults(
-        searchTerm || undefined,
+        searchKeyword || undefined,
         status === "all" ? undefined : status,
         1,
         newPageSize
       );
     },
-    [fetchComplianceResults, searchTerm, status]
+    [fetchComplianceResults, searchKeyword, status]
   );
 
   // Filter options for FilterBar
@@ -113,7 +133,6 @@ export default function SystemHardeningDashboard() {
       options: [
         { value: "all", label: t("filters.all") },
         { value: "completed", label: t("filters.completed") },
-
         { value: "failed", label: t("filters.failed") },
       ],
       widthClass: "w-36",
@@ -142,7 +161,10 @@ export default function SystemHardeningDashboard() {
         <FilterBar
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          onSearchClear={handleSearchClear}
           filters={filterOptions}
+          placeholder={t("filters.placeholder")}
         />
       </Card>
 

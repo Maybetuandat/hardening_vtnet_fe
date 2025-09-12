@@ -1,0 +1,181 @@
+{
+  "serverPage": {
+    "filter": {
+      "allStatuses": "Tất cả trạng thái",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "statusPlaceholder": "Trạng thái",
+      "searchPlaceholder": "Tìm kiếm theo địa chỉ IP hoặc hostname"
+    }
+  },
+  "serverHeader": {
+    "title": "Quản lý Server",
+    "description": "Quản lý và giám sát các server trong hệ thống",
+    "refreshButton": "Làm mới",
+    "uploadButton": "Upload Server"
+  },
+  "serverList": {
+    "title": "Danh sách Server",
+    "loading": "Đang tải dữ liệu...",
+    "errorOccurred": "Có lỗi xảy ra:",
+    "noServersFound": "Không có server nào được tìm thấy.",
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "toast": {
+      "copySuccess": "Đã copy địa chỉ IP!",
+      "copyFail": "Không thể copy địa chỉ IP",
+      "editNotImplemented": "Chức năng sửa server sẽ được triển khai sau",
+      "deleteNotImplemented": "Chức năng xóa server sẽ được triển khai sau",
+      "historyNotImplemented": "Chức năng xem lịch sử hardening sẽ được triển khai sau"
+    },
+    "tableHeader": {
+      "hostname": "Hostname",
+      "ipAddress": "Địa chỉ IP",
+      "osVersion": "Phiên bản OS",
+      "workload": "Workload",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động"
+    },
+    "unknown": "Không xác định",
+    "copyIpTooltip": "Copy địa chỉ IP",
+    "actionsMenuTooltip": "Xem thêm hành động",
+    "openActionsMenu": "Mở menu hành động",
+    "action": {
+      "editServer": "Sửa server",
+      "deleteServer": "Xóa server",
+      "viewHistory": "Xem lịch sử hardening"
+    }
+  },
+  "serverFormDialog": {
+    "title": "Chỉnh sửa Server",
+    "loadingData": "Đang tải dữ liệu...",
+    "loadingWorkloads": "Đang tải...",
+    "fields": {
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "OS Version",
+      "workload": "Workload",
+      "sshPort": "SSH Port",
+      "sshUser": "SSH User",
+      "sshPassword": "SSH Password"
+    },
+    "placeholders": {
+      "hostname": "web-server-01",
+      "ipAddress": "192.168.1.100",
+      "osVersion": "Ubuntu 24.04 LTS",
+      "workload": "Chọn workload...",
+      "sshPort": "22",
+      "sshUser": "root",
+      "sshPassword": "••••••••"
+    },
+    "validation": {
+      "errors": "Lỗi validation",
+      "ipAddressExists": "IP Address đã tồn tại",
+      "inProgress": "Đang kiểm tra tính duy nhất của hostname và IP address..."
+    },
+    "testConnection": {
+      "title": "Test Connection",
+      "description": "Test kết nối sau khi thay đổi thông tin",
+      "button": "Test Connection",
+      "testing": "Testing..."
+    },
+    "alerts": {
+      "fixValidationErrors": "Vui lòng sửa các lỗi validation trước khi test connection.",
+      "testConnectionRequired": "Bạn đã thay đổi thông tin server. Vui lòng test connection trước khi cập nhật.",
+      "connectionTestMustSucceed": "Connection test phải thành công trước khi có thể cập nhật server."
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "update": "Cập nhật"
+    }
+  },
+  "serverDeleteDialog": {
+    "title": "Xác nhận xóa Server",
+    "description": "Bạn có chắc chắn muốn xóa server này không? Hành động này không thể hoàn tác.",
+    "fields": {
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "OS Version"
+    },
+    "unknown": "Không xác định",
+    "messages": {
+      "deleteSuccess": "Đã xóa server \"{{hostname}}\" thành công!",
+      "deleteError": "Lỗi khi xóa server: {{error}}",
+      "deleteErrorDefault": "Không thể xóa server"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "delete": "Xóa Server"
+    }
+  },
+  "serverUploadDialog": {
+    "title": "Upload Server",
+    "descriptions": {
+      "selectWorkload": "Chọn workload sẽ áp dụng cho các server được upload",
+      "uploadFile": "Upload file Excel chứa thông tin các server"
+    }
+  },
+  "workloadSelector": {
+    "title": "Chọn Workload",
+    "label": "Workload áp dụng cho các server",
+    "placeholder": "Chọn workload...",
+    "loading": "Đang tải...",
+    "buttons": {
+      "cancel": "Hủy",
+      "continue": "Tiếp tục"
+    }
+  },
+  "serverUploadHeader": {
+    "title": "thêm máy chủ cho Workload",
+    "downloadTemplate": "Tải mẫu",
+    "toast": {
+      "downloadSuccess": "Mẫu đã được tải xuống thành công!",
+      "downloadError": "Lỗi khi tải mẫu: {{message}}"
+    }
+  },
+  "serverUploadArea": {
+    "errors": {
+      "title": "Có lỗi xảy ra"
+    },
+    "states": {
+      "processing": "Đang xử lý file...",
+      "dropZone": "Kéo và thả file Excel hoặc click để chọn"
+    },
+    "fileSupport": "Hỗ trợ file .xlsx, .xls (tối đa 10MB)"
+  },
+  "serverManagement": {
+    "title": "Danh sách Server ({{count}} server)",
+    "notDetermined": "Chưa xác định",
+    "status": {
+      "testing": "Testing...",
+      "connected": "Connected",
+      "failed": "Failed",
+      "untested": "Untested"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "testConnection": "Test Connection",
+      "addServers": "Thêm Server ({{count}})"
+    },
+    "tooltips": {
+      "testConnectionRequired": "Vui lòng test connection thành công cho tất cả server trước khi thêm"
+    },
+    "alerts": {
+      "allConnected": "Tất cả server đã kết nối thành công! Bạn có thể thêm chúng vào hệ thống.",
+      "failedConnections": "Một số server không thể kết nối hoặc đã tồn tại trong hệ thống. Các server lỗi sẽ được tự động loại bỏ sau khi test connection.",
+      "testRequired": "Vui lòng test connection để kiểm tra tính hợp lệ của các server trước khi thêm vào hệ thống."
+    },
+    "tableHeaders": {
+      "ipAddress": "IP Address",
+      "sshUser": "SSH User",
+      "sshPort": "SSH Port",
+      "hostname": "Hostname",
+      "osVersion": "OS Version",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  }
+}

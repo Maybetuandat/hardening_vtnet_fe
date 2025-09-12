@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -55,6 +56,8 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
   getServerById,
   onSuccess,
 }) => {
+  const { t } = useTranslation("server");
+
   const {
     form,
     loading,
@@ -95,13 +98,13 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chỉnh sửa Server</DialogTitle>
+          <DialogTitle>{t("serverFormDialog.title")}</DialogTitle>
         </DialogHeader>
 
         {loadingServerData ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Đang tải dữ liệu...</span>
+            <span className="ml-2">{t("serverFormDialog.loadingData")}</span>
           </div>
         ) : (
           <Form {...form}>
@@ -112,10 +115,14 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="hostname"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Hostname</FormLabel>
+                      <FormLabel>
+                        {t("serverFormDialog.fields.hostname")}
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="web-server-01"
+                          placeholder={t(
+                            "serverFormDialog.placeholders.hostname"
+                          )}
                           {...field}
                           disabled
                         />
@@ -130,7 +137,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        IP Address
+                        {t("serverFormDialog.fields.ipAddress")}
                         {validatingFields && (
                           <Clock className="inline h-3 w-3 ml-1 animate-spin" />
                         )}
@@ -143,7 +150,9 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="192.168.1.100"
+                          placeholder={t(
+                            "serverFormDialog.placeholders.ipAddress"
+                          )}
                           {...field}
                           className={
                             !fieldValidation.ip_address ? "border-red-500" : ""
@@ -153,7 +162,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                       <FormMessage />
                       {!fieldValidation.ip_address && (
                         <p className="text-xs text-red-500 mt-1">
-                          IP Address đã tồn tại
+                          {t("serverFormDialog.validation.ipAddressExists")}
                         </p>
                       )}
                     </FormItem>
@@ -167,10 +176,14 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="os_version"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>OS Version</FormLabel>
+                      <FormLabel>
+                        {t("serverFormDialog.fields.osVersion")}
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Ubuntu 24.04 LTS"
+                          placeholder={t(
+                            "serverFormDialog.placeholders.osVersion"
+                          )}
                           {...field}
                           disabled
                         />
@@ -185,7 +198,9 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="workload_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Workload</FormLabel>
+                      <FormLabel>
+                        {t("serverFormDialog.fields.workload")}
+                      </FormLabel>
                       <Select
                         value={field.value?.toString() || ""}
                         onValueChange={(value) =>
@@ -198,10 +213,16 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                             {loadingWorkloads ? (
                               <div className="flex items-center gap-2">
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                <span>Đang tải...</span>
+                                <span>
+                                  {t("serverFormDialog.loadingWorkloads")}
+                                </span>
                               </div>
                             ) : (
-                              <SelectValue placeholder="Chọn workload..." />
+                              <SelectValue
+                                placeholder={t(
+                                  "serverFormDialog.placeholders.workload"
+                                )}
+                              />
                             )}
                           </SelectTrigger>
                         </FormControl>
@@ -237,9 +258,17 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="ssh_port"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SSH Port</FormLabel>
+                      <FormLabel>
+                        {t("serverFormDialog.fields.sshPort")}
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="22" {...field} />
+                        <Input
+                          type="number"
+                          placeholder={t(
+                            "serverFormDialog.placeholders.sshPort"
+                          )}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -251,9 +280,16 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   name="ssh_user"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SSH User</FormLabel>
+                      <FormLabel>
+                        {t("serverFormDialog.fields.sshUser")}
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="root" {...field} />
+                        <Input
+                          placeholder={t(
+                            "serverFormDialog.placeholders.sshUser"
+                          )}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -266,11 +302,15 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                 name="ssh_password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>SSH Password</FormLabel>
+                    <FormLabel>
+                      {t("serverFormDialog.fields.sshPassword")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="••••••••"
+                        placeholder={t(
+                          "serverFormDialog.placeholders.sshPassword"
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -285,7 +325,9 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-1">
-                      <p className="font-medium">Lỗi validation:</p>
+                      <p className="font-medium">
+                        {t("serverFormDialog.validation.errors")}:
+                      </p>
                       {validationErrors.map((error, index) => (
                         <p key={index} className="text-xs">
                           • {error}
@@ -300,9 +342,11 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
               <div className="space-y-3 border-t pt-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-medium">Test Connection</h4>
+                    <h4 className="text-sm font-medium">
+                      {t("serverFormDialog.testConnection.title")}
+                    </h4>
                     <p className="text-xs text-muted-foreground">
-                      Test kết nối sau khi thay đổi thông tin
+                      {t("serverFormDialog.testConnection.description")}
                     </p>
                   </div>
                   <Button
@@ -315,12 +359,12 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     {testingConnection ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Testing...
+                        {t("serverFormDialog.testConnection.testing")}
                       </>
                     ) : (
                       <>
                         <Wifi className="mr-2 h-4 w-4" />
-                        Test Connection
+                        {t("serverFormDialog.testConnection.button")}
                       </>
                     )}
                   </Button>
@@ -348,12 +392,14 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                           </p>
                           {connectionResult.hostname && (
                             <p className="text-xs">
-                              Hostname: {connectionResult.hostname}
+                              {t("serverFormDialog.fields.hostname")}:{" "}
+                              {connectionResult.hostname}
                             </p>
                           )}
                           {connectionResult.os_version && (
                             <p className="text-xs">
-                              OS: {connectionResult.os_version}
+                              {t("serverFormDialog.fields.osVersion")}:{" "}
+                              {connectionResult.os_version}
                             </p>
                           )}
                           {connectionResult.error_details && (
@@ -372,7 +418,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   <Alert>
                     <Clock className="h-4 w-4 animate-spin" />
                     <AlertDescription>
-                      Đang kiểm tra tính duy nhất của hostname và IP address...
+                      {t("serverFormDialog.validation.inProgress")}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -382,7 +428,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      Vui lòng sửa các lỗi validation trước khi test connection.
+                      {t("serverFormDialog.alerts.fixValidationErrors")}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -395,8 +441,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     <Alert>
                       <WifiOff className="h-4 w-4" />
                       <AlertDescription>
-                        Bạn đã thay đổi thông tin server. Vui lòng test
-                        connection trước khi cập nhật.
+                        {t("serverFormDialog.alerts.testConnectionRequired")}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -408,8 +453,7 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
                     <Alert variant="destructive">
                       <XCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Connection test phải thành công trước khi có thể cập
-                        nhật server.
+                        {t("serverFormDialog.alerts.connectionTestMustSucceed")}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -417,14 +461,14 @@ export const ServerFormDialog: React.FC<ServerFormDialogProps> = ({
 
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={handleClose}>
-                  Hủy
+                  {t("serverFormDialog.buttons.cancel")}
                 </Button>
                 <Button
                   type="submit"
                   disabled={loading || !canUpdate || validatingFields}
                 >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Cập nhật
+                  {t("serverFormDialog.buttons.update")}
                 </Button>
               </DialogFooter>
             </form>

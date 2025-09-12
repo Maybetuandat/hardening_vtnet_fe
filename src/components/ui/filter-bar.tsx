@@ -27,6 +27,7 @@ interface DropdownFilter {
 interface FilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  onSearchSubmit?: () => void;
   onSearchClear?: () => void;
   filters?: DropdownFilter[];
   placeholder?: string;
@@ -35,15 +36,22 @@ interface FilterBarProps {
 const FilterBar: FC<FilterBarProps> = ({
   searchTerm,
   onSearchChange,
+  onSearchSubmit,
   onSearchClear,
   filters,
   placeholder,
 }) => {
   const handleClear = () => {
-    onSearchChange("");
-
     if (onSearchClear) {
       onSearchClear();
+    } else {
+      onSearchChange("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && onSearchSubmit) {
+      onSearchSubmit();
     }
   };
 
@@ -56,7 +64,14 @@ const FilterBar: FC<FilterBarProps> = ({
             <Input
               placeholder={placeholder}
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                onSearchChange(val);
+                if (val === "" && onSearchClear) {
+                  onSearchClear();
+                }
+              }}
+              onKeyDown={handleKeyDown}
               className="pl-12 pr-12 py-3 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200 rounded-lg shadow-sm"
             />
             {searchTerm && (

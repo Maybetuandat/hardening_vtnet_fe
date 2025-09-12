@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw, Monitor } from "lucide-react";
 
@@ -13,6 +14,8 @@ export const OSHeader: React.FC<OSHeaderProps> = ({
   onAddClick,
   loading = false,
 }) => {
+  const { t } = useTranslation("os");
+
   return (
     <div className="p-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -22,11 +25,9 @@ export const OSHeader: React.FC<OSHeaderProps> = ({
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Quản lý hệ điều hành
+              {t("osHeader.title")}
             </h1>
-            <p className="text-sm text-gray-600">
-              Quản lý các phiên bản hệ điều hành trong hệ thống
-            </p>
+            <p className="text-sm text-gray-600">{t("osHeader.description")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -37,11 +38,11 @@ export const OSHeader: React.FC<OSHeaderProps> = ({
             className="flex items-center gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Làm mới
+            {t("osHeader.refreshButton")}
           </Button>
           <Button onClick={onAddClick} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Thêm hệ điều hành
+            {t("osHeader.addButton")}
           </Button>
         </div>
       </div>

@@ -1,0 +1,181 @@
+{
+  "serverPage": {
+    "filter": {
+      "allStatuses": "All Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "statusPlaceholder": "Status",
+      "searchPlaceholder": "Search by IP address or hostname"
+    }
+  },
+  "serverHeader": {
+    "title": "Server Management",
+    "description": "Manage and monitor servers in the system",
+    "refreshButton": "Refresh",
+    "uploadButton": "Upload Server"
+  },
+  "serverList": {
+    "title": "Server List",
+    "loading": "Loading data...",
+    "errorOccurred": "An error occurred:",
+    "noServersFound": "No servers found.",
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "toast": {
+      "copySuccess": "IP address copied!",
+      "copyFail": "Failed to copy IP address",
+      "editNotImplemented": "Server edit functionality will be implemented later",
+      "deleteNotImplemented": "Server delete functionality will be implemented later",
+      "historyNotImplemented": "Hardening history view functionality will be implemented later"
+    },
+    "tableHeader": {
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "OS Version",
+      "workload": "Workload",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "unknown": "N/A",
+    "copyIpTooltip": "Copy IP address",
+    "actionsMenuTooltip": "View more actions",
+    "openActionsMenu": "Open actions menu",
+    "action": {
+      "editServer": "Edit server",
+      "deleteServer": "Delete server",
+      "viewHistory": "View hardening history"
+    }
+  },
+  "serverFormDialog": {
+    "title": "Edit Server",
+    "loadingData": "Loading data...",
+    "loadingWorkloads": "Loading...",
+    "fields": {
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "OS Version",
+      "workload": "Workload",
+      "sshPort": "SSH Port",
+      "sshUser": "SSH User",
+      "sshPassword": "SSH Password"
+    },
+    "placeholders": {
+      "hostname": "web-server-01",
+      "ipAddress": "192.168.1.100",
+      "osVersion": "Ubuntu 24.04 LTS",
+      "workload": "Select workload...",
+      "sshPort": "22",
+      "sshUser": "root",
+      "sshPassword": "••••••••"
+    },
+    "validation": {
+      "errors": "Validation errors",
+      "ipAddressExists": "IP Address already exists",
+      "inProgress": "Checking uniqueness of hostname and IP address..."
+    },
+    "testConnection": {
+      "title": "Test Connection",
+      "description": "Test connection after changing information",
+      "button": "Test Connection",
+      "testing": "Testing..."
+    },
+    "alerts": {
+      "fixValidationErrors": "Please fix validation errors before testing connection.",
+      "testConnectionRequired": "You have changed server information. Please test connection before updating.",
+      "connectionTestMustSucceed": "Connection test must succeed before server can be updated."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "update": "Update"
+    }
+  },
+  "serverDeleteDialog": {
+    "title": "Confirm Server Deletion",
+    "description": "Are you sure you want to delete this server? This action cannot be undone.",
+    "fields": {
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "OS Version"
+    },
+    "unknown": "N/A",
+    "messages": {
+      "deleteSuccess": "Server \"{{hostname}}\" deleted successfully!",
+      "deleteError": "Error deleting server: {{error}}",
+      "deleteErrorDefault": "Unable to delete server"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "delete": "Delete Server"
+    }
+  },
+  "serverUploadDialog": {
+    "title": "Upload Server",
+    "descriptions": {
+      "selectWorkload": "Select workload to apply to uploaded servers",
+      "uploadFile": "Upload Excel file containing server information"
+    }
+  },
+  "workloadSelector": {
+    "title": "Select Workload",
+    "label": "Workload to apply to servers",
+    "placeholder": "Select workload...",
+    "loading": "Loading...",
+    "buttons": {
+      "cancel": "Cancel",
+      "continue": "Continue"
+    }
+  },
+  "serverUploadHeader": {
+    "title": "Upload Server for Workload",
+    "downloadTemplate": "Download Template",
+    "toast": {
+      "downloadSuccess": "Template downloaded successfully!",
+      "downloadError": "Error downloading template: {{message}}"
+    }
+  },
+  "serverUploadArea": {
+    "errors": {
+      "title": "Errors occurred"
+    },
+    "states": {
+      "processing": "Processing file...",
+      "dropZone": "Drag and drop Excel file or click to select"
+    },
+    "fileSupport": "Supports .xlsx, .xls files (max 10MB)"
+  },
+  "serverManagement": {
+    "title": "Server List ({{count}} servers)",
+    "notDetermined": "Not determined",
+    "status": {
+      "testing": "Testing...",
+      "connected": "Connected",
+      "failed": "Failed",
+      "untested": "Untested"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "testConnection": "Test Connection",
+      "addServers": "Add Servers ({{count}})"
+    },
+    "tooltips": {
+      "testConnectionRequired": "Please test connection successfully for all servers before adding"
+    },
+    "alerts": {
+      "allConnected": "All servers connected successfully! You can add them to the system.",
+      "failedConnections": "Some servers could not connect or already exist in the system. Failed servers will be automatically removed after testing connection.",
+      "testRequired": "Please test connection to verify server validity before adding to the system."
+    },
+    "tableHeaders": {
+      "ipAddress": "IP Address",
+      "sshUser": "SSH User",
+      "sshPort": "SSH Port",
+      "hostname": "Hostname",
+      "osVersion": "OS Version",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  }
+}

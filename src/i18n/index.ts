@@ -14,6 +14,10 @@ import enDashboard from "./locales/en/dashboard.json";
 import viDashboard from "./locales/vi/dashboard.json";
 import enCompliance from "./locales/en/compliance.json";
 import viCompliance from "./locales/vi/compliance.json";
+import viServer from "./locales/vi/server.json";
+import enServer from "./locales/en/server.json";
+import enOs from "./locales/en/os.json";
+import viOs from "./locales/vi/os.json";
 // Configuration
 i18n.use(initReactI18next).init({
   // Default language
@@ -33,6 +37,8 @@ i18n.use(initReactI18next).init({
       notfound: viNotfound,
       dashboard: viDashboard,
       compliance: viCompliance,
+      server: viServer,
+      os: viOs,
     },
     en: {
       common: enCommon,
@@ -41,6 +47,8 @@ i18n.use(initReactI18next).init({
       notfound: enNotfound,
       dashboard: enDashboard,
       compliance: enCompliance,
+      server: enServer,
+      os: enOs,
     },
   },
 

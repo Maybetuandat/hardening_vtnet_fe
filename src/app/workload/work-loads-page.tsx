@@ -12,12 +12,13 @@ import { WorkloadResponse } from "@/types/workload";
 
 export default function WorkloadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
   const [status, setStatus] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingWorkload, setDeletingWorkload] =
     useState<WorkloadResponse | null>(null);
-  const [pageSize, setPageSize] = useState(10); // State cho pageSize
+  const [pageSize, setPageSize] = useState(10);
 
   const { t } = useTranslation("workload");
   const navigate = useNavigate();
@@ -33,23 +34,37 @@ export default function WorkloadsPage() {
     deleteWorkload,
   } = useWorkloads();
 
-  // Debounced search effect
+  // Initial data load
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      searchWorkloads(searchTerm, 1, pageSize);
-    }, 500);
+    searchWorkloads("", 1, pageSize);
+  }, [searchWorkloads, pageSize]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, status, dateFilter, pageSize, searchWorkloads]);
+  // Effect khi searchKeyword hoặc status thay đổi
+  useEffect(() => {
+    searchWorkloads(searchKeyword, 1, pageSize);
+  }, [searchKeyword, status, dateFilter, pageSize, searchWorkloads]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
+    // KHÔNG tự động search gì cả, chỉ update UI
+  }, []);
+
+  // Xử lý khi nhấn Enter
+  const handleSearchSubmit = useCallback(() => {
+    const trimmedSearch = searchTerm.trim();
+    setSearchKeyword(trimmedSearch);
+  }, [searchTerm]);
+
+  // Xử lý khi clear search
+  const handleSearchClear = useCallback(() => {
+    setSearchTerm("");
+    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
   }, []);
 
   const handleRefresh = useCallback(() => {
-    searchWorkloads(searchTerm, currentPage, pageSize);
+    searchWorkloads(searchKeyword, currentPage, pageSize);
     toast.success(t("workloads.refreshed"));
-  }, [searchWorkloads, searchTerm, currentPage, pageSize, t]);
+  }, [searchWorkloads, searchKeyword, currentPage, pageSize, t]);
 
   const handleAddWorkload = useCallback(() => {
     navigate("/workloads/add");
@@ -57,17 +72,17 @@ export default function WorkloadsPage() {
 
   const handlePageChange = useCallback(
     (page: number) => {
-      searchWorkloads(searchTerm, page, pageSize);
+      searchWorkloads(searchKeyword, page, pageSize);
     },
-    [searchWorkloads, searchTerm, pageSize]
+    [searchWorkloads, searchKeyword, pageSize]
   );
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       setPageSize(newPageSize);
-      searchWorkloads(searchTerm, 1, newPageSize); // Reset về trang 1 khi thay đổi page size
+      searchWorkloads(searchKeyword, 1, newPageSize); // Reset về trang 1 khi thay đổi page size
     },
-    [searchWorkloads, searchTerm]
+    [searchWorkloads, searchKeyword]
   );
 
   const handleEditWorkload = useCallback(
@@ -91,12 +106,12 @@ export default function WorkloadsPage() {
         setDeletingWorkload(null);
         setDeleteDialogOpen(false);
         // Refresh lại danh sách sau khi xóa
-        searchWorkloads(searchTerm, currentPage, pageSize);
+        searchWorkloads(searchKeyword, currentPage, pageSize);
       } catch (error) {
         toast.error(t("workloads.form.delete.messages.deleteError"));
       }
     },
-    [deleteWorkload, t, searchWorkloads, searchTerm, currentPage, pageSize]
+    [deleteWorkload, t, searchWorkloads, searchKeyword, currentPage, pageSize]
   );
 
   const handleDeleteSuccess = useCallback(() => {
@@ -104,8 +119,8 @@ export default function WorkloadsPage() {
     setDeleteDialogOpen(false);
     toast.success(t("workloads.workloadDeleted"));
     // Refresh lại danh sách
-    searchWorkloads(searchTerm, currentPage, pageSize);
-  }, [t, searchWorkloads, searchTerm, currentPage, pageSize]);
+    searchWorkloads(searchKeyword, currentPage, pageSize);
+  }, [t, searchWorkloads, searchKeyword, currentPage, pageSize]);
 
   const handleDeleteDialogClose = useCallback(() => {
     setDeleteDialogOpen(false);
@@ -133,6 +148,8 @@ export default function WorkloadsPage() {
         <FilterBar
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          onSearchClear={handleSearchClear}
           placeholder={t("common.search")}
           filters={[
             {

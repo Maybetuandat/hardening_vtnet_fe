@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,7 @@ import {
 
 import { WorkloadSelector } from "./workload-selector";
 import { ServerUpload, ServerUploadWithWorkloadRef } from "./server-upload";
-import { ConfirmCancelDialog } from "../ui/confirm-cancel-dialog";
+import { ConfirmCancelDialog } from "../../ui/confirm-cancel-dialog";
 import { WorkloadResponse } from "@/types/workload";
 
 interface ServerUploadDialogWithWorkloadProps {
@@ -21,6 +22,7 @@ interface ServerUploadDialogWithWorkloadProps {
 export const ServerUploadDialogWithWorkload: React.FC<
   ServerUploadDialogWithWorkloadProps
 > = ({ open, onOpenChange, onServerAdded }) => {
+  const { t } = useTranslation("server");
   const [step, setStep] = useState<"select-workload" | "upload-servers">(
     "select-workload"
   );
@@ -124,13 +126,11 @@ export const ServerUploadDialogWithWorkload: React.FC<
           }
         >
           <DialogHeader>
-            <DialogTitle>
-              {step === "select-workload" ? "Upload Server" : "Upload Server"}
-            </DialogTitle>
+            <DialogTitle>{t("serverUploadDialog.title")}</DialogTitle>
             <DialogDescription>
               {step === "select-workload"
-                ? "Chọn workload sẽ áp dụng cho các server được upload"
-                : "Upload file Excel chứa thông tin các server"}
+                ? t("serverUploadDialog.descriptions.selectWorkload")
+                : t("serverUploadDialog.descriptions.uploadFile")}
             </DialogDescription>
           </DialogHeader>
 

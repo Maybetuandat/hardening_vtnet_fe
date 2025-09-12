@@ -5,14 +5,17 @@ import { Server } from "@/types/server";
 import { Card } from "@/components/ui/card";
 import FilterBar from "@/components/ui/filter-bar";
 
-import { ServerHeader } from "@/components/servers/server-header";
-import { ServerList } from "@/components/servers/server-list";
-import { ServerFormDialog } from "@/components/servers/server-form-dialog";
-import { ServerDeleteDialog } from "@/components/servers/server-delete-dialog";
+import { ServerList } from "@/components/servers/index/server-list";
+import { ServerFormDialog } from "@/components/servers/form-dialog/server-form-dialog";
+import { ServerDeleteDialog } from "@/components/servers/form-dialog/server-delete-dialog";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { ServerHeader } from "@/components/servers/index/server-header";
 
 export default function ServersPage() {
+  const { t } = useTranslation("server");
+
   const {
     servers,
     loading,
@@ -28,6 +31,7 @@ export default function ServersPage() {
   } = useServers();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
   const [status, setStatus] = useState("status");
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -35,51 +39,71 @@ export default function ServersPage() {
   const [editingServer, setEditingServer] = useState<Server | null>(null);
   const [deletingServer, setDeletingServer] = useState<Server | null>(null);
 
+  // Initial data load
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      searchServers(
-        searchTerm,
-        status === "status" ? undefined : status,
-        1,
-        pageSize
-      );
-    }, 500);
+    searchServers("", status === "status" ? undefined : status, 1, pageSize);
+  }, [searchServers, pageSize]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, status, pageSize, searchServers]);
+  // Effect khi searchKeyword hoặc status thay đổi
+  useEffect(() => {
+    searchServers(
+      searchKeyword,
+      status === "status" ? undefined : status,
+      1,
+      pageSize
+    );
+  }, [searchKeyword, status, pageSize, searchServers]);
 
   const navigate = useNavigate();
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    // KHÔNG tự động search gì cả, chỉ update UI
+  }, []);
+
+  // Xử lý khi nhấn Enter
+  const handleSearchSubmit = useCallback(() => {
+    const trimmedSearch = searchTerm.trim();
+    setSearchKeyword(trimmedSearch);
+  }, [searchTerm]);
+
+  // Xử lý khi clear search
+  const handleSearchClear = useCallback(() => {
+    setSearchTerm("");
+    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
+  }, []);
+
   const handleRefresh = useCallback(() => {
     searchServers(
-      searchTerm,
+      searchKeyword,
       status === "status" ? undefined : status,
       currentPage,
       pageSize
     );
-  }, [searchServers, currentPage, pageSize, searchTerm, status]);
+  }, [searchServers, currentPage, pageSize, searchKeyword, status]);
 
   const handlePageChange = useCallback(
     (page: number) => {
       searchServers(
-        searchTerm,
+        searchKeyword,
         status === "status" ? undefined : status,
         page,
         pageSize
       );
     },
-    [searchServers, searchTerm, status, pageSize]
+    [searchServers, searchKeyword, status, pageSize]
   );
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       searchServers(
-        searchTerm,
+        searchKeyword,
         status === "status" ? undefined : status,
         1,
         newPageSize
       );
     },
-    [searchServers, searchTerm, status]
+    [searchServers, searchKeyword, status]
   );
 
   // Dialog event handlers
@@ -146,21 +170,23 @@ export default function ServersPage() {
       <Card className="p-6">
         <FilterBar
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          onSearchClear={handleSearchClear}
           filters={[
             {
               value: status,
               onChange: setStatus,
               options: [
-                { value: "status", label: "Tất cả trạng thái" },
-                { value: "true", label: "Hoạt động" },
-                { value: "false", label: "Không hoạt động" },
+                { value: "status", label: t("serverPage.filter.allStatuses") },
+                { value: "true", label: t("serverPage.filter.active") },
+                { value: "false", label: t("serverPage.filter.inactive") },
               ],
-              placeholder: "Trạng thái",
+              placeholder: t("serverPage.filter.statusPlaceholder"),
               widthClass: "w-36",
             },
           ]}
-          placeholder="Tìm kiếm theo địa chỉ IP hoặc hostname"
+          placeholder={t("serverPage.filter.searchPlaceholder")}
         />
       </Card>
 
@@ -173,7 +199,7 @@ export default function ServersPage() {
         onDelete={handleDeleteServer}
         onViewHardeningHistory={handleViewHardeningHistory}
       />
-      
+
       {!loading && !error && (
         <Pagination
           currentPage={currentPage}
@@ -188,7 +214,7 @@ export default function ServersPage() {
           pageSizeOptions={[5, 10, 20, 50]}
         />
       )}
-      
+
       <ServerFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
@@ -198,7 +224,7 @@ export default function ServersPage() {
         getServerById={getServerById}
         onSuccess={handleFormSuccess}
       />
-      
+
       <ServerDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

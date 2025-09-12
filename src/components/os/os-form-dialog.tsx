@@ -1,5 +1,5 @@
-// src/components/os/os-form-dialog.tsx
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ export const OSFormDialog: React.FC<OSFormDialogProps> = ({
   onSubmit,
   loading,
 }) => {
+  const { t } = useTranslation("os");
   const [version, setVersion] = useState("");
 
   const isEditing = Boolean(editingOS);
@@ -72,29 +73,31 @@ export const OSFormDialog: React.FC<OSFormDialogProps> = ({
             {isEditing ? (
               <>
                 <Edit className="h-5 w-5 text-primary" />
-                Chỉnh sửa hệ điều hành
+                {t("osFormDialog.titles.edit")}
               </>
             ) : (
               <>
                 <Plus className="h-5 w-5 text-primary" />
-                Thêm hệ điều hành mới
+                {t("osFormDialog.titles.add")}
               </>
             )}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Cập nhật thông tin phiên bản hệ điều hành"
-              : "Nhập thông tin phiên bản hệ điều hành mới"}
+              ? t("osFormDialog.descriptions.edit")
+              : t("osFormDialog.descriptions.add")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="version">Phiên bản *</Label>
+              <Label htmlFor="version">
+                {t("osFormDialog.fields.version")}
+              </Label>
               <Input
                 id="version"
-                placeholder="VD: Ubuntu 22.04, CentOS 7, Windows Server 2019"
+                placeholder={t("osFormDialog.placeholders.version")}
                 value={version}
                 onChange={(e) => setVersion(e.target.value)}
                 required
@@ -111,18 +114,20 @@ export const OSFormDialog: React.FC<OSFormDialogProps> = ({
               onClick={handleClose}
               disabled={loading}
             >
-              Hủy
+              {t("osFormDialog.buttons.cancel")}
             </Button>
             <Button type="submit" disabled={loading || !version.trim()}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? "Đang cập nhật..." : "Đang tạo..."}
+                  {isEditing
+                    ? t("osFormDialog.buttons.updating")
+                    : t("osFormDialog.buttons.creating")}
                 </>
               ) : isEditing ? (
-                "Cập nhật"
+                t("osFormDialog.buttons.update")
               ) : (
-                "Tạo mới"
+                t("osFormDialog.buttons.create")
               )}
             </Button>
           </DialogFooter>
