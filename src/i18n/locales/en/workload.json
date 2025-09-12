@@ -1,6 +1,6 @@
 {
   "common": {
-    "search": "Search",
+    "search": "Search by workload name",
     "loading": "Loading...",
     "error": "Error",
     "retry": "Retry",

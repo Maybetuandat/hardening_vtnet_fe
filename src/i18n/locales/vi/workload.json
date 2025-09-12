@@ -1,6 +1,6 @@
 {
   "common": {
-    "search": "Tìm kiếm",
+    "search": "Tìm kiếm theo tên workload",
     "loading": "Đang tải...",
     "error": "Lỗi",
     "retry": "Thử lại",

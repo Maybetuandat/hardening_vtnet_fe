@@ -155,13 +155,9 @@ export default function OSPage() {
               searchTerm={searchInput}
               onSearchChange={handleSearchInputChange}
               onSearchClear={handleSearchClear}
+              placeholder={t("os:search.placeholder")}
               filters={[]}
             />
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">
-              {t("os:search.placeholder")}
-            </p>
           </div>
         </div>
       </Card>
