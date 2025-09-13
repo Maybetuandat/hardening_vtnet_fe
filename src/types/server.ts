@@ -106,3 +106,29 @@ export interface ServerUploadData {
   connection_status?: "untested" | "testing" | "success" | "failed";
   connection_message?: string;
 }
+export interface UseServerUploadReturn {
+  dragActive: boolean;
+  uploading: boolean;
+  testing: boolean;
+  adding: boolean;
+  servers: ServerUploadData[];
+  uploadedFileName: string;
+  errors: string[];
+  isDirty: boolean;
+  allServersConnected: boolean;
+  anyServerTesting: boolean;
+  hasFailedConnections: boolean;
+  canAddServers: boolean;
+
+  setDragActive: (active: boolean) => void;
+  handleFileUpload: (file: File) => Promise<void>;
+  removeServer: (serverId: string) => void;
+  handleDiscard: () => void;
+  handleTestConnection: () => Promise<void>;
+  cancelAllOperations: () => void;
+  handleAddServersWithWorkload: (
+    workloadId: number,
+    onSuccess?: () => void,
+    onRefreshList?: () => void
+  ) => Promise<void>;
+}

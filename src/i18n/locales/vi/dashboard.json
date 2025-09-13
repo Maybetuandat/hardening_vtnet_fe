@@ -105,6 +105,7 @@
     },
     "actions": {
       "cancel": "Hủy",
+      "startCan": "Bắt đầu Scan",
       "scanAll": "Scan Toàn Bộ",
       "scanSelected": "Scan {{count}} Server",
       "selectToScan": "Chọn Server để Scan",

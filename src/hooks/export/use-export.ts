@@ -29,7 +29,7 @@ export function useExport(): UseExportReturn {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading file:", err);
-      throw new Error("Không thể tải xuống file");
+      throw new Error("Error downloading file");
     }
   }, []);
 
@@ -61,14 +61,14 @@ export function useExport(): UseExportReturn {
         if (params?.keyword?.trim()) {
           searchParams.append("keyword", params.keyword.trim());
         }
-        
+
         if (params?.list_workload_id && params.list_workload_id.length > 0) {
           // Thêm từng workload_id vào query params
-          params.list_workload_id.forEach(id => {
+          params.list_workload_id.forEach((id) => {
             searchParams.append("list_workload_id", id.toString());
           });
         }
-        
+
         if (params?.status) {
           searchParams.append("status", params.status);
         }
@@ -91,7 +91,9 @@ export function useExport(): UseExportReturn {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.detail || `Lỗi HTTP: ${response.status}`);
+          throw new Error(
+            errorData?.detail || `Error HTTP: ${response.status}`
+          );
         }
 
         // Get file blob
@@ -104,14 +106,15 @@ export function useExport(): UseExportReturn {
         downloadFile(blob, filename);
 
         // Show success toast
-        toast.success("Xuất báo cáo thành công!", {
-          description: `File ${filename} đã được tải xuống`,
+        toast.success("Export report successfully!", {
+          description: `File ${filename} has been downloaded`,
+          duration: 300,
         });
       } catch (err: any) {
         console.error("Error exporting compliance report:", err);
-        const errorMessage = err.message || "Có lỗi xảy ra khi xuất báo cáo";
+        const errorMessage = err.message || "Error exporting report";
         setError(errorMessage);
-        toast.error("Xuất báo cáo thất bại", {
+        toast.error("Error exporting report", {
           description: errorMessage,
         });
         throw err;

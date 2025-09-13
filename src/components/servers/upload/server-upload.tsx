@@ -1,7 +1,7 @@
 import React, { useCallback, useImperativeHandle, forwardRef } from "react";
 import { toast } from "sonner";
 
-import { useServerUpload } from "@/hooks/server/use-server-upload";
+import { useServerUpload } from "@/hooks/server/server-upload/use-server-upload";
 import { WorkloadResponse } from "@/types/workload";
 import { ServerManagement } from "./server-management";
 import { ServerUploadArea } from "./server-upload-area";

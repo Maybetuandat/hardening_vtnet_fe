@@ -92,7 +92,7 @@ export function useRuleResults(): UseRuleResultsReturn {
         });
       } catch (err) {
         console.error("Error fetching rule results:", err);
-        setError("Không thể tải danh sách rule results");
+        setError("Error fetching rule results");
         setRuleResults([]);
         setTotalItems(0);
         setCurrentPage(1);
@@ -107,12 +107,9 @@ export function useRuleResults(): UseRuleResultsReturn {
   const updateRuleStatus = useCallback(
     async (ruleResultId: number, newStatus: "passed" | "failed") => {
       try {
-        // Fix: Send new_status as query parameter, not in request body
         const params = new URLSearchParams({
           new_status: newStatus,
         });
-
-        console.log(`Updating rule ${ruleResultId} status to:`, newStatus);
 
         await api.put(
           `/rule-results/${ruleResultId}/status?${params.toString()}`

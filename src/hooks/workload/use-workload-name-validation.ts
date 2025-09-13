@@ -37,7 +37,7 @@ export function useWorkloadNameValidation() {
           )}`
         );
 
-        const isValid = !response.exists; // Tên workload hợp lệ khi chưa tồn tại
+        const isValid = !response.exists;
 
         setWorkloadNameValidation({
           isValid: isValid,
@@ -47,7 +47,7 @@ export function useWorkloadNameValidation() {
         console.error("Error validating workload name:", error);
         setWorkloadNameValidation({
           isValid: false,
-          message: "Lỗi khi kiểm tra tên workload",
+          message: "Error validating workload name",
         });
       } finally {
         setValidatingWorkloadName(false);

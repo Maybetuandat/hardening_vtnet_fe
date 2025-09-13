@@ -14,29 +14,29 @@ import { useWorkloads } from "@/hooks/workload/use-workloads";
 const serverFormSchema = z.object({
   hostname: z
     .string()
-    .min(1, "Hostname là bắt buộc")
-    .max(255, "Hostname quá dài"),
+    .min(1, "Hostname is required")
+    .max(255, "Hostname is too long"),
   ip_address: z
     .string()
-    .min(1, "IP Address là bắt buộc")
+    .min(1, "IP Address is required")
     .regex(
       /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-      "IP Address không hợp lệ"
+      "IP Address is invalid"
     ),
   os_version: z
     .string()
-    .min(1, "OS Version là bắt buộc")
-    .max(50, "OS Version quá dài"),
+    .min(1, "OS Version is required")
+    .max(50, "OS Version is too long"),
   ssh_port: z.coerce
     .number()
-    .min(1, "SSH Port phải lớn hơn 0")
-    .max(65535, "SSH Port không hợp lệ"),
+    .min(1, "SSH Port must be greater than 0")
+    .max(65535, "SSH Port is invalid"),
   ssh_user: z
     .string()
-    .min(1, "SSH User là bắt buộc")
-    .max(100, "SSH User quá dài"),
+    .min(1, "SSH User is required")
+    .max(100, "SSH User is too long"),
   ssh_password: z.string().optional(),
-  workload_id: z.coerce.number().min(1, "Vui lòng chọn workload"),
+  workload_id: z.coerce.number().min(1, "Please select a workload"),
 });
 
 export type ServerFormValues = z.infer<typeof serverFormSchema>;
@@ -147,7 +147,7 @@ export function useServerForm({
           const filtered = prev.filter(
             (error) => !error.includes("IP address")
           );
-          return [...filtered, "Lỗi khi kiểm tra IP address"];
+          return [...filtered, "Error validating IP address"];
         });
       } finally {
         setValidatingIpAddress(false);
@@ -249,7 +249,7 @@ export function useServerForm({
       setInitialFormValues(serverValues);
     } catch (error) {
       console.error(" Error loading server data:", error);
-      onSuccess("Lỗi khi tải dữ liệu server");
+      onSuccess("Error loading server data");
     } finally {
       setLoadingServerData(false);
     }
@@ -262,7 +262,7 @@ export function useServerForm({
     // Validate required fields for connection test
     if (!values.ip_address || !values.ssh_user || !values.ssh_password) {
       onSuccess(
-        "Vui lòng nhập đầy đủ IP Address, SSH User và SSH Password để test connection"
+        "Please provide IP Address, SSH User, and SSH Password to test connection"
       );
       return;
     }
@@ -273,7 +273,7 @@ export function useServerForm({
         " Cannot test connection due to validation errors:",
         validationErrors
       );
-      onSuccess("Vui lòng sửa các lỗi validation trước khi test connection");
+      onSuccess("Please fix validation errors before testing connection");
       return;
     }
 
@@ -294,7 +294,7 @@ export function useServerForm({
       if (response.status === "success") {
         setConnectionTested(true);
         setConnectionResult(response);
-        onSuccess("Test connection thành công!");
+        onSuccess("Test connection successful!");
         if (response.hostname && response.hostname !== values.hostname) {
           form.setValue("hostname", response.hostname);
         }
@@ -312,7 +312,7 @@ export function useServerForm({
           error_details: response.error_details || "Unknown error",
         });
         onSuccess(
-          `Lỗi test connection: ${response.message || "Không thể kết nối"}`
+          `Error testing connection: ${response.message || "Unable to connect"}`
         );
       }
     } catch (error: any) {
@@ -326,7 +326,9 @@ export function useServerForm({
         error_details: error.response?.data?.detail || "Unknown error",
       });
       setConnectionTested(true);
-      onSuccess(`Lỗi test connection: ${error.message || "Không thể kết nối"}`);
+      onSuccess(
+        `Error testing connection: ${error.message || "Unable to connect"}`
+      );
     } finally {
       setTestingConnection(false);
     }
@@ -355,7 +357,7 @@ export function useServerForm({
           " Cannot submit due to validation errors:",
           validationErrors
         );
-        onSuccess("Vui lòng sửa các lỗi validation trước khi cập nhật");
+        onSuccess("Please fix validation errors before updating");
         return;
       }
 
@@ -377,14 +379,14 @@ export function useServerForm({
 
         await updateServer(editingServer.id, updateData);
 
-        onSuccess("Cập nhật server thành công!");
+        onSuccess("Server updated successfully!");
         handleClose();
       } catch (error: any) {
         console.error(" Error updating server:", error);
         if (error.response?.status === 400) {
-          onSuccess(`Lỗi validation: ${error.response.data.detail}`);
+          onSuccess(`Validation error: ${error.response.data.detail}`);
         } else {
-          onSuccess(`Lỗi: ${error.message || "Không thể cập nhật server"}`);
+          onSuccess(`Error: ${error.message || "Unable to update server"}`);
         }
       } finally {
         setLoading(false);

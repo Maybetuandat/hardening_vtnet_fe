@@ -1,5 +1,5 @@
 import DashboardCard from "./dash-board-card";
-import ScanDialog from "./scan-dialog";
+import ScanDialog from "./scan-dialog/scan-dialog";
 
 import { Button } from "../ui/button";
 import {
@@ -171,6 +171,7 @@ export default function HeaderDashBoard({
         open={scanDialogOpen}
         onOpenChange={setScanDialogOpen}
         onScanComplete={handleScanComplete}
+        handleRefresh={handleRefresh}
       />
 
       {/* Schedule Dialog */}

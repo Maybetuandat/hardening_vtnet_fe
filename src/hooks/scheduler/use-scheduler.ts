@@ -28,8 +28,7 @@ export function useScheduler() {
         setScheduleInfo(data);
         return data;
       } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi lấy thông tin lịch scan";
+        const errorMessage = err.message || "Error fetching scan schedule";
         setError(errorMessage);
         console.error("Error fetching scan schedule:", err);
         return null;
@@ -52,8 +51,7 @@ export function useScheduler() {
         setScheduleInfo(data);
         return true;
       } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi cập nhật lịch scan";
+        const errorMessage = err.message || "Error updating scan schedule";
         setError(errorMessage);
         console.error("Error updating scan schedule:", err);
         return false;
@@ -75,8 +73,7 @@ export function useScheduler() {
         setSchedulerStatus(data);
         return data;
       } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi lấy trạng thái scheduler";
+        const errorMessage = err.message || "Error fetching scheduler status";
         setError(errorMessage);
         console.error("Error fetching scheduler status:", err);
         return null;
@@ -108,7 +105,7 @@ export function useScheduler() {
       }
       return false;
     } catch (err: any) {
-      const errorMessage = err.message || "Có lỗi xảy ra khi tắt lịch scan";
+      const errorMessage = err.message || "Error disabling scan schedule";
       setError(errorMessage);
       console.error("Error disabling scan schedule:", err);
       return false;
@@ -123,13 +120,11 @@ export function useScheduler() {
   }, [getScanSchedule, getSchedulerStatus]);
 
   return {
-    // State
     loading,
     error,
     scheduleInfo,
     schedulerStatus,
 
-    // Actions
     getScanSchedule,
     updateScanSchedule,
 
@@ -137,7 +132,6 @@ export function useScheduler() {
     disableScanSchedule,
     refreshData,
 
-    // Helpers
     clearError: () => setError(null),
   };
 }

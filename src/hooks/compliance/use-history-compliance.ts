@@ -83,7 +83,7 @@ export function useHistoryCompliance(): UseComplianceReturn {
         // Store current search params
         setCurrentSearchParams({ keyword: keyword ?? "", status });
       } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi tải dữ liệu";
+        const errorMessage = err.message || "Error fetching compliance results";
         setError(errorMessage);
         console.error("Error fetching compliance results:", err);
       } finally {
@@ -104,7 +104,7 @@ export function useHistoryCompliance(): UseComplianceReturn {
         );
         return data;
       } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi tải chi tiết";
+        const errorMessage = err.message || "Error fetching compliance detail";
         setError(errorMessage);
         console.error("Error fetching compliance detail:", err);
         return null;

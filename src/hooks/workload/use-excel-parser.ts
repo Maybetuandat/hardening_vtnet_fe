@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 
 import { ExcelUploadResult } from "@/types/workload";
 
-import { Rule } from "@/types/rule";
+import { RuleCreate } from "@/types/rule";
 
 export function useExcelParser() {
   const parseJsonSafely = useCallback(
@@ -22,7 +22,7 @@ export function useExcelParser() {
     []
   );
 
-  const createRuleHashKey = useCallback((rule: Rule): string => {
+  const createRuleHashKey = useCallback((rule: RuleCreate): string => {
     const parametersString = rule.parameters
       ? JSON.stringify(rule.parameters, Object.keys(rule.parameters).sort())
       : "";
@@ -30,10 +30,11 @@ export function useExcelParser() {
   }, []);
 
   const removeDuplicateRules = useCallback(
-    (rules: Rule[]) => {
+    (rules: RuleCreate[]) => {
       const seenRules = new Set<string>();
-      const uniqueRules: Rule[] = [];
-      const duplicates: { rule: Rule; index: number; reason: string }[] = [];
+      const uniqueRules: RuleCreate[] = [];
+      const duplicates: { rule: RuleCreate; index: number; reason: string }[] =
+        [];
 
       rules.forEach((rule, index) => {
         const hashKey = createRuleHashKey(rule);
@@ -42,7 +43,7 @@ export function useExcelParser() {
           duplicates.push({
             rule,
             index,
-            reason: `Rule "${rule.name}" với cùng parameters đã tồn tại trong file`,
+            reason: `Rule "${rule.name}" with same name and parameters already exists`,
           });
         } else {
           seenRules.add(hashKey);
@@ -76,7 +77,7 @@ export function useExcelParser() {
           ) || workbook.SheetNames[0];
 
         if (!sheetName) {
-          throw new Error("Không tìm thấy sheet nào trong file Excel");
+          throw new Error("Error reading Excel file: No sheets found");
         }
 
         // Parse sheet thành array of objects
@@ -84,7 +85,7 @@ export function useExcelParser() {
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         if (!jsonData || jsonData.length < 2) {
-          throw new Error("File Excel không có dữ liệu hoặc thiếu header");
+          throw new Error("Error reading Excel file: No data found");
         }
 
         console.log(" Raw Excel data:", jsonData);
@@ -104,13 +105,13 @@ export function useExcelParser() {
         );
         if (missingColumns.length > 0) {
           throw new Error(
-            `Thiếu các cột bắt buộc: ${missingColumns.join(", ")}`
+            `Missing required columns: ${missingColumns.join(", ")}`
           );
         }
 
         console.log("⚡ All required columns found:", ruleColumns);
 
-        const rules: Rule[] = [];
+        const rules: RuleCreate[] = [];
 
         // Parse tất cả rules
         for (let rowIndex = 1; rowIndex < jsonData.length; rowIndex++) {
@@ -126,7 +127,7 @@ export function useExcelParser() {
             rowData[header] = row[colIndex];
           });
 
-          const rule: Rule = {
+          const rule: RuleCreate = {
             name: rowData["Name"] || `Rule ${rowIndex}`,
             description: rowData["Description"] || "",
             parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {},
@@ -153,7 +154,7 @@ export function useExcelParser() {
 
         // Tạo warnings và errors
         const warnings: string[] = [
-          `Đã parse thành công ${uniqueRules.length} rules từ Excel file`,
+          `Parsed ${uniqueRules.length} rules from Excel file`,
           `Format: Name | Description | Parameters_JSON | command`,
         ];
 
@@ -161,7 +162,7 @@ export function useExcelParser() {
 
         if (removedCount > 0) {
           warnings.push(
-            ` Đã loại bỏ ${removedCount} rules trùng lặp trong file Excel`
+            `Removed ${removedCount} duplicate rules from Excel file`
           );
           duplicates.forEach((duplicate) => {
             warnings.push(

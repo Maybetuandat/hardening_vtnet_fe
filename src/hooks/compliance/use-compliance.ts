@@ -90,7 +90,7 @@ export function useCompliance(): UseComplianceReturn {
           status: status,
         });
       } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi tải dữ liệu";
+        const errorMessage = err.message || "Error fetching compliance results";
         setError(errorMessage);
         console.error("Error fetching compliance results:", err);
       } finally {
@@ -111,7 +111,7 @@ export function useCompliance(): UseComplianceReturn {
         );
         return data;
       } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi tải chi tiết";
+        const errorMessage = err.message || "Error fetching compliance detail";
         setError(errorMessage);
         console.error("Error fetching compliance detail:", err);
         return null;
@@ -143,8 +143,7 @@ export function useCompliance(): UseComplianceReturn {
 
         return true;
       } catch (err: any) {
-        const errorMessage =
-          err.message || "Có lỗi xảy ra khi xóa compliance result";
+        const errorMessage = err.message || "Error deleting compliance result";
         setError(errorMessage);
         console.error("Error deleting compliance:", err);
         return false;
@@ -176,7 +175,7 @@ export function useCompliance(): UseComplianceReturn {
 
         return false;
       } catch (err: any) {
-        const errorMessage = err.message || "Có lỗi xảy ra khi khởi động scan";
+        const errorMessage = err.message || "Error starting compliance scan";
         setError(errorMessage);
         console.error("Error starting compliance scan:", err);
         return false;
@@ -239,6 +238,6 @@ export function useCompliance(): UseComplianceReturn {
     deleteCompliance,
     startScan,
     refreshData,
-    updateComplianceResult, // 🔥 NEW
+    updateComplianceResult,
   };
 }

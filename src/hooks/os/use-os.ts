@@ -93,7 +93,7 @@ export function useOS(): UseOSReturn {
       try {
         setError(null); // Clear error trước khi tạo
         await api.post("/os_version/", osData);
-        toast.success("Tạo hệ điều hành thành công");
+        toast.success("Create OS version successfully");
         // Refresh list sau khi tạo thành công
         await fetchOSVersions(undefined, currentPage, pageSize);
       } catch (err) {
@@ -118,7 +118,7 @@ export function useOS(): UseOSReturn {
           prev.map((os) => (os.id === osId ? updatedOS : os))
         );
 
-        toast.success("Cập nhật hệ điều hành thành công");
+        toast.success("Update OS version successfully");
       } catch (err) {
         handleError(err, "update OS version");
         throw err;
@@ -137,7 +137,7 @@ export function useOS(): UseOSReturn {
         setOsVersions((prev) => prev.filter((os) => os.id !== osId));
         setTotalItems((prev) => prev - 1);
 
-        toast.success("Xóa hệ điều hành thành công");
+        toast.success("Delete OS version successfully");
       } catch (err) {
         handleError(err, "delete OS version");
         throw err;

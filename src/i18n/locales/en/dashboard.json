@@ -88,17 +88,32 @@
   },
   "scanDialog": {
     "title": "Start Compliance Scan",
-    "scanMethod": "Select scan method:",
+    "scanMethod": "Scan Method",
     "scanAll": "Scan all servers",
     "scanSelected": "Scan selected servers",
-    "selectServers": "Select servers to scan:",
-    "selectAll": "Select all",
-    "deselectAll": "Deselect",
-    "searchPlaceholder": "Search servers by IP or hostname...",
-    "selectedCount": "{{count}} servers selected",
-    "loading": "Loading server list...",
-    "noServers": "No active servers",
-    "noResults": "No servers found matching criteria",
+    "selectServers": "Select Servers",
+    "searchPlaceholder": "Search by IP, hostname, or workload...",
+    "loading": "Loading servers...",
+    "loadingMore": "Loading more servers...",
+    "loadMore": "Load More",
+    "endOfList": "End of results",
+    "serversLoaded": "servers loaded",
+    "noResults": "No servers found matching your search",
+    "noServers": "No servers available",
+    "noServersSelected": "No servers selected",
+    "serversAvailable": "servers available",
+    "totalServers": "total servers",
+    "filtered": "filtered",
+    "showing": "Showing",
+
+    "selectVisible": "Select Visible",
+    "selectAll": "Select All",
+    "selectAllServers": "Select All Servers",
+    "deselectAll": "Deselect All",
+
+    "selectedCount": "{count, plural, =0 {No servers selected} =1 {1 server selected} other {{count} servers selected}}",
+    "inCurrentView": "{count} in view",
+
     "serverStatus": {
       "active": "Active",
       "inactive": "Inactive"
@@ -106,6 +121,7 @@
     "actions": {
       "cancel": "Cancel",
       "scanAll": "Scan All",
+      "startScan": "Start Scan",
       "scanSelected": "Scan {{count}} Servers",
       "selectToScan": "Select Servers to Scan",
       "starting": "Starting..."

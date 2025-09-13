@@ -56,7 +56,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
 
       try {
         if (!parseExcel) {
-          throw new Error("Excel parser không khả dụng");
+          throw new Error("Excel parser is not available");
         }
 
         const result = await parseExcel(file);
@@ -68,7 +68,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             workload_id: 0,
             parameters: rule.parameters || {},
             is_active: rule.is_active !== false,
-            command: rule.command, // ✅ Remove || "" here
+            command: rule.command,
           }));
 
           setRules(rulesForApi);
@@ -76,7 +76,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
 
         return result;
       } catch (err: any) {
-        const errorMessage = err.message || "Không thể parse file Excel";
+        const errorMessage = err.message || "Error parsing Excel file";
         setError(errorMessage);
         return {
           success: false,
@@ -93,7 +93,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   const checkRulesExistence = useCallback(
     async (workloadId: number): Promise<void> => {
       if (rules.length === 0) {
-        toast.error("Không có rules để kiểm tra");
+        toast.error("No rules to check");
         return;
       }
 
@@ -109,7 +109,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         const rulesToCheck = rules.map((rule) => ({
           ...rule,
           workload_id: workloadId,
-          command: rule.command, // ✅ Remove || "" here
+          command: rule.command,
         }));
 
         const response = await api.post<RuleCheckResult[]>(
@@ -124,7 +124,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         setCheckResults(response);
       } catch (err: any) {
         console.error(" Error checking rules existence:", err);
-        const errorMessage = err.message || "Không thể kiểm tra rule existence";
+        const errorMessage = err.message || "Error checking rules existence";
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {

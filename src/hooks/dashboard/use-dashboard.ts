@@ -13,22 +13,17 @@ export const useDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Lấy thống kê dashboard từ API
-   */
   const fetchStatistics = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      console.log(" Fetching dashboard statistics..."); // Debug log theo style của api.ts
 
       const data = await api.get<DashboardStats>("/dashboard/statistics");
       setStats(data);
 
       console.log(" Dashboard stats fetched:", data); // Debug log
     } catch (err: any) {
-      const errorMessage = err.message || "Không thể tải dữ liệu dashboard";
+      const errorMessage = err.message || "Error fetching dashboard statistics";
       setError(errorMessage);
       console.error(" Error fetching dashboard statistics:", err);
     } finally {
@@ -51,17 +46,14 @@ export const useDashboard = () => {
           await refreshCompliance();
         }
 
-        toast.success("Dữ liệu đã được cập nhật");
+        toast.success("Data has been updated");
       } catch (err) {
-        toast.error("Không thể cập nhật dữ liệu dashboard");
+        toast.error("Error updating dashboard data  ");
       }
     },
     [fetchStatistics]
   );
 
-  /**
-   * Auto refresh mỗi 30 giây
-   */
   useEffect(() => {
     fetchStatistics();
   }, [fetchStatistics]);
