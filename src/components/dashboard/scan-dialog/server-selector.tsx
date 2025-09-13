@@ -17,7 +17,6 @@ interface ServerSelectorProps {
   totalSelected: number;
   onSearchChange: (value: string) => void;
   onServerToggle: (serverId: number) => void;
-  onSelectAllVisible: () => void;
   onSelectAllServers: () => void;
   onSelectNone: () => void;
   onLoadMore: () => void;
@@ -35,7 +34,6 @@ export const ServerSelector = ({
   totalSelected,
   onSearchChange,
   onServerToggle,
-  onSelectAllVisible,
   onSelectAllServers,
   onSelectNone,
   onLoadMore,

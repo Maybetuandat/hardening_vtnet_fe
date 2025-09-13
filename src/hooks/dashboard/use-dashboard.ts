@@ -19,6 +19,7 @@ export const useDashboard = () => {
       setError(null);
 
       const data = await api.get<DashboardStats>("/dashboard/statistics");
+      data.compliance_rate = Math.round(data.compliance_rate * 100);
       setStats(data);
 
       console.log(" Dashboard stats fetched:", data); // Debug log

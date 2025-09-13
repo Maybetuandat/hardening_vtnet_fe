@@ -45,7 +45,7 @@ export default function ScanDialog({
     setScanType,
     setSearchTerm,
     handleServerToggle,
-    handleSelectAllVisible,
+
     handleSelectAllServers,
     handleSelectNone,
     handleStartScan,
@@ -119,7 +119,6 @@ export default function ScanDialog({
               totalSelected={totalSelected}
               onSearchChange={setSearchTerm}
               onServerToggle={handleServerToggle}
-              onSelectAllVisible={handleSelectAllVisible}
               onSelectAllServers={handleSelectAllServers}
               onSelectNone={handleSelectNone}
               onLoadMore={loadMoreServers}
@@ -129,13 +128,6 @@ export default function ScanDialog({
         </div>
 
         <DialogFooter className="flex-col space-y-2">
-          {/* Performance tips for large scans */}
-          {isLargeScan && (
-            <div className="w-full text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950/50 p-3 rounded-md">
-              💡 {t("scanDialog.tips.largeScan")}
-            </div>
-          )}
-
           <div className="flex justify-between w-full">
             <Button variant="outline" onClick={handleClose} disabled={scanning}>
               {t("scanDialog.actions.cancel")}

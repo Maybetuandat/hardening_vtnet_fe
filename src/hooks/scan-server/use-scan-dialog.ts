@@ -164,19 +164,6 @@ export const useScanDialog = (open: boolean) => {
     });
   }, []);
 
-  // Select all visible servers (only active ones)
-  const handleSelectAllVisible = useCallback(() => {
-    const visibleActiveServerIds = allLoadedServers
-      .filter((s) => s.status)
-      .map((s) => s.id);
-
-    setSelectedServers((prev) => {
-      const newSelected = new Set(prev);
-      visibleActiveServerIds.forEach((id) => newSelected.add(id));
-      return newSelected;
-    });
-  }, [allLoadedServers]);
-
   // Select all servers (including not loaded ones)
   const handleSelectAllServers = useCallback(async () => {
     try {
@@ -252,6 +239,8 @@ export const useScanDialog = (open: boolean) => {
         onClose();
         onScanComplete();
 
+        console.log("Starting scan with request:", scanRequest);
+
         // Start scan in background
         api
           .post("/compliance/scan", scanRequest)
@@ -315,7 +304,7 @@ export const useScanDialog = (open: boolean) => {
     setScanType,
     setSearchTerm,
     handleServerToggle,
-    handleSelectAllVisible,
+
     handleSelectAllServers,
     handleSelectNone,
     handleStartScan,

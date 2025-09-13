@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui load server big data"
+git commit -m "update ui fix server selected scan and fix icon secondary sidebar "
 git push origin main 

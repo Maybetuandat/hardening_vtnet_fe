@@ -25,8 +25,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-
 import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
 
 interface UserInfo {
@@ -39,15 +37,14 @@ interface UserInfo {
   isPremium: boolean;
 }
 
-
 const getMockUserData = (): UserInfo => {
   // Kiểm tra localStorage trước
-  const storedUser = localStorage.getItem('userInfo');
+  const storedUser = localStorage.getItem("userInfo");
   if (storedUser) {
     try {
       return JSON.parse(storedUser);
     } catch (error) {
-      console.error('Error parsing stored user data:', error);
+      console.error("Error parsing stored user data:", error);
     }
   }
 
@@ -73,24 +70,24 @@ const fetchUserInfo = (): Promise<UserInfo> => {
 };
 
 export function NavUser() {
-  const { t } = useTranslation('common');
-  const { isMobile } = useSidebar();
+  const { t } = useTranslation("common");
+  const { isMobile, state } = useSidebar(); // Thêm state để check collapsed
   const navigate = useNavigate();
-  
+
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Fetch user info - không còn dependency vào api
+  // Fetch user info
   useEffect(() => {
     let mounted = true;
 
     const fetchUser = async () => {
-      if (hasLoaded) return; // Only fetch once
+      if (hasLoaded) return;
 
       try {
         setLoading(true);
-        const userData = await fetchUserInfo(); // Sử dụng function local thay vì api
+        const userData = await fetchUserInfo();
 
         if (mounted) {
           setUserInfo(userData);
@@ -99,7 +96,7 @@ export function NavUser() {
       } catch (error) {
         console.error("Failed to fetch user:", error);
         if (mounted) {
-          setHasLoaded(true); // Mark as loaded even on error
+          setHasLoaded(true);
         }
       } finally {
         if (mounted) {
@@ -121,18 +118,12 @@ export function NavUser() {
 
   const handleLogout = useCallback(async () => {
     try {
-      // Show loading toast
-     
       // Clear localStorage
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken'); // nếu có
-      
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("authToken");
+
       // Simulate logout delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-     
-
-    
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Redirect after showing toast
       setTimeout(() => {
@@ -142,18 +133,16 @@ export function NavUser() {
       console.error("Logout error:", error);
 
       // Clear local data anyway
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken');
-
-    
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("authToken");
 
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 1000);
     }
-  }, [navigate, t]); // Removed api dependency
+  }, [navigate, t]);
 
-  // Helper functions - safe versions
+  // Helper functions
   const getInitials = (user: UserInfo | null): string => {
     if (!user) return "U";
 
@@ -187,24 +176,33 @@ export function NavUser() {
     return user?.email || "user@example.com";
   };
 
-  // Render logic - simple and safe
+  // Render logic
   const displayName = getDisplayName(userInfo);
   const initials = getInitials(userInfo);
   const email = getEmail(userInfo);
   const isPremium = userInfo?.isPremium || false;
+  const isCollapsed = state === "collapsed";
 
   // Show loading skeleton
   if (loading && !userInfo) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" disabled>
+          <SidebarMenuButton
+            size="lg"
+            disabled
+            className="group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-2"
+          >
             <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <div className="h-4 bg-muted rounded animate-pulse mb-1" />
-              <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
-            </div>
-            <Loader2 className="ml-auto size-4 animate-spin" />
+            {!isCollapsed && (
+              <>
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:sr-only">
+                  <div className="h-4 bg-muted rounded animate-pulse mb-1" />
+                  <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+                </div>
+                <Loader2 className="ml-auto size-4 animate-spin group-data-[collapsible=icon]:sr-only" />
+              </>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -218,20 +216,25 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              tooltip={isCollapsed ? displayName : undefined} // Chỉ show tooltip khi collapsed
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+
+              {/* User info - ẩn khi collapsed */}
+              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:sr-only">
                 <span className="truncate font-medium">{displayName}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {email}
                 </span>
               </div>
-              <MoreVerticalIcon className="ml-auto size-4" />
+
+              {/* Menu icon - ẩn khi collapsed */}
+              <MoreVerticalIcon className="ml-auto size-4 group-data-[collapsible=icon]:sr-only" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -243,7 +246,7 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                  <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -258,31 +261,31 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleAccountClick}>
-                <UserCircleIcon />
-                {t('sidebar.account')}
+                <UserCircleIcon className="h-4 w-4" />
+                {t("sidebar.account")}
               </DropdownMenuItem>
               {isPremium && (
                 <DropdownMenuItem>
                   <span className="text-yellow-600 font-medium">
-                    ✨ {t('sidebar.premiumAccount')}
+                    ✨ {t("sidebar.premiumAccount")}
                   </span>
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <ThemeSettingsPanel 
+            <ThemeSettingsPanel
               variant="dialog"
               trigger={
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <Settings />
-                  {t('sidebar.settings')}
+                  <Settings className="h-4 w-4" />
+                  {t("sidebar.settings")}
                 </DropdownMenuItem>
               }
             />
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOutIcon />
-              {t('sidebar.logout')}
+              <LogOutIcon className="h-4 w-4" />
+              {t("sidebar.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

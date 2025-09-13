@@ -69,29 +69,18 @@ export const ServerList = ({
         className={`flex items-center space-x-3 p-2 rounded-lg border cursor-pointer transition-colors ${
           selectedServers.has(server.id)
             ? "bg-primary/10 border-primary"
-            : server.status
-            ? "hover:bg-muted"
-            : "opacity-50 cursor-not-allowed"
+            : "hover:bg-muted"
         }`}
-        onClick={() => server.status && onServerToggle(server.id)}
+        onClick={() => onServerToggle(server.id)}
       >
         <Checkbox
           checked={selectedServers.has(server.id)}
-          disabled={!server.status}
-          onChange={() => server.status && onServerToggle(server.id)}
+          onChange={() => onServerToggle(server.id)}
         />
         <ServerIcon className="h-4 w-4 text-muted-foreground" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
             <span className="font-medium truncate">{server.ip_address}</span>
-            <Badge
-              variant={server.status ? "default" : "secondary"}
-              className="text-xs"
-            >
-              {server.status
-                ? t("scanDialog.serverStatus.active")
-                : t("scanDialog.serverStatus.inactive")}
-            </Badge>
           </div>
           <div className="text-sm text-muted-foreground truncate">
             {server.hostname}

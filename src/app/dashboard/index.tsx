@@ -70,19 +70,16 @@ export default function SystemHardeningDashboard() {
   // Event handlers
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-    // KHÔNG tự động search gì cả, chỉ update UI
   }, []);
 
-  // Xử lý khi nhấn Enter hoặc xóa hết text
   const handleSearchSubmit = useCallback(() => {
     const trimmedSearch = searchTerm.trim();
     setSearchKeyword(trimmedSearch);
   }, [searchTerm]);
 
-  // Xử lý khi clear search
   const handleSearchClear = useCallback(() => {
     setSearchTerm("");
-    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
+    setSearchKeyword("");
   }, []);
 
   // Refresh compliance data function for dashboard
@@ -124,7 +121,6 @@ export default function SystemHardeningDashboard() {
     [fetchComplianceResults, searchKeyword, status]
   );
 
-  // Filter options for FilterBar
   const filterOptions = [
     {
       value: status,
