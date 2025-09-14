@@ -1,8 +1,12 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useEffect, useReducer, ReactNode } from "react";
-import { AuthContextType, LoginRequest, User } from "@/types/auth";
-
-import { authApi } from "@/lib/apiClient";
+import {
+  AuthContextType,
+  LoginRequest,
+  User,
+  LoginResponse,
+} from "@/types/auth";
+import { api } from "@/lib/api"; // Sử dụng trực tiếp api instance có sẵn
 import { authReducer, initialAuthState } from "./authReducer";
 
 // Create context
@@ -14,6 +18,10 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 interface AuthProviderProps {
   children: ReactNode;
 }
+
+// Storage keys
+const TOKEN_KEY = "jwt_token";
+const USER_KEY = "user_data";
 
 // Provider Component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -37,17 +45,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = () => {
       try {
-        const { token, user } = authApi.getStoredAuthData();
+        const storedToken = localStorage.getItem(TOKEN_KEY);
+        const storedUser = localStorage.getItem(USER_KEY);
 
-        if (token && user) {
+        if (storedToken && storedUser) {
+          const user: User = JSON.parse(storedUser);
+
+          // Set token in api client
+          api.setAuthToken(storedToken);
+
           dispatch({
             type: "AUTH_SUCCESS",
-            payload: { user, token },
+            payload: { user, token: storedToken },
           });
+        } else {
+          dispatch({ type: "SET_LOADING", payload: false });
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
-        authApi.clearAuthData();
+        // Clear corrupted data
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+        api.setAuthToken(null);
+
+        dispatch({
+          type: "AUTH_ERROR",
+          payload: "Error initializing authentication",
+        });
       }
     };
 
@@ -60,9 +84,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       console.log("🔐 Starting login process...");
-      const response = await authApi.login(credentials);
+      const response = await api.post<LoginResponse>(
+        "/auth/login",
+        credentials
+      );
 
       console.log("✅ Login successful, dispatching AUTH_SUCCESS");
+
+      // Save to localStorage
+      localStorage.setItem(TOKEN_KEY, response.access_token);
+      localStorage.setItem(USER_KEY, JSON.stringify(response.user));
+
+      // Set token in api client
+      api.setAuthToken(response.access_token);
+
       dispatch({
         type: "AUTH_SUCCESS",
         payload: {
@@ -107,10 +142,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
   const logout = async (): Promise<void> => {
     try {
-      await authApi.logout();
+      await api.post("/auth/logout");
     } catch (error) {
       console.error("Logout API call failed:", error);
     } finally {
+      // Clear localStorage
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+
+      // Clear token in api client
+      api.setAuthToken(null);
+
       dispatch({ type: "LOGOUT" });
     }
   };
@@ -124,7 +166,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
-      const response = await authApi.refreshToken();
+      const response = await api.post<{
+        access_token: string;
+        token_type: string;
+      }>("/auth/refresh-token");
+
+      // Update localStorage
+      localStorage.setItem(TOKEN_KEY, response.access_token);
+
+      // Set new token in api client
+      api.setAuthToken(response.access_token);
 
       dispatch({
         type: "AUTH_SUCCESS",
@@ -147,8 +198,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Update user
   const updateUser = (user: User): void => {
-    authApi.saveAuthData(state.token!, user);
-    dispatch({ type: "UPDATE_USER", payload: user });
+    if (state.token) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      dispatch({ type: "UPDATE_USER", payload: user });
+    }
   };
 
   // Context value
