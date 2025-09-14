@@ -1,6 +1,7 @@
 import { ComplianceResult } from "@/types/compliance";
 import { useEffect, useRef, useCallback, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/authentication/use-auth"; // Import useAuth hook
 
 interface SSEMessage {
   type: string;
@@ -18,6 +19,7 @@ export interface UseSSENotificationsReturn {
 export function useSSENotifications(
   onComplianceCompleted?: (data: ComplianceResult) => void
 ): UseSSENotificationsReturn {
+  const { token, isAuthenticated, isLoading } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<SSEMessage | null>(null);
@@ -28,13 +30,28 @@ export function useSSENotifications(
   const maxReconnectAttempts = 5;
 
   const connect = useCallback(() => {
+    // Không kết nối nếu đang loading hoặc không authenticated
+    if (isLoading || !isAuthenticated || !token) {
+      if (!isLoading && !isAuthenticated) {
+        console.log("SSE: Not authenticated, skipping connection.");
+      }
+      if (!isLoading && isAuthenticated && !token) {
+        console.log(
+          "SSE: Authenticated but no token found, skipping connection."
+        );
+      }
+      return;
+    }
+
     if (eventSourceRef.current) {
+      // Đã có kết nối, không tạo lại
       return;
     }
 
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const sseURL = `${baseURL}/notifications/stream`;
+      // Thêm token vào URL làm query parameter
+      const sseURL = `${baseURL}/notifications/stream?token=${token}`;
 
       const eventSource = new EventSource(sseURL);
       eventSourceRef.current = eventSource;
@@ -43,6 +60,7 @@ export function useSSENotifications(
         setIsConnected(true);
         setConnectionError(null);
         reconnectAttempts.current = 0;
+        console.log(" SSE connection established");
       };
 
       eventSource.onmessage = (event) => {
@@ -52,7 +70,7 @@ export function useSSENotifications(
 
           switch (message.type) {
             case "connected":
-              console.log(" SSE connection established");
+              // console.log(" SSE connection established (from server message)"); // Có thể bỏ qua hoặc dùng để xác nhận
               break;
 
             case "completed":
@@ -64,7 +82,13 @@ export function useSSENotifications(
                 }`,
                 {
                   description: `Score: ${message.data.score}% (${message.data.passed_rules}/${message.data.total_rules} rules passed)`,
-                  duration: 300,
+                  duration: 3000,
+                  action: {
+                    label: "View",
+                    onClick: () => {
+                      /* Handle view action */
+                    },
+                  },
                 }
               );
 
@@ -77,13 +101,14 @@ export function useSSENotifications(
               toast.error(
                 `Scan failed: ${message.message || "Unknown error"}`,
                 {
-                  duration: 300,
+                  duration: 5000,
                 }
               );
 
-              if (onComplianceCompleted) {
-                onComplianceCompleted(message.data as ComplianceResult);
-              }
+              // Tùy chọn: Xử lý dữ liệu thất bại nếu cần
+              // if (onComplianceCompleted) {
+              //   onComplianceCompleted(message.data as ComplianceResult);
+              // }
               break;
             case "heartbeat":
               // Silent heartbeat
@@ -104,23 +129,36 @@ export function useSSENotifications(
 
         // Close current connection
         eventSource.close();
-        eventSourceRef.current = null;
+        eventSourceRef.current = null; // Đảm bảo ref được reset
 
-        // Attempt to reconnect
-        if (reconnectAttempts.current < maxReconnectAttempts) {
+        // Attempt to reconnect if authenticated and token exists
+        if (
+          isAuthenticated &&
+          token &&
+          reconnectAttempts.current < maxReconnectAttempts
+        ) {
           reconnectAttempts.current++;
           const delay = Math.min(
             1000 * Math.pow(2, reconnectAttempts.current),
             30000
-          );
+          ); // Max 30 seconds delay
 
           console.log(
             `Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            connect();
+            connect(); // Gọi lại connect
           }, delay);
+        } else if (!isAuthenticated || !token) {
+          console.log(
+            "SSE: Not authenticated or no token, stopping reconnection attempts."
+          );
+          setConnectionError(
+            "Session expired or not logged in. Please re-login."
+          );
+          // Có thể emit một sự kiện để chuyển hướng người dùng đến trang đăng nhập
+          // window.dispatchEvent(new CustomEvent('auth:unauthorized'));
         } else {
           console.error(" Max reconnection attempts reached");
           setConnectionError("Unable to reconnect. Please refresh the page.");
@@ -130,7 +168,7 @@ export function useSSENotifications(
       console.error(" Failed to create SSE connection:", error);
       setConnectionError("Failed to create connection");
     }
-  }, []);
+  }, [token, isAuthenticated, isLoading, onComplianceCompleted]); // Thêm token, isAuthenticated, isLoading vào dependency array
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -144,19 +182,28 @@ export function useSSENotifications(
     }
 
     setIsConnected(false);
+    setConnectionError(null); // Clear error on disconnect
+    reconnectAttempts.current = 0; // Reset attempts
     console.log(" SSE Disconnected");
   }, []);
 
-  // Auto connect on mount
+  // Effect để quản lý kết nối dựa trên trạng thái xác thực và token
   useEffect(() => {
-    connect();
+    if (!isLoading) {
+      if (isAuthenticated && token) {
+        connect();
+      } else {
+        disconnect(); // Ngắt kết nối nếu không authenticated hoặc không có token
+      }
+    }
 
+    // Cleanup khi component unmount hoặc khi dependencies thay đổi
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, [isAuthenticated, token, isLoading, connect, disconnect]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount (đảm bảo ngắt kết nối khi component bị hủy)
   useEffect(() => {
     return () => {
       disconnect();
