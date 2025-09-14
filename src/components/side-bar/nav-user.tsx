@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useTranslation } from "react-i18next";
 import { LogOutIcon, UserCircleIcon, Loader2, Settings } from "lucide-react";
 
@@ -23,14 +22,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth, useRole } from "@/hooks/authentication/use-auth";
 
-export function AuthenticatedNavUser() {
+export function NavUser() {
   const { t } = useTranslation("common");
   const { isMobile, state } = useSidebar();
   const navigate = useNavigate();
 
-  // Sử dụng auth hooks thay vì mock data
+  // Sử dụng auth hooks
   const { user, logout, isLoading } = useAuth();
-  const { role, isAdmin } = useRole();
 
   const handleAccountClick = () => {
     navigate("/profile");
@@ -65,6 +63,17 @@ export function AuthenticatedNavUser() {
     return user?.full_name || user?.username || "User";
   };
 
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "destructive";
+      case "user":
+        return "default";
+      default:
+        return "secondary";
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -75,7 +84,7 @@ export function AuthenticatedNavUser() {
               <Loader2 className="size-4 animate-spin" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">Loading...</span>
+              <span className="truncate font-semibold">Đang tải...</span>
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -94,7 +103,7 @@ export function AuthenticatedNavUser() {
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">Đăng nhập</span>
-              <span className="truncate text-xs">Truy cập hệ thống</span>
+              <span className="truncate text-xs">Nhấp để đăng nhập</span>
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -102,6 +111,7 @@ export function AuthenticatedNavUser() {
     );
   }
 
+  // Authenticated user display
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -112,7 +122,7 @@ export function AuthenticatedNavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">
+                <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   {getInitials(user)}
                 </AvatarFallback>
               </Avatar>
@@ -120,21 +130,20 @@ export function AuthenticatedNavUser() {
                 <span className="truncate font-semibold">
                   {getDisplayName(user)}
                 </span>
-                <span className="truncate text-xs flex items-center gap-1">
-                  @{user.username}
-                  {isAdmin() && (
-                    <Badge
-                      variant="destructive"
-                      className="text-[10px] px-1 py-0"
-                    >
-                      Admin
-                    </Badge>
-                  )}
-                </span>
+                <div className="flex items-center gap-1">
+                  <span className="truncate text-xs text-sidebar-muted-foreground">
+                    {user.email}
+                  </span>
+                  <Badge
+                    variant={getRoleBadgeVariant(user.role)}
+                    className="text-xs h-4 px-1"
+                  >
+                    {user.role}
+                  </Badge>
+                </div>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -144,7 +153,7 @@ export function AuthenticatedNavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">
+                  <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     {getInitials(user)}
                   </AvatarFallback>
                 </Avatar>
@@ -158,26 +167,21 @@ export function AuthenticatedNavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
-
             <DropdownMenuSeparator />
-
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleAccountClick}>
                 <UserCircleIcon className="mr-2 h-4 w-4" />
-                {t("profile", "Hồ sơ")}
+                {t("nav.account", "Tài khoản")}
               </DropdownMenuItem>
-
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                {t("settings", "Cài đặt")}
+                {t("nav.settings", "Cài đặt")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
-
             <DropdownMenuSeparator />
-
-            <DropdownMenuItem onClick={handleLogout} disabled={isLoading}>
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOutIcon className="mr-2 h-4 w-4" />
-              {isLoading ? "Đang đăng xuất..." : t("logout", "Đăng xuất")}
+              {t("nav.logout", "Đăng xuất")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

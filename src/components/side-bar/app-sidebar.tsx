@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { NavMain } from "@/components/side-bar/nav-main";
 import { NavSecondary } from "@/components/side-bar/nav-secondary";
-import { NavUser } from "@/components/side-bar/nav-user";
+import { NavUser } from "@/components/side-bar/nav-user"; // Import NavUser (đã đổi tên export)
 import {
   Sidebar,
   SidebarContent,

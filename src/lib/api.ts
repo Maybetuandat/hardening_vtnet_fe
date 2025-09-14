@@ -13,7 +13,12 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    console.log(" API Request:", url); // Debug log
+    console.log("🌐 API Request:", url); // Debug log
+    console.log("📦 Request options:", {
+      method: options.method || "GET",
+      headers: options.headers,
+      body: options.body,
+    });
 
     const config: RequestInit = {
       headers: {
@@ -26,28 +31,56 @@ class ApiClient {
     try {
       const response = await fetch(url, config);
 
-      console.log(" Response status:", response.status); // Debug log
+      console.log("📈 Response status:", response.status); // Debug log
 
       // Handle no content responses (like DELETE)
       if (response.status === 204) {
         return {} as T;
       }
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `HTTP ${response.status}`);
+      // Try to parse response body
+      let responseData;
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await response.json();
+      } else {
+        responseData = await response.text();
       }
 
-      const data = await response.json();
-      console.log(" Response data:", data); // Debug log
+      console.log("📊 Response data:", responseData); // Debug log
 
-      return data;
+      if (!response.ok) {
+        // Handle different error formats
+        let errorMessage = `HTTP ${response.status}`;
+
+        if (typeof responseData === "object" && responseData.detail) {
+          errorMessage = responseData.detail;
+        } else if (typeof responseData === "string") {
+          errorMessage = responseData;
+        } else if (typeof responseData === "object" && responseData.message) {
+          errorMessage = responseData.message;
+        }
+
+        console.error("❌ API Error Response:", responseData);
+        throw new Error(errorMessage);
+      }
+
+      return responseData as T;
     } catch (error) {
-      console.error(" API Error:", error); // Debug log
+      console.error("💥 API Request Failed:", {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Re-throw with better error message
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error("Network error");
+
+      // Handle network errors
+      throw new Error("Network error - Unable to connect to server");
     }
   }
 
@@ -58,11 +91,12 @@ class ApiClient {
   async post<T>(
     endpoint: string,
     data?: any,
-    p0?: { signal: AbortSignal }
+    options?: { signal?: AbortSignal }
   ): Promise<T> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
+      signal: options?.signal,
     });
   }
 

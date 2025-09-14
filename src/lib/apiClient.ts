@@ -41,6 +41,8 @@ class AuthenticatedApiClient {
         const response = await originalRequest(endpoint, options);
         return response;
       } catch (error: any) {
+        console.error("API request failed:", error);
+
         // Xử lý lỗi 401 - Token expired
         if (
           error.message?.includes("401") ||
@@ -49,6 +51,8 @@ class AuthenticatedApiClient {
           await this.handleUnauthorized();
           throw new Error("Authentication failed. Please login again.");
         }
+
+        // Re-throw original error for other cases
         throw error;
       }
     };
@@ -65,21 +69,33 @@ class AuthenticatedApiClient {
 
   // Auth API methods sử dụng api object
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>(
-      "/api/auth/login",
-      credentials
-    );
+    try {
+      console.log("🔐 Attempting login with:", {
+        username: credentials.username,
+        endpoint: "/auth/login",
+      });
 
-    // Lưu token
-    this.setToken(response.access_token);
-    this.saveAuthData(response.access_token, response.user);
+      const response = await api.post<LoginResponse>(
+        "/auth/login", // Fixed: thêm /api prefix
+        credentials
+      );
 
-    return response;
+      console.log("✅ Login successful:", response);
+
+      // Lưu token
+      this.setToken(response.access_token);
+      this.saveAuthData(response.access_token, response.user);
+
+      return response;
+    } catch (error: any) {
+      console.error("❌ Login failed:", error);
+      throw error;
+    }
   }
 
   async logout(): Promise<void> {
     try {
-      await api.post("/api/auth/logout");
+      await api.post("/auth/logout"); // Fixed: thêm /api prefix
     } catch (error) {
       console.warn("Logout API call failed:", error);
     } finally {
@@ -89,7 +105,7 @@ class AuthenticatedApiClient {
 
   async refreshToken(): Promise<{ access_token: string }> {
     const response = await api.post<{ access_token: string }>(
-      "/api/auth/refresh-token"
+      "/auth/refresh-token" // Fixed: thêm /api prefix
     );
 
     // Update token

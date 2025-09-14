@@ -54,13 +54,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Login function
+  // Login function with improved error handling
   const login = async (credentials: LoginRequest): Promise<void> => {
     dispatch({ type: "AUTH_START" });
 
     try {
+      console.log("🔐 Starting login process...");
       const response = await authApi.login(credentials);
 
+      console.log("✅ Login successful, dispatching AUTH_SUCCESS");
       dispatch({
         type: "AUTH_SUCCESS",
         payload: {
@@ -68,11 +70,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           token: response.access_token,
         },
       });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Login failed";
+    } catch (error: any) {
+      console.error("❌ Login failed in auth context:", error);
+
+      // Better error message extraction
+      let errorMessage = "Login failed";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.detail) {
+        errorMessage = error.detail;
+      }
+
+      // Handle specific error cases
+      if (
+        errorMessage.includes("401") ||
+        errorMessage.includes("Unauthorized")
+      ) {
+        errorMessage = "Incorrect username or password";
+      } else if (errorMessage.includes("Network error")) {
+        errorMessage =
+          "Cannot connect to server. Please check your connection.";
+      } else if (errorMessage.includes("fetch")) {
+        errorMessage = "Network error. Please try again.";
+      }
+
       dispatch({ type: "AUTH_ERROR", payload: errorMessage });
-      throw error;
+      throw new Error(errorMessage);
     }
   };
 
