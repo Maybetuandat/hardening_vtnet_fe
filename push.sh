@@ -1,3 +1,3 @@
 git add .
-git commit -m "update ui fix server selected scan and fix icon secondary sidebar "
+git commit -m "update ui for author and authentication" 
 git push origin main 

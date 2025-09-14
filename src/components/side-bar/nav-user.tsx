@@ -1,13 +1,8 @@
-import {
-  LogOutIcon,
-  MoreVerticalIcon,
-  UserCircleIcon,
-  Loader2,
-  Settings,
-} from "lucide-react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+
 import { useTranslation } from "react-i18next";
+import { LogOutIcon, UserCircleIcon, Loader2, Settings } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -25,184 +20,82 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
+import { Badge } from "@/components/ui/badge";
+import { useAuth, useRole } from "@/hooks/authentication/use-auth";
 
-interface UserInfo {
-  id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  fullName: string;
-  isPremium: boolean;
-}
-
-const getMockUserData = (): UserInfo => {
-  // Kiểm tra localStorage trước
-  const storedUser = localStorage.getItem("userInfo");
-  if (storedUser) {
-    try {
-      return JSON.parse(storedUser);
-    } catch (error) {
-      console.error("Error parsing stored user data:", error);
-    }
-  }
-
-  // Fallback to mock data
-  return {
-    id: "user-123",
-    firstName: "John",
-    lastName: "Doe",
-    username: "johndoe",
-    email: "john.doe@example.com",
-    fullName: "John Doe",
-    isPremium: false,
-  };
-};
-
-// Simulate API call với delay
-const fetchUserInfo = (): Promise<UserInfo> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getMockUserData());
-    }, 500); // Simulate network delay
-  });
-};
-
-export function NavUser() {
+export function AuthenticatedNavUser() {
   const { t } = useTranslation("common");
-  const { isMobile, state } = useSidebar(); // Thêm state để check collapsed
+  const { isMobile, state } = useSidebar();
   const navigate = useNavigate();
 
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  // Sử dụng auth hooks thay vì mock data
+  const { user, logout, isLoading } = useAuth();
+  const { role, isAdmin } = useRole();
 
-  // Fetch user info
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchUser = async () => {
-      if (hasLoaded) return;
-
-      try {
-        setLoading(true);
-        const userData = await fetchUserInfo();
-
-        if (mounted) {
-          setUserInfo(userData);
-          setHasLoaded(true);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        if (mounted) {
-          setHasLoaded(true);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchUser();
-
-    return () => {
-      mounted = false;
-    };
-  }, [hasLoaded]);
-
-  const handleAccountClick = useCallback(() => {
+  const handleAccountClick = () => {
     navigate("/profile");
-  }, [navigate]);
+  };
 
-  const handleLogout = useCallback(async () => {
+  const handleLogout = async () => {
     try {
-      // Clear localStorage
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("authToken");
-
-      // Simulate logout delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect after showing toast
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1000);
+      await logout();
+      navigate("/login", { replace: true });
     } catch (error) {
-      console.error("Logout error:", error);
-
-      // Clear local data anyway
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("authToken");
-
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1000);
+      console.error("Logout failed:", error);
+      // Force navigate anyway
+      navigate("/login", { replace: true });
     }
-  }, [navigate, t]);
+  };
 
-  // Helper functions
-  const getInitials = (user: UserInfo | null): string => {
+  const getInitials = (user: any): string => {
     if (!user) return "U";
 
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-    }
-    if (user.fullName) {
-      const parts = user.fullName.trim().split(/\s+/);
+    if (user.full_name) {
+      const parts = user.full_name.trim().split(/\s+/);
       if (parts.length >= 2) {
         return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
       }
-      return user.fullName[0].toUpperCase();
+      return parts[0][0].toUpperCase();
     }
-    if (user.username) {
-      return user.username.substring(0, 2).toUpperCase();
-    }
-    return "U";
+
+    return user.username[0].toUpperCase();
   };
 
-  const getDisplayName = (user: UserInfo | null): string => {
-    if (!user) return "User";
-    return (
-      user.fullName ||
-      `${user.firstName} ${user.lastName}`.trim() ||
-      user.username ||
-      "User"
-    );
+  const getDisplayName = (user: any): string => {
+    return user?.full_name || user?.username || "User";
   };
 
-  const getEmail = (user: UserInfo | null): string => {
-    return user?.email || "user@example.com";
-  };
-
-  // Render logic
-  const displayName = getDisplayName(userInfo);
-  const initials = getInitials(userInfo);
-  const email = getEmail(userInfo);
-  const isPremium = userInfo?.isPremium || false;
-  const isCollapsed = state === "collapsed";
-
-  // Show loading skeleton
-  if (loading && !userInfo) {
+  // Show loading state
+  if (isLoading) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton
-            size="lg"
-            disabled
-            className="group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-2"
-          >
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-            {!isCollapsed && (
-              <>
-                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:sr-only">
-                  <div className="h-4 bg-muted rounded animate-pulse mb-1" />
-                  <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
-                </div>
-                <Loader2 className="ml-auto size-4 animate-spin group-data-[collapsible=icon]:sr-only" />
-              </>
-            )}
+          <SidebarMenuButton size="lg" disabled>
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <Loader2 className="size-4 animate-spin" />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">Loading...</span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!user) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" onClick={() => navigate("/login")}>
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <UserCircleIcon className="size-4" />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">Đăng nhập</span>
+              <span className="truncate text-xs">Truy cập hệ thống</span>
+            </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -216,27 +109,32 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              tooltip={isCollapsed ? displayName : undefined} // Chỉ show tooltip khi collapsed
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
-                  {initials}
+                <AvatarFallback className="rounded-lg">
+                  {getInitials(user)}
                 </AvatarFallback>
               </Avatar>
-
-              {/* User info - ẩn khi collapsed */}
-              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:sr-only">
-                <span className="truncate font-medium">{displayName}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {email}
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">
+                  {getDisplayName(user)}
+                </span>
+                <span className="truncate text-xs flex items-center gap-1">
+                  @{user.username}
+                  {isAdmin() && (
+                    <Badge
+                      variant="destructive"
+                      className="text-[10px] px-1 py-0"
+                    >
+                      Admin
+                    </Badge>
+                  )}
                 </span>
               </div>
-
-              {/* Menu icon - ẩn khi collapsed */}
-              <MoreVerticalIcon className="ml-auto size-4 group-data-[collapsible=icon]:sr-only" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -246,46 +144,40 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
-                    {initials}
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(user)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{displayName}</span>
+                  <span className="truncate font-semibold">
+                    {getDisplayName(user)}
+                  </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {email}
+                    {user.email}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleAccountClick}>
-                <UserCircleIcon className="h-4 w-4" />
-                {t("sidebar.account")}
+                <UserCircleIcon className="mr-2 h-4 w-4" />
+                {t("profile", "Hồ sơ")}
               </DropdownMenuItem>
-              {isPremium && (
-                <DropdownMenuItem>
-                  <span className="text-yellow-600 font-medium">
-                    ✨ {t("sidebar.premiumAccount")}
-                  </span>
-                </DropdownMenuItem>
-              )}
+
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                {t("settings", "Cài đặt")}
+              </DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
-            <ThemeSettingsPanel
-              variant="dialog"
-              trigger={
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <Settings className="h-4 w-4" />
-                  {t("sidebar.settings")}
-                </DropdownMenuItem>
-              }
-            />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOutIcon className="h-4 w-4" />
-              {t("sidebar.logout")}
+
+            <DropdownMenuItem onClick={handleLogout} disabled={isLoading}>
+              <LogOutIcon className="mr-2 h-4 w-4" />
+              {isLoading ? "Đang đăng xuất..." : t("logout", "Đăng xuất")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
