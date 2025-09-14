@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
-import { AuthProvider } from "@/context/auth-context";
+import { AuthProvider } from "@/contexts/auth-context";
 import ProtectedRoute, {
   AdminRoute,
   UserRoute,
@@ -15,8 +15,6 @@ import { useAuth } from "@/hooks/authentication/use-auth";
 
 import "./i18n";
 
-// Existing pages
-import HomePage from "./app/dashboard";
 import SystemHardeningDashboard from "./app/dashboard";
 import WorkloadsPage from "./app/workload/work-loads-page";
 import ServersPage from "./app/server/server-page";
@@ -30,7 +28,6 @@ import ProfilePage from "./app/profile/profile-page";
 import UnauthorizedPage from "./app/auth/unauthor-page";
 import LoginPage from "./app/login/login-page";
 
-// Component để redirect từ root nếu đã authenticated
 const RootRedirect: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 

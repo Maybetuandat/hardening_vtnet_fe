@@ -17,19 +17,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
-  // Show loading while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-gray-600">Đang xác thực...</p>
+          <p className="text-gray-600">Authenticating ....</p>
         </div>
       </div>
     );
   }
 
-  // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
@@ -41,7 +39,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       : user.role === requiredRole;
 
     if (!hasRequiredRole) {
-      // Redirect to unauthorized page or home
       return <Navigate to="/unauthorized" replace />;
     }
   }
@@ -51,7 +48,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
 export default ProtectedRoute;
 
-// Admin-only route wrapper
 export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -62,7 +58,6 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// User and Admin route wrapper
 export const UserRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {

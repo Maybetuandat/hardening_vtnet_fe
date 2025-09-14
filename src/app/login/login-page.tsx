@@ -1,6 +1,6 @@
-// src/pages/auth/LoginPage.tsx
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ interface LoginFormData {
 }
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation("auth"); // Sử dụng namespace 'auth'
   const { login, error, isLoading, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,19 +72,17 @@ const LoginPage: React.FC = () => {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            VDT Hardening System
+            {t("login.systemTitle")}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Hệ thống quản lý bảo mật server
+            {t("login.systemDescription")}
           </p>
         </div>
 
         <Card className="w-full shadow-xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Đăng nhập</CardTitle>
-            <CardDescription>
-              Nhập thông tin đăng nhập để truy cập hệ thống
-            </CardDescription>
+            <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
+            <CardDescription>{t("login.description")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,12 +93,12 @@ const LoginPage: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="username">Tên đăng nhập</Label>
+                <Label htmlFor="username">{t("login.username")}</Label>
                 <Input
                   id="username"
                   name="username"
                   type="text"
-                  placeholder="Nhập tên đăng nhập"
+                  placeholder={t("login.usernamePlaceholder")}
                   value={formData.username}
                   onChange={handleInputChange}
                   disabled={isLoading}
@@ -109,13 +108,13 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Mật khẩu</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Nhập mật khẩu"
+                    placeholder={t("login.passwordPlaceholder")}
                     value={formData.password}
                     onChange={handleInputChange}
                     disabled={isLoading}
@@ -147,30 +146,26 @@ const LoginPage: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Đang đăng nhập...
+                    {t("login.submitting")}
                   </>
                 ) : (
-                  "Đăng nhập"
+                  t("login.submit")
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                <p>Tài khoản demo:</p>
-                <p>
-                  <strong>Admin:</strong> admin / admin123
-                </p>
-                <p>
-                  <strong>User:</strong> user1 / user123
-                </p>
+                <p>{t("login.demoAccount.title")}</p>
+                <p>{t("login.demoAccount.admin")}</p>
+                <p>{t("login.demoAccount.user")}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <div className="text-center mt-6 text-sm text-gray-500">
-          © 2024 VDT Hardening System. All rights reserved.
+          {t("login.footer")}
         </div>
       </div>
     </div>

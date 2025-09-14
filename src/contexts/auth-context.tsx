@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import React, { createContext, useEffect, useReducer, ReactNode } from "react";
 import {
   AuthContextType,
@@ -23,10 +22,9 @@ const USER_KEY = "user_data";
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, {
     ...initialAuthState,
-    isLoading: true, // Bắt đầu với isLoading = true
+    isLoading: true,
   });
 
-  // Listen for unauthorized events (existing logic)
   useEffect(() => {
     const handleUnauthorized = () => {
       console.error("Auth: Unauthorized event received, logging out.");
@@ -34,9 +32,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         type: "AUTH_ERROR",
         payload: "Session expired. Please login again.",
       });
-      // Optionally, force a full logout which clears token and redirects.
-      // logout(); // Be careful with calling async functions directly in event handlers without proper cleanup
-      // Or simply:
       api.setAuthToken(null);
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
@@ -45,7 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     window.addEventListener("auth:unauthorized", handleUnauthorized);
     return () =>
       window.removeEventListener("auth:unauthorized", handleUnauthorized);
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   // Initialize auth from storage on mount
   useEffect(() => {
@@ -131,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       localStorage.setItem(TOKEN_KEY, response.access_token);
       localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-      api.setAuthToken(response.access_token); // Đảm bảo api client được cập nhật
+      api.setAuthToken(response.access_token);
 
       dispatch({
         type: "AUTH_SUCCESS",
@@ -143,7 +138,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error("❌ Login failed in auth context:", error);
       let errorMessage = "Login failed";
-      // ... (error handling) ...
       dispatch({ type: "AUTH_ERROR", payload: errorMessage });
       throw new Error(errorMessage);
     }

@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { NavMain } from "@/components/side-bar/nav-main";
 import { NavSecondary } from "@/components/side-bar/nav-secondary";
-import { NavUser } from "@/components/side-bar/nav-user"; // Import NavUser (đã đổi tên export)
+import { NavUser } from "@/components/side-bar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -70,7 +70,7 @@ export function AppSidebar({
 
   return (
     <Sidebar
-      collapsible="icon" // Đổi từ "offcanvas" sang "icon"
+      collapsible="icon"
       variant={variant}
       {...props}
       className="border-sidebar-border bg-sidebar"

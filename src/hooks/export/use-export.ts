@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { api } from "@/lib/api"; // Import ApiClient instance
 
 export interface ExportParams {
   keyword?: string;
@@ -42,7 +43,7 @@ export function useExport(): UseExportReturn {
       }
     }
 
-    // Default filename với timestamp
+    // Default filename with timestamp
     const now = new Date();
     const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
     const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, "");
@@ -63,7 +64,6 @@ export function useExport(): UseExportReturn {
         }
 
         if (params?.list_workload_id && params.list_workload_id.length > 0) {
-          // Thêm từng workload_id vào query params
           params.list_workload_id.forEach((id) => {
             searchParams.append("list_workload_id", id.toString());
           });
@@ -78,29 +78,34 @@ export function useExport(): UseExportReturn {
           queryString ? `?${queryString}` : ""
         }`;
 
-        // Make request với fetch để handle blob response
-        const response = await fetch(
+        // Use api.get from ApiClient instead of fetch
+        const response = await api.get<Response>(endpoint);
+
+        const blobResponse = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}${endpoint}`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              ...(api.getAuthToken()
+                ? { Authorization: `Bearer ${api.getAuthToken()}` }
+                : {}),
             },
           }
         );
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
+        if (!blobResponse.ok) {
+          const errorData = await blobResponse.json().catch(() => null);
           throw new Error(
-            errorData?.detail || `Error HTTP: ${response.status}`
+            errorData?.detail || `Error HTTP: ${blobResponse.status}`
           );
         }
 
         // Get file blob
-        const blob = await response.blob();
+        const blob = await blobResponse.blob();
 
         // Extract filename from headers
-        const filename = extractFilename(response);
+        const filename = extractFilename(blobResponse);
 
         // Download file
         downloadFile(blob, filename);
@@ -108,7 +113,7 @@ export function useExport(): UseExportReturn {
         // Show success toast
         toast.success("Export report successfully!", {
           description: `File ${filename} has been downloaded`,
-          duration: 300,
+          duration: 3000,
         });
       } catch (err: any) {
         console.error("Error exporting compliance report:", err);

@@ -18,14 +18,24 @@ import viServer from "./locales/vi/server.json";
 import enServer from "./locales/en/server.json";
 import enOs from "./locales/en/os.json";
 import viOs from "./locales/vi/os.json";
-// Configuration
+import viAuth from "./locales/vi/auth.json";
+import enAuth from "./locales/en/auth.json";
+
 i18n.use(initReactI18next).init({
-  // Default language
-  lng: "vi",
+  lng: "en",
   fallbackLng: "en",
 
   // Namespaces
-  ns: ["common", "workload", "notfound", "dashboard", "compliance"],
+  ns: [
+    "common",
+    "workload",
+    "notfound",
+    "dashboard",
+    "compliance",
+    "server",
+    "os",
+    "auth",
+  ],
   defaultNS: "common",
 
   // Resources
@@ -38,6 +48,7 @@ i18n.use(initReactI18next).init({
       dashboard: viDashboard,
       compliance: viCompliance,
       server: viServer,
+      auth: viAuth,
       os: viOs,
     },
     en: {
@@ -49,6 +60,7 @@ i18n.use(initReactI18next).init({
       compliance: enCompliance,
       server: enServer,
       os: enOs,
+      auth: enAuth,
     },
   },
 

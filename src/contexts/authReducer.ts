@@ -1,4 +1,3 @@
-// src/reducers/authReducer.ts
 import { AuthState, AuthAction } from "@/types/auth";
 
 export const initialAuthState: AuthState = {
