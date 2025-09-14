@@ -20,18 +20,22 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
-import { useAuth, useRole } from "@/hooks/authentication/use-auth";
+import { useAuth } from "@/hooks/authentication/use-auth";
 
 export function NavUser() {
   const { t } = useTranslation("common");
-  const { isMobile, state } = useSidebar();
+  const { isMobile } = useSidebar();
   const navigate = useNavigate();
 
-  // Sử dụng auth hooks
-  const { user, logout, isLoading } = useAuth();
+  // Sử dụng auth hooks từ Context
+  const { user, logout, isLoading, isAuthenticated } = useAuth();
 
   const handleAccountClick = () => {
     navigate("/profile");
+  };
+
+  const handleSettingsClick = () => {
+    navigate("/settings");
   };
 
   const handleLogout = async () => {
@@ -40,7 +44,7 @@ export function NavUser() {
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
-      // Force navigate anyway
+      // Force navigate anyway nếu logout API thất bại
       navigate("/login", { replace: true });
     }
   };
@@ -66,11 +70,11 @@ export function NavUser() {
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin":
-        return "destructive";
+        return "destructive" as const;
       case "user":
-        return "default";
+        return "default" as const;
       default:
-        return "secondary";
+        return "secondary" as const;
     }
   };
 
@@ -93,7 +97,7 @@ export function NavUser() {
   }
 
   // Show login prompt if not authenticated
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
@@ -173,7 +177,7 @@ export function NavUser() {
                 <UserCircleIcon className="mr-2 h-4 w-4" />
                 {t("nav.account", "Tài khoản")}
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettingsClick}>
                 <Settings className="mr-2 h-4 w-4" />
                 {t("nav.settings", "Cài đặt")}
               </DropdownMenuItem>
