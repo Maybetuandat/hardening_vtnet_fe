@@ -1,7 +1,12 @@
-import React from "react";
+import {
+  LogOutIcon,
+  MoreVerticalIcon,
+  UserCircleIcon,
+  Loader2,
+  Settings,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LogOutIcon, UserCircleIcon, Loader2, Settings } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -21,10 +26,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/authentication/use-auth";
+import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
 
 export function NavUser() {
   const { t } = useTranslation("common");
-  const { isMobile } = useSidebar();
+  const { isMobile, state } = useSidebar(); // Thêm state từ useSidebar
   const navigate = useNavigate();
 
   // Sử dụng auth hooks từ Context
@@ -32,10 +38,6 @@ export function NavUser() {
 
   const handleAccountClick = () => {
     navigate("/profile");
-  };
-
-  const handleSettingsClick = () => {
-    navigate("/settings");
   };
 
   const handleLogout = async () => {
@@ -60,11 +62,11 @@ export function NavUser() {
       return parts[0][0].toUpperCase();
     }
 
-    return user.username[0].toUpperCase();
+    return user.username?.[0]?.toUpperCase() || "U";
   };
 
   const getDisplayName = (user: any): string => {
-    return user?.full_name || user?.username || "User";
+    return user?.full_name || user?.username || t("sidebar.user", "User");
   };
 
   const getRoleBadgeVariant = (role: string) => {
@@ -84,12 +86,16 @@ export function NavUser() {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg" disabled>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
               <Loader2 className="size-4 animate-spin" />
             </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">Đang tải...</span>
-            </div>
+            {state !== "collapsed" && (
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">
+                  {t("common.loading", "Đang tải...")}
+                </span>
+              </div>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -101,21 +107,33 @@ export function NavUser() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" onClick={() => navigate("/login")}>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              <UserCircleIcon className="size-4" />
+          <SidebarMenuButton
+            size="lg"
+            onClick={() => navigate("/login")}
+            tooltip={
+              state === "collapsed" ? t("auth.login", "Đăng nhập") : undefined
+            }
+          >
+            <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <UserCircleIcon className="size-5" />
             </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">Đăng nhập</span>
-              <span className="truncate text-xs">Nhấp để đăng nhập</span>
-            </div>
+            {state !== "collapsed" && (
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">
+                  {t("auth.login", "Đăng nhập")}
+                </span>
+                <span className="truncate text-xs">
+                  {t("auth.clickToLogin", "Nhấp để đăng nhập")}
+                </span>
+              </div>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     );
   }
 
-  // Authenticated user display
+  // Authenticated user display - Đây là phần quan trọng nhất!
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -124,28 +142,37 @@ export function NavUser() {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              tooltip={state === "collapsed" ? getDisplayName(user) : undefined}
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  {getInitials(user)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {getDisplayName(user)}
-                </span>
-                <div className="flex items-center gap-1">
-                  <span className="truncate text-xs text-sidebar-muted-foreground">
-                    {user.email}
-                  </span>
-                  <Badge
-                    variant={getRoleBadgeVariant(user.role)}
-                    className="text-xs h-4 px-1"
-                  >
-                    {user.role}
-                  </Badge>
-                </div>
+              {/* User icon - LUÔN hiển thị */}
+              <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+                {getInitials(user)}
               </div>
+
+              {/* Text info - CHỈ hiển thị khi KHÔNG collapsed */}
+              {state !== "collapsed" && (
+                <>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {getDisplayName(user)}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="truncate text-xs text-sidebar-muted-foreground">
+                        {user.email}
+                      </span>
+                      {user.role && (
+                        <Badge
+                          variant={getRoleBadgeVariant(user.role)}
+                          className="text-xs h-4 px-1"
+                        >
+                          {user.role}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <MoreVerticalIcon className="ml-auto size-4" />
+                </>
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -157,7 +184,7 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-semibold">
                     {getInitials(user)}
                   </AvatarFallback>
                 </Avatar>
@@ -175,17 +202,26 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleAccountClick}>
                 <UserCircleIcon className="mr-2 h-4 w-4" />
-                {t("nav.account", "Tài khoản")}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSettingsClick}>
-                <Settings className="mr-2 h-4 w-4" />
-                {t("nav.settings", "Cài đặt")}
+                {t("sidebar.account", "Tài khoản")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+
+            {/* Settings sử dụng ThemeSettingsPanel thay vì navigation */}
+            <ThemeSettingsPanel
+              variant="dialog"
+              trigger={
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  {t("sidebar.settings", "Cài đặt")}
+                </DropdownMenuItem>
+              }
+            />
+
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOutIcon className="mr-2 h-4 w-4" />
-              {t("nav.logout", "Đăng xuất")}
+              {t("sidebar.logout", "Đăng xuất")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
