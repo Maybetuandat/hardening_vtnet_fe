@@ -19,6 +19,8 @@ import {
   MinusCircle,
 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
+import { AdminOnly } from "@/components/auth/role-guard";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { RuleResult } from "@/types/rule-result";
 
 interface RuleResultTableProps {
@@ -50,6 +52,7 @@ export function RuleResultTable({
   onStatusToggle,
 }: RuleResultTableProps) {
   const { t } = useTranslation("compliance");
+  const { isAdmin } = usePermissions();
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -115,6 +118,7 @@ export function RuleResultTable({
   };
 
   const handleStatusToggle = (ruleResult: RuleResult) => {
+    if (!isAdmin()) return; // Chỉ admin mới có thể toggle
     const newStatus = ruleResult.status === "passed" ? "failed" : "passed";
     onStatusToggle(ruleResult.id, newStatus);
   };
@@ -129,6 +133,26 @@ export function RuleResultTable({
         <div className="w-14 h-7 bg-gray-200 rounded-full flex items-center justify-center">
           <span className="text-xs text-gray-500">
             {t("table.values.notAvailable")}
+          </span>
+        </div>
+      );
+    }
+
+    // Chỉ admin mới thấy toggle button hoạt động
+    if (!isAdmin()) {
+      return (
+        <div className="w-14 h-7 bg-gray-200 rounded-full flex items-center justify-center">
+          <span
+            className={`
+              inline-block w-5 h-5 bg-white rounded-full shadow-lg
+              ${isPassed ? "translate-x-8" : "translate-x-1"}
+            `}
+          >
+            {isPassed ? (
+              <CheckCircle className="w-3 h-3 text-green-600 m-1" />
+            ) : (
+              <XCircle className="w-3 h-3 text-red-600 m-1" />
+            )}
           </span>
         </div>
       );
@@ -218,9 +242,12 @@ export function RuleResultTable({
                   <TableHead className="w-[180px]">
                     {t("table.headers.createdDate")}
                   </TableHead>
-                  <TableHead className="w-[100px] text-center">
-                    {t("table.headers.toggle")}
-                  </TableHead>
+                  {/* Chỉ hiển thị cột Toggle cho admin */}
+                  <AdminOnly>
+                    <TableHead className="w-[100px] text-center">
+                      {t("table.headers.toggle")}
+                    </TableHead>
+                  </AdminOnly>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -273,9 +300,12 @@ export function RuleResultTable({
                         {formatDate(ruleResult.created_at)}
                       </div>
                     </TableCell>
-                    <TableCell className="text-center align-top">
-                      {getToggleButton(ruleResult)}
-                    </TableCell>
+                    {/* Chỉ hiển thị Toggle cho admin */}
+                    <AdminOnly>
+                      <TableCell className="text-center align-top">
+                        {getToggleButton(ruleResult)}
+                      </TableCell>
+                    </AdminOnly>
                   </TableRow>
                 ))}
               </TableBody>

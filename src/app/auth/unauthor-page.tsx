@@ -1,6 +1,7 @@
 // src/pages/auth/UnauthorizedPage.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldX, Home, ArrowLeft } from "lucide-react";
@@ -9,6 +10,7 @@ import { useAuth } from "@/hooks/authentication/use-auth";
 const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { t } = useTranslation("auth");
 
   const handleGoHome = () => {
     navigate("/");
@@ -36,21 +38,23 @@ const UnauthorizedPage: React.FC = () => {
               <ShieldX className="w-8 h-8 text-white" />
             </div>
             <CardTitle className="text-2xl text-red-600">
-              Truy cập bị từ chối
+              {t("unauthorized.title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600 dark:text-gray-400">
-              Bạn không có quyền truy cập vào trang này.
+              {t("unauthorized.description")}
             </p>
 
             {user && (
               <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Đăng nhập với tư cách: <strong>{user.username}</strong>
+                  {t("unauthorized.userInfo.loggedInAs")}:{" "}
+                  <strong>{user.username}</strong>
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Vai trò: <strong className="capitalize">{user.role}</strong>
+                  {t("unauthorized.userInfo.role")}:{" "}
+                  <strong className="capitalize">{user.role}</strong>
                 </p>
               </div>
             )}
@@ -62,12 +66,12 @@ const UnauthorizedPage: React.FC = () => {
                 className="w-full"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Quay lại
+                {t("unauthorized.actions.goBack")}
               </Button>
 
               <Button onClick={handleGoHome} className="w-full">
                 <Home className="mr-2 h-4 w-4" />
-                Về trang chủ
+                {t("unauthorized.actions.goHome")}
               </Button>
 
               <Button
@@ -75,14 +79,12 @@ const UnauthorizedPage: React.FC = () => {
                 variant="destructive"
                 className="w-full"
               >
-                Đăng xuất
+                {t("unauthorized.actions.logout")}
               </Button>
             </div>
 
             <div className="mt-6 text-xs text-gray-500">
-              <p>
-                Nếu bạn cho rằng đây là lỗi, vui lòng liên hệ với quản trị viên.
-              </p>
+              <p>{t("unauthorized.helpText")}</p>
             </div>
           </CardContent>
         </Card>

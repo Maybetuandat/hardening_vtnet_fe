@@ -114,11 +114,11 @@ function App() {
           <Route
             path="/workload/add"
             element={
-              <UserRoute>
+              <AdminRoute>
                 <MainLayout>
                   <AddWorkloadPage />
                 </MainLayout>
-              </UserRoute>
+              </AdminRoute>
             }
           />
 
