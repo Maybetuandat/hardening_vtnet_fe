@@ -20,7 +20,8 @@ import enOs from "./locales/en/os.json";
 import viOs from "./locales/vi/os.json";
 import viAuth from "./locales/vi/auth.json";
 import enAuth from "./locales/en/auth.json";
-
+import enUser from "./locales/en/user.json";
+import viUser from "./locales/vi/user.json";
 i18n.use(initReactI18next).init({
   lng: "en",
   fallbackLng: "en",
@@ -50,6 +51,7 @@ i18n.use(initReactI18next).init({
       server: viServer,
       auth: viAuth,
       os: viOs,
+      user: viUser,
     },
     en: {
       common: enCommon,
@@ -61,6 +63,7 @@ i18n.use(initReactI18next).init({
       server: enServer,
       os: enOs,
       auth: enAuth,
+      user: enUser,
     },
   },
 

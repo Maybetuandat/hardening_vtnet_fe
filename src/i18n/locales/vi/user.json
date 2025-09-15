@@ -1,0 +1,54 @@
+{
+  "profile": {
+    "title": "Thông tin cá nhân",
+    "loading": "Đang tải...",
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "changePassword": "Đổi mật khẩu",
+      "update": "Cập nhật"
+    },
+    "personalInfo": {
+      "title": "Chỉnh sửa thông tin",
+      "description": "Cập nhật thông tin cá nhân của bạn"
+    },
+    "security": {
+      "title": "Đổi mật khẩu",
+      "description": "Cập nhật mật khẩu để bảo vệ tài khoản"
+    },
+    "fields": {
+      "username": "Tên đăng nhập",
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "joinedDate": "Tham gia",
+      "currentPassword": "Mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "confirmPassword": "Xác nhận mật khẩu mới"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "roles": {
+      "admin": "Quản trị viên",
+      "user": "Người dùng",
+      "moderator": "Điều hành viên"
+    },
+    "messages": {
+      "passwordMismatch": "Mật khẩu mới không khớp!",
+      "updateSuccess": "Cập nhật thông tin thành công!",
+      "updateError": "Có lỗi xảy ra khi cập nhật thông tin!",
+      "passwordChangeSuccess": "Đổi mật khẩu thành công!",
+      "passwordChangeError": "Có lỗi xảy ra khi đổi mật khẩu!"
+    },
+    "validation": {
+      "required": "Trường này là bắt buộc",
+      "emailInvalid": "Email không hợp lệ",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+      "passwordComplexity": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường và một số"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "profile": {
+    "title": "Profile Information",
+    "loading": "Loading...",
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "changePassword": "Change Password",
+      "update": "Update"
+    },
+    "personalInfo": {
+      "title": "Edit Profile",
+      "description": "Update your personal information"
+    },
+    "security": {
+      "title": "Change Password",
+      "description": "Update your password to protect your account"
+    },
+    "fields": {
+      "username": "Username",
+      "fullName": "Full Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "joinedDate": "Joined",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "User",
+      "moderator": "Moderator"
+    },
+    "messages": {
+      "passwordMismatch": "New passwords do not match!",
+      "updateSuccess": "Profile updated successfully!",
+      "updateError": "Error occurred while updating profile!",
+      "passwordChangeSuccess": "Password changed successfully!",
+      "passwordChangeError": "Error occurred while changing password!"
+    },
+    "validation": {
+      "required": "This field is required",
+      "emailInvalid": "Invalid email address",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+    }
+  }
+}

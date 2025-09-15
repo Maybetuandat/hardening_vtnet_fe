@@ -1,5 +1,6 @@
 // src/pages/profile/ProfilePage.tsx
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/authentication/use-auth";
 import {
   Card,
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation("user");
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -79,36 +81,48 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleEditSubmit = async () => {
-    // TODO: Implement update user API call
-    console.log("Update user:", editForm);
-    // updateUser({ ...user, ...editForm });
-    setIsEditing(false);
+    try {
+      // TODO: Implement update user API call
+      console.log("Update user:", editForm);
+      // updateUser({ ...user, ...editForm });
+      setIsEditing(false);
+      // Show success message
+      console.log(t("profile.messages.updateSuccess"));
+    } catch (error) {
+      console.error(t("profile.messages.updateError"));
+    }
   };
 
   const handlePasswordSubmit = async () => {
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      alert("Mật khẩu mới không khớp!");
+      alert(t("profile.messages.passwordMismatch"));
       return;
     }
 
-    // TODO: Implement change password API call
-    console.log("Change password:", passwordForm);
-    setIsChangingPassword(false);
-    setPasswordForm({
-      current_password: "",
-      new_password: "",
-      confirm_password: "",
-    });
+    try {
+      // TODO: Implement change password API call
+      console.log("Change password:", passwordForm);
+      setIsChangingPassword(false);
+      setPasswordForm({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+      // Show success message
+      console.log(t("profile.messages.passwordChangeSuccess"));
+    } catch (error) {
+      console.error(t("profile.messages.passwordChangeError"));
+    }
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>{t("profile.loading")}</div>;
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Thông tin cá nhân</h1>
+        <h1 className="text-3xl font-bold">{t("profile.title")}</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -131,14 +145,16 @@ const ProfilePage: React.FC = () => {
                   variant={getRoleBadgeVariant(user.role)}
                   className="capitalize"
                 >
-                  {user.role}
+                  {t(`profile.roles.${user.role}`, user.role)}
                 </Badge>
                 {user.is_active ? (
                   <Badge variant="default" className="bg-green-500">
-                    Đang hoạt động
+                    {t("profile.status.active")}
                   </Badge>
                 ) : (
-                  <Badge variant="secondary">Không hoạt động</Badge>
+                  <Badge variant="secondary">
+                    {t("profile.status.inactive")}
+                  </Badge>
                 )}
               </CardDescription>
             </CardHeader>
@@ -154,12 +170,14 @@ const ProfilePage: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  Tham gia {formatDate(user.created_at)}
+                  {t("profile.fields.joinedDate")} {formatDate(user.created_at)}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Shield className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm capitalize">{user.role}</span>
+                <span className="text-sm capitalize">
+                  {t(`profile.roles.${user.role}`, user.role)}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -172,21 +190,21 @@ const ProfilePage: React.FC = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Chỉnh sửa thông tin</CardTitle>
+                  <CardTitle>{t("profile.personalInfo.title")}</CardTitle>
                   <CardDescription>
-                    Cập nhật thông tin cá nhân của bạn
+                    {t("profile.personalInfo.description")}
                   </CardDescription>
                 </div>
                 {!isEditing ? (
                   <Button onClick={() => setIsEditing(true)} variant="outline">
                     <Edit2 className="mr-2 h-4 w-4" />
-                    Chỉnh sửa
+                    {t("profile.actions.edit")}
                   </Button>
                 ) : (
                   <div className="space-x-2">
                     <Button onClick={handleEditSubmit} size="sm">
                       <Save className="mr-2 h-4 w-4" />
-                      Lưu
+                      {t("profile.actions.save")}
                     </Button>
                     <Button
                       onClick={() => setIsEditing(false)}
@@ -194,7 +212,7 @@ const ProfilePage: React.FC = () => {
                       size="sm"
                     >
                       <X className="mr-2 h-4 w-4" />
-                      Hủy
+                      {t("profile.actions.cancel")}
                     </Button>
                   </div>
                 )}
@@ -203,7 +221,9 @@ const ProfilePage: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="username">Tên đăng nhập</Label>
+                  <Label htmlFor="username">
+                    {t("profile.fields.username")}
+                  </Label>
                   <Input
                     id="username"
                     value={user.username}
@@ -212,7 +232,9 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="full_name">Họ và tên</Label>
+                  <Label htmlFor="full_name">
+                    {t("profile.fields.fullName")}
+                  </Label>
                   <Input
                     id="full_name"
                     value={
@@ -226,7 +248,7 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("profile.fields.email")}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -247,9 +269,9 @@ const ProfilePage: React.FC = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Đổi mật khẩu</CardTitle>
+                  <CardTitle>{t("profile.security.title")}</CardTitle>
                   <CardDescription>
-                    Cập nhật mật khẩu để bảo vệ tài khoản
+                    {t("profile.security.description")}
                   </CardDescription>
                 </div>
                 {!isChangingPassword ? (
@@ -258,13 +280,13 @@ const ProfilePage: React.FC = () => {
                     variant="outline"
                   >
                     <Shield className="mr-2 h-4 w-4" />
-                    Đổi mật khẩu
+                    {t("profile.actions.changePassword")}
                   </Button>
                 ) : (
                   <div className="space-x-2">
                     <Button onClick={handlePasswordSubmit} size="sm">
                       <Save className="mr-2 h-4 w-4" />
-                      Cập nhật
+                      {t("profile.actions.update")}
                     </Button>
                     <Button
                       onClick={() => setIsChangingPassword(false)}
@@ -272,7 +294,7 @@ const ProfilePage: React.FC = () => {
                       size="sm"
                     >
                       <X className="mr-2 h-4 w-4" />
-                      Hủy
+                      {t("profile.actions.cancel")}
                     </Button>
                   </div>
                 )}
@@ -281,7 +303,9 @@ const ProfilePage: React.FC = () => {
             {isChangingPassword && (
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="current_password">Mật khẩu hiện tại</Label>
+                  <Label htmlFor="current_password">
+                    {t("profile.fields.currentPassword")}
+                  </Label>
                   <div className="relative">
                     <Input
                       id="current_password"
@@ -313,7 +337,9 @@ const ProfilePage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="new_password">Mật khẩu mới</Label>
+                  <Label htmlFor="new_password">
+                    {t("profile.fields.newPassword")}
+                  </Label>
                   <div className="relative">
                     <Input
                       id="new_password"
@@ -344,7 +370,7 @@ const ProfilePage: React.FC = () => {
                 </div>
                 <div>
                   <Label htmlFor="confirm_password">
-                    Xác nhận mật khẩu mới
+                    {t("profile.fields.confirmPassword")}
                   </Label>
                   <Input
                     id="confirm_password"
