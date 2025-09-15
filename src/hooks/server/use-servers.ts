@@ -68,7 +68,7 @@ export function useServers(): UseServersReturn {
         }
 
         const response = await api.get<ServerListResponse>(
-          `/servers?${params.toString()}`
+          `/servers/?${params.toString()}`
         );
 
         setServers(response.servers);

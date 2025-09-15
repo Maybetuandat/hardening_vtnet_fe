@@ -60,7 +60,7 @@ export function useOS(): UseOSReturn {
         }
 
         const response = await api.get<OSListResponse>(
-          `/os_version?${params.toString()}`
+          `/os_version/?${params.toString()}`
         );
 
         setOsVersions(response.os || []);

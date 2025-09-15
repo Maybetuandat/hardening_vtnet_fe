@@ -71,7 +71,7 @@ export function useRuleResults(): UseRuleResultsReturn {
         console.log("Fetching rule results with params:", params.toString());
 
         const response = await api.get<RuleResultListResponse>(
-          `/rule-results?${params.toString()}`
+          `/rule-results/?${params.toString()}`
         );
 
         console.log("Rule results response:", response);

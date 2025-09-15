@@ -64,17 +64,21 @@ export function useSSENotifications(
       };
 
       eventSource.onmessage = (event) => {
+        console.log("🔥 SSE Raw message received:", event.data); // Debug raw data
+
         try {
           const message: SSEMessage = JSON.parse(event.data);
           setLastMessage(message);
 
+          console.log("📩 SSE Parsed message type:", message.type); // Debug message type
+
           switch (message.type) {
             case "connected":
-              // console.log(" SSE connection established (from server message)"); // Có thể bỏ qua hoặc dùng để xác nhận
+              console.log("✅ SSE connection confirmed from server");
               break;
 
             case "completed":
-              console.log(" Compliance scan completed:", message.data);
+              console.log("🎉 Compliance scan completed:", message.data);
 
               toast.success(
                 `Scan successful for ${
@@ -104,21 +108,22 @@ export function useSSENotifications(
                   duration: 5000,
                 }
               );
-
-              // Tùy chọn: Xử lý dữ liệu thất bại nếu cần
-              // if (onComplianceCompleted) {
-              //   onComplianceCompleted(message.data as ComplianceResult);
-              // }
               break;
+
             case "heartbeat":
-              // Silent heartbeat
+              console.log("💓 SSE Heartbeat received at:", message.timestamp); // THÊM LOG NÀY
               break;
 
             default:
-              console.log(" Unknown SSE message type:", message.type);
+              console.log("❓ Unknown SSE message type:", message.type);
           }
         } catch (error) {
-          console.error(" Error parsing SSE message:", error);
+          console.error(
+            "❌ Error parsing SSE message:",
+            error,
+            "Raw data:",
+            event.data
+          );
         }
       };
 

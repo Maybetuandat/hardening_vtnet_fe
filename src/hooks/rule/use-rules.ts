@@ -47,7 +47,7 @@ export function useRules(): UseRulesReturn {
       searchParams.append("page_size", params.page_size.toString());
 
       const response = await api.get<RuleListResponse>(
-        `/rules?${searchParams.toString()}`
+        `/rules/?${searchParams.toString()}`
       );
 
       setRules(response.rules);
@@ -69,7 +69,7 @@ export function useRules(): UseRulesReturn {
     async (data: RuleCreate): Promise<RuleResponse> => {
       try {
         console.log("Creating rule with data:", data);
-        const response = await api.post<RuleResponse>("/rules", data);
+        const response = await api.post<RuleResponse>("/rules/", data);
         toast.success("Create rule successfully");
         return response;
       } catch (err: any) {

@@ -30,7 +30,7 @@ export function useWorkloads() {
         params.append("page_size", pageSize.toString());
 
         const queryString = params.toString();
-        const url = queryString ? `/workloads?${queryString}` : "/workloads";
+        const url = queryString ? `/workloads/?${queryString}` : "/workloads/";
 
         const response = await api.get<WorkLoadListResponse>(url);
 

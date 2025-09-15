@@ -182,7 +182,7 @@ export const useScanDialog = (open: boolean) => {
       const response = await api.get<{
         servers: Server[];
         total_servers: number;
-      }>(`/servers?${params.toString()}`);
+      }>(`/servers/?${params.toString()}`);
 
       const activeServerIds = (response.servers || [])
         .filter((s) => s.status)

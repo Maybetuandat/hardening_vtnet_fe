@@ -70,7 +70,7 @@ export function useHistoryCompliance(): UseComplianceReturn {
         params.append("page_size", size.toString());
 
         const queryString = params.toString();
-        const url = queryString ? `/compliance?${queryString}` : "compliance";
+        const url = queryString ? `/compliance/?${queryString}` : "compliance";
 
         const data = await api.get<ComplianceResultListResponse>(url);
 
