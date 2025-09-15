@@ -16,6 +16,7 @@
   },
   "serverList": {
     "title": "Danh sách Server",
+
     "loading": "Đang tải dữ liệu...",
     "errorOccurred": "Có lỗi xảy ra:",
     "noServersFound": "Không có server nào được tìm thấy.",
@@ -23,6 +24,7 @@
       "online": "Online",
       "offline": "Offline"
     },
+
     "toast": {
       "copySuccess": "Đã copy địa chỉ IP!",
       "copyFail": "Không thể copy địa chỉ IP",
@@ -46,7 +48,8 @@
     "action": {
       "editServer": "Sửa server",
       "deleteServer": "Xóa server",
-      "viewHistory": "Xem lịch sử hardening"
+      "viewHistory": "Xem lịch sử hardening",
+      "viewServer": "Xem chi tiết server"
     }
   },
   "serverFormDialog": {

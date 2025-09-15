@@ -15,6 +15,7 @@ import { WorkloadResponse } from "@/types/workload";
 import { Edit, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 import i18n from "@/i18n";
 
 interface WorkloadTableProps {
@@ -46,6 +47,7 @@ export function WorkloadTable({
 }: WorkloadTableProps) {
   const navigate = useNavigate();
   const { t } = useTranslation("workload");
+  const { isAdmin } = usePermissions();
 
   // Format date with locale
   const formatDate = (dateString?: string) => {
@@ -71,6 +73,9 @@ export function WorkloadTable({
   // Handle action clicks with event stopping
   const handleEdit = (workload: WorkloadResponse, event: React.MouseEvent) => {
     event.stopPropagation();
+    if (!isAdmin()) {
+      return; // Không cho phép edit nếu không phải admin
+    }
     onEdit(workload);
   };
 
@@ -79,6 +84,9 @@ export function WorkloadTable({
     event: React.MouseEvent
   ) => {
     event.stopPropagation();
+    if (!isAdmin()) {
+      return; // Không cho phép delete nếu không phải admin
+    }
     onDelete(workload);
   };
 
@@ -162,7 +170,12 @@ export function WorkloadTable({
                         size="sm"
                         onClick={(event) => handleEdit(workload, event)}
                         className="h-8 w-8 p-0"
-                        title={t("workloads.table.editTooltip")}
+                        title={
+                          isAdmin()
+                            ? t("workloads.table.editTooltip")
+                            : "Chỉ admin mới có thể chỉnh sửa"
+                        }
+                        disabled={!isAdmin()}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -170,8 +183,13 @@ export function WorkloadTable({
                         variant="ghost"
                         size="sm"
                         onClick={(event) => handleDelete(workload, event)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        title={t("workloads.table.deleteTooltip")}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive disabled:text-muted-foreground disabled:hover:text-muted-foreground"
+                        title={
+                          isAdmin()
+                            ? t("workloads.table.deleteTooltip")
+                            : "Chỉ admin mới có thể xóa"
+                        }
+                        disabled={!isAdmin()}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw, Boxes } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { AdminOnly } from "@/components/auth/role-guard";
 
 interface WorkloadHeaderProps {
   onRefresh: () => void;
@@ -29,9 +30,7 @@ export default function WorkloadHeader({
             <Boxes className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">
-              {t("workloads.title")}
-            </h1>
+            <h1 className="text-2xl font-bold">{t("workloads.title")}</h1>
             <p className="text-sm text-muted-foreground">
               {t("workloads.subtitle")}
             </p>
@@ -45,19 +44,20 @@ export default function WorkloadHeader({
             disabled={loading}
             className="flex items-center gap-2"
           >
-            <RefreshCw
-              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             <span>{t("workloads.refresh")}</span>
           </Button>
 
-          <Button
-            onClick={handleAddWorkload}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>{t("workloads.addWorkload")}</span>
-          </Button>
+          {/* Chỉ admin mới thấy nút Add Workload */}
+          <AdminOnly>
+            <Button
+              onClick={handleAddWorkload}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>{t("workloads.addWorkload")}</span>
+            </Button>
+          </AdminOnly>
         </div>
       </div>
     </div>

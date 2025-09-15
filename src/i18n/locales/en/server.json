@@ -46,7 +46,8 @@
     "action": {
       "editServer": "Edit server",
       "deleteServer": "Delete server",
-      "viewHistory": "View hardening history"
+      "viewHistory": "View hardening history",
+      "viewServer": "Detail"
     }
   },
   "serverFormDialog": {

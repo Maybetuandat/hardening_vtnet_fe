@@ -26,9 +26,12 @@ import {
   History,
   Copy,
   Check,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { AdminOnly, UserOnly } from "@/components/auth/role-guard";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 
 interface ServerListProps {
   servers: Server[];
@@ -37,6 +40,7 @@ interface ServerListProps {
   onEdit?: (server: Server) => void;
   onDelete?: (server: Server) => void;
   onViewHardeningHistory?: (server: Server) => void;
+  onView?: (server: Server) => void;
 }
 
 export const ServerList: React.FC<ServerListProps> = ({
@@ -45,8 +49,11 @@ export const ServerList: React.FC<ServerListProps> = ({
   error,
   onEdit,
   onDelete,
+  onViewHardeningHistory,
+  onView,
 }) => {
   const { t } = useTranslation("server");
+  const { isAdmin } = usePermissions();
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
   const getStatusBadge = (status?: boolean) => {
@@ -105,6 +112,14 @@ export const ServerList: React.FC<ServerListProps> = ({
       onDelete(server);
     } else {
       toast.info(t("serverList.toast.deleteNotImplemented"));
+    }
+  };
+
+  const handleView = (server: Server) => {
+    if (onView) {
+      onView(server);
+    } else {
+      toast.info(t("serverList.toast.viewNotImplemented"));
     }
   };
 
@@ -181,9 +196,12 @@ export const ServerList: React.FC<ServerListProps> = ({
                 <TableHead>{t("serverList.tableHeader.workload")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.status")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.createdAt")}</TableHead>
-                <TableHead className="text-center">
-                  {t("serverList.tableHeader.actions")}
-                </TableHead>
+                {/* Chỉ hiển thị cột Actions cho user có quyền */}
+                <UserOnly>
+                  <TableHead className="text-center">
+                    {t("serverList.tableHeader.actions")}
+                  </TableHead>
+                </UserOnly>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -197,19 +215,22 @@ export const ServerList: React.FC<ServerListProps> = ({
                       <span className="font-mono text-sm">
                         {server.ip_address}
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 hover:bg-muted"
-                        onClick={() => handleCopyIP(server.ip_address)}
-                        title={t("serverList.copyIpTooltip")}
-                      >
-                        {copiedIP === server.ip_address ? (
-                          <Check className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
+                      {/* User có thể copy IP */}
+                      <UserOnly>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 hover:bg-muted"
+                          onClick={() => handleCopyIP(server.ip_address)}
+                          title={t("serverList.copyIpTooltip")}
+                        >
+                          {copiedIP === server.ip_address ? (
+                            <Check className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </UserOnly>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -220,39 +241,59 @@ export const ServerList: React.FC<ServerListProps> = ({
                   </TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
-                  <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0"
-                          title={t("serverList.actionsMenuTooltip")}
-                        >
-                          <span className="sr-only">
-                            {t("serverList.openActionsMenu")}
-                          </span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onClick={() => handleEdit(server)}
-                          className="cursor-pointer"
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          {t("serverList.action.editServer")}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(server)}
-                          className="cursor-pointer text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          {t("serverList.action.deleteServer")}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+
+                  {/* Cột Actions với phân quyền */}
+                  <UserOnly>
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            title={t("serverList.actionsMenuTooltip")}
+                          >
+                            <span className="sr-only">
+                              {t("serverList.openActionsMenu")}
+                            </span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          {/* View - Tất cả user có thể xem */}
+                          <DropdownMenuItem
+                            onClick={() => handleView(server)}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            {t("serverList.action.viewServer")}
+                          </DropdownMenuItem>
+
+                          {/* Edit - Chỉ admin */}
+                          <AdminOnly>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(server)}
+                              className="cursor-pointer"
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              {t("serverList.action.editServer")}
+                            </DropdownMenuItem>
+                          </AdminOnly>
+
+                          {/* Delete - Chỉ admin */}
+                          <AdminOnly>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(server)}
+                              className="cursor-pointer text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              {t("serverList.action.deleteServer")}
+                            </DropdownMenuItem>
+                          </AdminOnly>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </UserOnly>
                 </TableRow>
               ))}
             </TableBody>

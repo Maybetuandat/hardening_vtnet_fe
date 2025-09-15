@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw, Monitor } from "lucide-react";
+import { AdminOnly } from "@/components/auth/role-guard";
 
 interface OSHeaderProps {
   onRefresh: () => void;
@@ -40,10 +41,14 @@ export const OSHeader: React.FC<OSHeaderProps> = ({
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             {t("osHeader.refreshButton")}
           </Button>
-          <Button onClick={onAddClick} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            {t("osHeader.addButton")}
-          </Button>
+
+          {/* Chỉ admin mới thấy nút Add */}
+          <AdminOnly>
+            <Button onClick={onAddClick} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              {t("osHeader.addButton")}
+            </Button>
+          </AdminOnly>
         </div>
       </div>
     </div>
