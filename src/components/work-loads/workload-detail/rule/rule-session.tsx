@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
+import { AdminOnly } from "@/components/auth/role-guard";
 
 import { Search, X, FileSpreadsheet } from "lucide-react";
 
@@ -11,8 +12,9 @@ import { useRules } from "@/hooks/rule/use-rules";
 import { DeleteRuleDialog } from "./delete-rule-dialog";
 import { EditRuleDialog } from "./edit-rule-dialog";
 import { RuleExcelUploadDialog } from "./rule-excel-upload-dialog";
+import { RuleViewDialog } from "./rule-view-dialog";
 import { RuleResponse } from "@/types/rule";
-import { Pagination } from "@/components/ui/pagination"; // Import component Pagination
+import { Pagination } from "@/components/ui/pagination";
 
 import { RulesTable } from "./rule-table";
 
@@ -31,13 +33,14 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Cho phép thay đổi pageSize
+  const [pageSize, setPageSize] = useState(10);
   const [isSearching, setIsSearching] = useState(false);
 
   // Dialog states
   const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
   const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
+  const [viewingRule, setViewingRule] = useState<RuleResponse | null>(null);
 
   const { rules, loading, error, totalRules, totalPages, fetchRules } =
     useRules();
@@ -92,7 +95,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset về trang đầu khi thay đổi page size
+    setCurrentPage(1);
   };
 
   const handleRulesUploaded = () => {
@@ -145,14 +148,16 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl">{getTitle()}</CardTitle>
 
-            <Button
-              onClick={() => setIsExcelUploadOpen(true)}
-              size="sm"
-              className="h-8 flex items-center gap-2"
-            >
-              <FileSpreadsheet className="h-4 w-4" />
-              {t("workloadDetail.rules.actions.addFromExcel")}
-            </Button>
+            <AdminOnly>
+              <Button
+                onClick={() => setIsExcelUploadOpen(true)}
+                size="sm"
+                className="h-8 flex items-center gap-2"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                {t("workloadDetail.rules.actions.addFromExcel")}
+              </Button>
+            </AdminOnly>
           </div>
 
           <div className="relative">
@@ -168,7 +173,6 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
               onKeyDown={handleKeyDown}
               className="pl-10 pr-10"
             />
-            {/* Clear search button */}
             {(searchInput || searchKeyword) && (
               <Button
                 variant="ghost"
@@ -244,6 +248,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
                 rules={rules}
                 selectedRuleId={selectedRuleId}
                 onRuleSelect={onRuleSelect}
+                onViewRule={(rule) => setViewingRule(rule)}
                 onEditRule={(rule) => setEditingRule(rule)}
                 onDeleteRule={(rule) => setDeletingRule(rule)}
               />
@@ -265,11 +270,19 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
         </CardContent>
       </Card>
 
-      <RuleExcelUploadDialog
-        workloadId={workloadId}
-        open={isExcelUploadOpen}
-        onOpenChange={setIsExcelUploadOpen}
-        onSuccess={handleRulesUploaded}
+      <AdminOnly>
+        <RuleExcelUploadDialog
+          workloadId={workloadId}
+          open={isExcelUploadOpen}
+          onOpenChange={setIsExcelUploadOpen}
+          onSuccess={handleRulesUploaded}
+        />
+      </AdminOnly>
+
+      <RuleViewDialog
+        open={!!viewingRule}
+        onOpenChange={() => setViewingRule(null)}
+        rule={viewingRule}
       />
 
       {editingRule && (

@@ -1,11 +1,12 @@
 import React from "react";
-import { Edit, Trash2, MoreHorizontal } from "lucide-react";
+import { Edit, Trash2, MoreHorizontal, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
+import { AdminOnly } from "@/components/auth/role-guard";
 import { RuleResponse } from "@/types/rule";
 import ParametersDisplay from "./parameter-display";
 
@@ -26,6 +28,7 @@ interface RulesTableProps {
   onRuleSelect: (ruleId: number) => void;
   onEditRule: (rule: RuleResponse) => void;
   onDeleteRule: (rule: RuleResponse) => void;
+  onViewRule: (rule: RuleResponse) => void;
 }
 
 export const RulesTable: React.FC<RulesTableProps> = ({
@@ -34,6 +37,7 @@ export const RulesTable: React.FC<RulesTableProps> = ({
   onRuleSelect,
   onEditRule,
   onDeleteRule,
+  onViewRule,
 }) => {
   const { t } = useTranslation("workload");
 
@@ -114,22 +118,35 @@ export const RulesTable: React.FC<RulesTableProps> = ({
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        onEditRule(rule);
+                        onViewRule(rule);
                       }}
                     >
-                      <Edit className="h-4 w-4 mr-2" />
-                      {t("workloadDetail.rules.table.actions.edit")}
+                      <Eye className="h-4 w-4 mr-2" />
+                      {t("workloadDetail.rules.table.actions.view")}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteRule(rule);
-                      }}
-                      className="text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      {t("workloadDetail.rules.table.actions.delete")}
-                    </DropdownMenuItem>
+
+                    <AdminOnly>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditRule(rule);
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        {t("workloadDetail.rules.table.actions.edit")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteRule(rule);
+                        }}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {t("workloadDetail.rules.table.actions.delete")}
+                      </DropdownMenuItem>
+                    </AdminOnly>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

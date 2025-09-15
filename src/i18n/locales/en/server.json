@@ -50,6 +50,39 @@
       "viewServer": "Detail"
     }
   },
+  "serverViewDialog": {
+    "title": "Server Information",
+    "loading": "Loading information...",
+    "errorMessage": "Unable to load server information",
+    "toast": {
+      "loadError": "Unable to load server information",
+      "copySuccess": "IP address copied successfully",
+      "copyError": "Unable to copy IP address"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "hostname": "Hostname",
+      "ipAddress": "IP Address",
+      "osVersion": "Operating System",
+      "status": "Status",
+      "workload": "Workload",
+      "unknown": "Unknown",
+      "noWorkload": "No workload assigned"
+    },
+    "sshConfig": {
+      "title": "SSH Configuration",
+      "port": "SSH Port",
+      "user": "SSH User",
+      "password": "SSH Password",
+      "notConfigured": "Not configured"
+    },
+    "metadata": {
+      "title": "Additional Information",
+      "createdDate": "Created Date",
+      "lastUpdated": "Last Updated",
+      "serverId": "Server ID"
+    }
+  },
   "serverFormDialog": {
     "title": "Edit Server",
     "loadingData": "Loading data...",

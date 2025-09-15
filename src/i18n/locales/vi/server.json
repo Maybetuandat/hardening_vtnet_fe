@@ -52,6 +52,40 @@
       "viewServer": "Xem chi tiết server"
     }
   },
+
+  "serverViewDialog": {
+    "title": "Thông tin Server",
+    "loading": "Đang tải thông tin...",
+    "errorMessage": "Không thể tải thông tin server",
+    "toast": {
+      "loadError": "Không thể tải thông tin server",
+      "copySuccess": "Đã sao chép địa chỉ IP",
+      "copyError": "Không thể sao chép địa chỉ IP"
+    },
+    "basicInfo": {
+      "title": "Thông tin cơ bản",
+      "hostname": "Hostname",
+      "ipAddress": "Địa chỉ IP",
+      "osVersion": "Hệ điều hành",
+      "status": "Trạng thái",
+      "workload": "Workload",
+      "unknown": "Không xác định",
+      "noWorkload": "Chưa gán workload"
+    },
+    "sshConfig": {
+      "title": "Cấu hình SSH",
+      "port": "SSH Port",
+      "user": "SSH User",
+      "password": "SSH Password",
+      "notConfigured": "Chưa cấu hình"
+    },
+    "metadata": {
+      "title": "Thông tin khác",
+      "createdDate": "Ngày tạo",
+      "lastUpdated": "Cập nhật lần cuối",
+      "serverId": "Server ID"
+    }
+  },
   "serverFormDialog": {
     "title": "Chỉnh sửa Server",
     "loadingData": "Đang tải dữ liệu...",

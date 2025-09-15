@@ -11,6 +11,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { AdminOnly } from "@/components/auth/role-guard";
 import { EditWorkloadDialog } from "./edit-workload-dialog";
 
 import type { WorkloadResponse } from "@/types/workload";
@@ -53,15 +54,18 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
             <CardTitle className="text-xl">
               {t("workloadDetail.info.title")}
             </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditDialogOpen(true)}
-              className="h-8"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              {t("workloadDetail.info.actions.edit")}
-            </Button>
+            {/* Chỉ admin mới thấy nút Edit */}
+            <AdminOnly>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditDialogOpen(true)}
+                className="h-8"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {t("workloadDetail.info.actions.edit")}
+              </Button>
+            </AdminOnly>
           </div>
         </CardHeader>
 
@@ -139,13 +143,15 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
         </CardContent>
       </Card>
 
-      {/* Edit Dialog */}
-      <EditWorkloadDialog
-        workload={workload}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSuccess={handleEditSuccess}
-      />
+      {/* Edit Dialog - Chỉ admin mới có dialog */}
+      <AdminOnly>
+        <EditWorkloadDialog
+          workload={workload}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSuccess={handleEditSuccess}
+        />
+      </AdminOnly>
     </>
   );
 };

@@ -17,6 +17,29 @@
     "saving": "Saving...",
     "saveChanges": "Save changes"
   },
+  "ruleViewDialog": {
+    "title": "Rule Details",
+    "basicInfo": {
+      "title": "Basic Information",
+      "name": "Rule Name",
+      "ruleId": "Rule ID",
+      "command": "Command",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "description": "Description"
+    },
+    "parameters": {
+      "title": "Parameters",
+      "noParameters": "No parameters"
+    },
+    "metadata": {
+      "title": "Additional Information",
+      "createdDate": "Created Date",
+      "lastUpdated": "Last Updated",
+      "workloadId": "Workload ID"
+    }
+  },
   "workloads": {
     "title": "Workloads",
     "subtitle": "Manage infrastructure workloads and deployment configurations",
@@ -240,7 +263,8 @@
         },
         "actions": {
           "edit": "Edit",
-          "delete": "Delete"
+          "delete": "Delete",
+          "view": "View"
         }
       },
       "title": {

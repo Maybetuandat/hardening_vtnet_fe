@@ -17,6 +17,29 @@
     "saving": "Đang lưu...",
     "saveChanges": "Lưu thay đổi"
   },
+  "ruleViewDialog": {
+    "title": "Chi tiết Rule",
+    "basicInfo": {
+      "title": "Thông tin cơ bản",
+      "name": "Tên Rule",
+      "ruleId": "Rule ID",
+      "command": "Command",
+      "status": "Trạng thái",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "description": "Mô tả"
+    },
+    "parameters": {
+      "title": "Tham số",
+      "noParameters": "Không có tham số nào"
+    },
+    "metadata": {
+      "title": "Thông tin khác",
+      "createdDate": "Ngày tạo",
+      "lastUpdated": "Cập nhật lần cuối",
+      "workloadId": "Workload ID"
+    }
+  },
   "workloads": {
     "title": "Workloads",
     "subtitle": "Quản lý workloads hạ tầng và cấu hình triển khai",
@@ -247,7 +270,8 @@
         },
         "actions": {
           "edit": "Chỉnh sửa",
-          "delete": "Xóa"
+          "delete": "Xóa",
+          "view": "Xem"
         }
       },
       "search": {

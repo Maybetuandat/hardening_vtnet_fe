@@ -8,6 +8,7 @@ import FilterBar from "@/components/ui/filter-bar";
 import { ServerList } from "@/components/servers/index/server-list";
 import { ServerFormDialog } from "@/components/servers/form-dialog/server-form-dialog";
 import { ServerDeleteDialog } from "@/components/servers/form-dialog/server-delete-dialog";
+import { ServerViewDialog } from "@/components/servers/form-dialog/server-view-dialog";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -36,8 +37,10 @@ export default function ServersPage() {
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editingServer, setEditingServer] = useState<Server | null>(null);
   const [deletingServer, setDeletingServer] = useState<Server | null>(null);
+  const [viewingServer, setViewingServer] = useState<Server | null>(null);
 
   // Initial data load
   useEffect(() => {
@@ -107,6 +110,11 @@ export default function ServersPage() {
   );
 
   // Dialog event handlers
+  const handleViewServer = useCallback((server: Server) => {
+    setViewingServer(server);
+    setViewDialogOpen(true);
+  }, []);
+
   const handleEditServer = useCallback((server: Server) => {
     setEditingServer(server);
     setFormDialogOpen(true);
@@ -115,6 +123,11 @@ export default function ServersPage() {
   const handleDeleteServer = useCallback((server: Server) => {
     setDeletingServer(server);
     setDeleteDialogOpen(true);
+  }, []);
+
+  const handleViewDialogClose = useCallback(() => {
+    setViewDialogOpen(false);
+    setViewingServer(null);
   }, []);
 
   const handleFormDialogClose = useCallback(() => {
@@ -195,6 +208,7 @@ export default function ServersPage() {
         servers={servers}
         loading={loading}
         error={error}
+        onView={handleViewServer}
         onEdit={handleEditServer}
         onDelete={handleDeleteServer}
         onViewHardeningHistory={handleViewHardeningHistory}
@@ -215,6 +229,15 @@ export default function ServersPage() {
         />
       )}
 
+      {/* View Dialog - Chỉ cần quyền user */}
+      <ServerViewDialog
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+        server={viewingServer}
+        getServerById={getServerById}
+      />
+
+      {/* Edit Dialog - Chỉ admin (đã có phân quyền trong ServerList) */}
       <ServerFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
@@ -225,6 +248,7 @@ export default function ServersPage() {
         onSuccess={handleFormSuccess}
       />
 
+      {/* Delete Dialog - Chỉ admin (đã có phân quyền trong ServerList) */}
       <ServerDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
