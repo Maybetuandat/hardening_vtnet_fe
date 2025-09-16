@@ -209,6 +209,7 @@
         "lastUpdated": "Cập nhật lần cuối"
       }
     },
+    "searchPlaceholder": "Tìm kiếm kết quả rule theo tên rule hoặc command...",
     "errors": {
       "notFound": "Không tìm thấy workload",
       "loadError": "Có lỗi xảy ra khi tải thông tin workload",
@@ -313,5 +314,18 @@
     "warningBullet2": "Không thể hoàn tác",
     "deleting": "Đang xóa...",
     "deleteButton": "Xóa Rule"
+  },
+  "ruleExcelUpload": {
+    "title": "Thêm Rules từ Excel",
+    "description": "Tải lên file Excel chứa các rules để thêm vào workload này",
+    "previewData": "Xem trước dữ liệu",
+    "checkDuplicates": "Kiểm tra trùng lặp",
+    "recheckDuplicates": "Kiểm tra lại",
+    "duplicateWarning": {
+      "detected": "Phát hiện {{count}} rules trùng lặp:",
+      "nameCount": "Trùng tên: {{count}} rules",
+      "parameterCount": "Trùng parameters: {{count}} rules"
+    },
+    "addRules": "Thêm {{count}} Rules"
   }
 }

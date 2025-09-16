@@ -23,7 +23,7 @@ export default function ComplianceDetailPage() {
   // Local filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState("all");
-  const [searchInput, setSearchInput] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // real search for input field
 
   // Compliance detail hook
   const { getComplianceDetail } = useCompliance();
@@ -64,18 +64,14 @@ export default function ComplianceDetailPage() {
   useEffect(() => {
     if (!complianceId || complianceId <= 0) return;
 
-    const timeoutId = setTimeout(() => {
-      fetchRuleResults(
-        complianceId,
-        searchTerm || undefined,
-        status === "all" ? undefined : status,
-        1,
-        pageSize
-      );
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [complianceId, searchTerm, status, pageSize, fetchRuleResults]);
+    fetchRuleResults(
+      complianceId,
+      searchKeyword || undefined,
+      status === "all" ? undefined : status,
+      1,
+      pageSize
+    );
+  }, [complianceId, searchKeyword, status, pageSize, fetchRuleResults]);
 
   // Initial load
   useEffect(() => {
@@ -84,14 +80,13 @@ export default function ComplianceDetailPage() {
     }
   }, [loadComplianceDetail]);
 
-  // Event handlers
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchInput(value);
-    setSearchTerm(value);
-  }, []);
+  const handleSearchSubmit = useCallback(() => {
+    const trimmedSearch = searchTerm.trim();
+    setSearchKeyword(trimmedSearch);
+  }, [searchTerm]);
 
   const handleClearFilters = useCallback(() => {
-    setSearchInput("");
+    setSearchKeyword("");
     setSearchTerm("");
     setStatus("all");
   }, []);
@@ -100,26 +95,30 @@ export default function ComplianceDetailPage() {
     (page: number) => {
       fetchRuleResults(
         complianceId,
-        searchTerm || undefined,
+        searchKeyword || undefined,
         status === "all" ? undefined : status,
         page,
         pageSize
       );
     },
-    [complianceId, searchTerm, status, pageSize, fetchRuleResults]
+    [complianceId, searchKeyword, status, pageSize, fetchRuleResults]
   );
 
+  const handleSearchClear = useCallback(() => {
+    setSearchTerm("");
+    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
+  }, []);
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
       fetchRuleResults(
         complianceId,
-        searchTerm || undefined,
+        searchKeyword || undefined,
         status === "all" ? undefined : status,
         1,
         newPageSize
       );
     },
-    [complianceId, searchTerm, status, fetchRuleResults]
+    [complianceId, searchKeyword, status, fetchRuleResults]
   );
 
   const handleStatusToggle = useCallback(
@@ -158,7 +157,7 @@ export default function ComplianceDetailPage() {
     }
   };
 
-  const hasActiveFilters = searchInput.trim() || (status && status !== "all");
+  const hasActiveFilters = searchKeyword.trim() || (status && status !== "all");
 
   if (!id || complianceId <= 0) {
     return (
@@ -201,8 +200,11 @@ export default function ComplianceDetailPage() {
       <Card className="p-6">
         <div className="space-y-4">
           <FilterBar
-            searchTerm={searchInput}
-            onSearchChange={handleSearchChange}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onSearchSubmit={handleSearchSubmit}
+            onSearchClear={handleSearchClear}
+            placeholder={t("detail.searchPlaceholder")}
             filters={[
               {
                 value: status,

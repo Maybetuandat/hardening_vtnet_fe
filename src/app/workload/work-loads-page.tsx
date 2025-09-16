@@ -12,9 +12,8 @@ import { WorkloadResponse } from "@/types/workload";
 
 export default function WorkloadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
+  const [searchKeyword, setSearchKeyword] = useState(""); // real keyword use for search
   const [status, setStatus] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingWorkload, setDeletingWorkload] =
     useState<WorkloadResponse | null>(null);
@@ -42,12 +41,7 @@ export default function WorkloadsPage() {
   // Effect khi searchKeyword hoặc status thay đổi
   useEffect(() => {
     searchWorkloads(searchKeyword, 1, pageSize);
-  }, [searchKeyword, status, dateFilter, pageSize, searchWorkloads]);
-
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchTerm(value);
-    // KHÔNG tự động search gì cả, chỉ update UI
-  }, []);
+  }, [searchKeyword, status, pageSize, searchWorkloads]);
 
   // Xử lý khi nhấn Enter
   const handleSearchSubmit = useCallback(() => {
@@ -147,7 +141,7 @@ export default function WorkloadsPage() {
       <Card className="p-6">
         <FilterBar
           searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
+          onSearchChange={setSearchTerm}
           onSearchSubmit={handleSearchSubmit}
           onSearchClear={handleSearchClear}
           placeholder={t("common.search")}

@@ -9,6 +9,7 @@
       "passed": "Đạt",
       "failed": "Không đạt"
     },
+    "searchPlaceholder": "Tìm kiếm kết quả rule theo tên rule hoặc lệnh...",
     "actions": {
       "clearFilters": "Xóa bộ lọc",
       "refresh": "Làm mới"

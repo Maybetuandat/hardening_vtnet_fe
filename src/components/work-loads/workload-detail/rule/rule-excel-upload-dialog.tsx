@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
   onOpenChange,
   onSuccess,
 }) => {
+  const { t } = useTranslation("workload");
   const [showPreview, setShowPreview] = useState(false);
 
   const {
@@ -46,7 +48,6 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
     checkingExistence,
     error,
     rules,
-
     checkResults,
     canAddRules,
     parseExcelFile,
@@ -95,26 +96,15 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="h-5 w-5" />
-              Thêm Rules từ Excel
-            </DialogTitle>
-            <DialogDescription>
-              Tải lên file Excel, kiểm tra trùng lặp, và thêm rules mới vào
-              workload
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6">
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto [&>button]:top-6">
+          <div className="space-y-6 mt-10">
             <ExcelUploadForm
               rules={rules.map((r) => ({
                 name: r.name,
                 description: r.description,
                 parameters: r.parameters ?? {},
                 is_active: r.is_active,
-                command: r.command, // ✅ Remove || "" here
+                command: r.command,
               }))}
               loading={loading}
               onFileUpload={handleFileUpload}
@@ -123,35 +113,25 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
 
             {rules.length > 0 && (
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-end">
                   <Button
-                    variant="outline"
-                    onClick={() => setShowPreview(true)}
+                    onClick={handleCheckExistence}
+                    disabled={checkingExistence || rules.length === 0}
                     className="flex items-center gap-2"
+                    variant={checkResults ? "outline" : "default"}
                   >
-                    <Eye className="h-4 w-4" />
-                    Xem trước dữ liệu
+                    {checkingExistence ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                    {checkResults
+                      ? t("ruleExcelUpload.recheckDuplicates")
+                      : t("ruleExcelUpload.checkDuplicates")}
                   </Button>
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleCheckExistence}
-                      disabled={checkingExistence || rules.length === 0}
-                      className="flex items-center gap-2"
-                      variant={checkResults ? "outline" : "default"}
-                    >
-                      {checkingExistence ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Search className="h-4 w-4" />
-                      )}
-                      {checkResults ? "Kiểm tra lại" : "Kiểm tra trùng lặp"}
-                    </Button>
-                  </div>
                 </div>
               </div>
             )}
-
             {checkResults && (
               <div className="space-y-4">
                 {/* Duplicate Warning */}
@@ -161,11 +141,22 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                     <AlertDescription>
                       <div className="space-y-2">
                         <p className="font-medium">
-                          Phát hiện {duplicateCount} rules trùng lặp:
+                          {t("ruleExcelUpload.duplicateWarning.detected", {
+                            count: duplicateCount,
+                          })}
                         </p>
                         <ul className="list-disc list-inside text-sm space-y-1">
-                          <li>Trùng tên: {nameDuplicates} rules</li>
-                          <li>Trùng parameters: {paramDuplicates} rules</li>
+                          <li>
+                            {t("ruleExcelUpload.duplicateWarning.nameCount", {
+                              count: nameDuplicates,
+                            })}
+                          </li>
+                          <li>
+                            {t(
+                              "ruleExcelUpload.duplicateWarning.parameterCount",
+                              { count: paramDuplicates }
+                            )}
+                          </li>
                         </ul>
                       </div>
                     </AlertDescription>
@@ -179,7 +170,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                     disabled={loading}
                   >
                     <X className="h-4 w-4 mr-2" />
-                    Hủy
+                    {t("common.cancel")}
                   </Button>
 
                   <Button
@@ -192,7 +183,7 @@ export const RuleExcelUploadDialog: React.FC<RuleExcelUploadDialogProps> = ({
                     ) : (
                       <Plus className="h-4 w-4" />
                     )}
-                    Thêm {uniqueCount} Rules
+                    {t("ruleExcelUpload.addRules", { count: uniqueCount })}
                   </Button>
                 </div>
               </div>

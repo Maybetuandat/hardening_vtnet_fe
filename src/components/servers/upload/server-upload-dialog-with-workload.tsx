@@ -10,7 +10,7 @@ import {
 
 import { WorkloadSelector } from "./workload-selector";
 import { ServerUpload, ServerUploadWithWorkloadRef } from "./server-upload";
-import { ConfirmCancelDialog } from "../../ui/confirm-cancel-dialog";
+import { ConfirmCancelDialog } from "./confirm-cancel-dialog";
 import { WorkloadResponse } from "@/types/workload";
 
 interface ServerUploadDialogWithWorkloadProps {
@@ -121,8 +121,8 @@ export const ServerUploadDialogWithWorkload: React.FC<
         <DialogContent
           className={
             step === "upload-servers"
-              ? "max-w-6xl max-h-[90vh] overflow-y-auto"
-              : "max-w-md"
+              ? "max-w-[60vw] max-h-[60vh] overflow-y-auto"
+              : "max-w-[60vw] max-h-[70vh] min-h-[60vh] overflow-y-auto"
           }
         >
           <DialogHeader>

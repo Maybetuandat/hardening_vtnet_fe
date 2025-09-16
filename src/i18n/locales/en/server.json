@@ -211,5 +211,11 @@
       "status": "Status",
       "actions": "Actions"
     }
+  },
+  "confirmCancelDialog": {
+    "title": "Confirm Cancel",
+    "description": "Are you sure you want to cancel all changes? All ongoing operations will be stopped.",
+    "continue": "Continue",
+    "cancel": "Cancel"
   }
 }

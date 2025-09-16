@@ -201,6 +201,7 @@
       "loadError": "An error occurred while loading workload information",
       "invalidId": "Invalid workload ID"
     },
+    "searchPlaceholder": "Search rule result by rule name or command...",
     "info": {
       "title": "Workload Information",
       "actions": {
@@ -269,7 +270,7 @@
       },
       "title": {
         "searching": "Search Rules ({{count}})",
-        "workload": "Workload Rules ({{count}})"
+        "workload": "Rules ({{count}})"
       },
       "actions": {
         "addFromExcel": "Add Rules from Excel"
@@ -313,5 +314,18 @@
     "warningBullet2": "This action cannot be undone",
     "deleting": "Deleting...",
     "deleteButton": "Delete Rule"
+  },
+  "ruleExcelUpload": {
+    "title": "Add Rules from Excel",
+    "description": "Upload Excel file containing rules to add to this workload",
+    "previewData": "Preview Data",
+    "checkDuplicates": "Check Duplicates",
+    "recheckDuplicates": "Recheck",
+    "duplicateWarning": {
+      "detected": "Found {{count}} duplicate rules:",
+      "nameCount": "Name duplicates: {{count}} rules",
+      "parameterCount": "Parameter duplicates: {{count}} rules"
+    },
+    "addRules": "Add {{count}} Rules"
   }
 }

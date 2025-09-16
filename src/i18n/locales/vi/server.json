@@ -214,5 +214,11 @@
       "status": "Status",
       "actions": "Actions"
     }
+  },
+  "confirmCancelDialog": {
+    "title": "Xác nhận hủy bỏ",
+    "description": "Bạn có chắc muốn hủy bỏ toàn bộ thay đổi? Tất cả thao tác đang thực hiện sẽ bị dừng.",
+    "continue": "Tiếp tục",
+    "cancel": "Hủy bỏ"
   }
 }

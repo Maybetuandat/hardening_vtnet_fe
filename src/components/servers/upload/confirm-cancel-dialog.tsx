@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,19 +21,24 @@ export const ConfirmCancelDialog = ({
   onOpenChange,
   onConfirm,
 }: ConfirmCancelDialogProps) => {
+  const { t } = useTranslation("server");
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xác nhận hủy bỏ</AlertDialogTitle>
+          <AlertDialogTitle>{t("confirmCancelDialog.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Bạn có chắc muốn hủy bỏ toàn bộ thay đổi? Tất cả thao tác đang thực
-            hiện sẽ bị dừng.
+            {t("confirmCancelDialog.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Tiếp tục</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Hủy bỏ</AlertDialogAction>
+          <AlertDialogCancel>
+            {t("confirmCancelDialog.cancel")}
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>
+            {t("confirmCancelDialog.continue")}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

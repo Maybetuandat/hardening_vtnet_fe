@@ -48,7 +48,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
   useEffect(() => {
     const fetchParams = {
       keyword: searchKeyword || undefined,
-      workload_id: isSearching ? undefined : workloadId,
+      workload_id: workloadId,
       page: currentPage,
       page_size: pageSize,
     };
@@ -64,6 +64,9 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
     fetchRules,
   ]);
 
+  useEffect(() => {
+    if (searchInput === "") handleClearSearch();
+  }, [searchInput]);
   const handleSearchInputChange = (value: string) => {
     setSearchInput(value);
   };
@@ -103,7 +106,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
 
     fetchRules({
       keyword: searchKeyword || undefined,
-      workload_id: isSearching ? undefined : workloadId,
+      workload_id: workloadId,
       page: currentPage,
       page_size: pageSize,
     });
@@ -113,7 +116,7 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
     setEditingRule(null);
     fetchRules({
       keyword: searchKeyword || undefined,
-      workload_id: isSearching ? undefined : workloadId,
+      workload_id: workloadId,
       page: currentPage,
       page_size: pageSize,
     });
@@ -134,19 +137,14 @@ export const RulesSection: React.FC<RulesSectionProps> = ({
     });
   };
 
-  const getTitle = () => {
-    if (isSearching) {
-      return t("workloadDetail.rules.title.searching", { count: totalRules });
-    }
-    return t("workloadDetail.rules.title.workload", { count: totalRules });
-  };
-
   return (
     <>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">{getTitle()}</CardTitle>
+            <CardTitle className="text-xl">
+              {t("workloadDetail.rules.title.workload", { count: totalRules })}
+            </CardTitle>
 
             <AdminOnly>
               <Button

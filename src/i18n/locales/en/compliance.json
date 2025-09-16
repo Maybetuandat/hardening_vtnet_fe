@@ -9,6 +9,7 @@
       "passed": "Passed",
       "failed": "Failed"
     },
+    "searchPlaceholder": "Search rule result by rule name or command...",
     "actions": {
       "clearFilters": "Clear filters",
       "refresh": "Refresh"
