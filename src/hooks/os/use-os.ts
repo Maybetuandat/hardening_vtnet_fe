@@ -47,7 +47,7 @@ export function useOS(): UseOSReturn {
   const fetchOSVersions = useCallback(
     async (keyword?: string, page: number = 1, size: number = 10) => {
       setLoading(true);
-      setError(null); // Clear error trước khi fetch
+      setError(null);
 
       try {
         const params = new URLSearchParams({
@@ -91,7 +91,7 @@ export function useOS(): UseOSReturn {
   const createOSVersion = useCallback(
     async (osData: OSCreate): Promise<void> => {
       try {
-        setError(null); // Clear error trước khi tạo
+        setError(null);
         await api.post("/os_version/", osData);
         toast.success("Create OS version successfully");
         // Refresh list sau khi tạo thành công

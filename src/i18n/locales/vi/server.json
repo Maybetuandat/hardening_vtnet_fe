@@ -39,7 +39,8 @@
       "workload": "Workload",
       "status": "Trạng thái",
       "createdAt": "Ngày tạo",
-      "actions": "Hành động"
+      "actions": "Hành động",
+      "manager": "Người quản lý"
     },
     "unknown": "Không xác định",
     "copyIpTooltip": "Copy địa chỉ IP",
@@ -70,7 +71,8 @@
       "status": "Trạng thái",
       "workload": "Workload",
       "unknown": "Không xác định",
-      "noWorkload": "Chưa gán workload"
+      "noWorkload": "Chưa gán workload",
+      "manager": "Người quản lý"
     },
     "sshConfig": {
       "title": "Cấu hình SSH",

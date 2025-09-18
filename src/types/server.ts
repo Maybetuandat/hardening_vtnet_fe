@@ -11,6 +11,7 @@ export interface Server {
   ssh_password: string;
   workload_id?: number;
   workload_name?: string;
+  nameofmanager: string;
 }
 
 export interface ServerCreate {

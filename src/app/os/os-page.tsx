@@ -77,7 +77,7 @@ export default function OSPage() {
   // Event handlers
   const handleRefresh = useCallback(() => {
     fetchOSVersions(currentSearchTerm, currentPage, pageSize);
-    toast.success("Dữ liệu đã được làm mới");
+    toast.success("Refreshed successfully");
   }, [fetchOSVersions, currentSearchTerm, currentPage, pageSize]);
 
   const handlePageChange = useCallback(

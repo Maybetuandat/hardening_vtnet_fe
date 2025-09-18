@@ -5,7 +5,7 @@ export interface RuleResponse {
   command: string;
   workload_id: number;
   parameters?: Record<string, any>;
-  is_active: boolean;
+  is_active: string;
   created_at: string;
   updated_at: string;
 }
@@ -16,7 +16,7 @@ export interface RuleCreate {
 
   workload_id?: number;
   parameters?: Record<string, any>;
-  is_active: boolean;
+  is_active: string;
   command: string;
 }
 

@@ -125,11 +125,6 @@ export default function ServersPage() {
     setDeleteDialogOpen(true);
   }, []);
 
-  const handleViewDialogClose = useCallback(() => {
-    setViewDialogOpen(false);
-    setViewingServer(null);
-  }, []);
-
   const handleFormDialogClose = useCallback(() => {
     setFormDialogOpen(false);
     setEditingServer(null);

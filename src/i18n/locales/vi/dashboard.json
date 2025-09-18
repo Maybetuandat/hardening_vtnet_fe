@@ -116,7 +116,9 @@
       "scanStartedSelected": "Đã khởi động scan cho {{count}} server được chọn",
       "scanRequestSent": "Yêu cầu scan đã được gửi thành công",
       "scanError": "Lỗi: {{message}}",
-      "loadServersError": "Không thể tải danh sách server"
+      "loadServersError": "Không thể tải danh sách server",
+      "selectedAllServers": "Chọn tất cả {{count}} server",
+      "selectAllError": "Không thể chọn tất cả server"
     }
   },
   "exportDialog": {

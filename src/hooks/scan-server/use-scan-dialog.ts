@@ -184,9 +184,7 @@ export const useScanDialog = (open: boolean) => {
         total_servers: number;
       }>(`/servers/?${params.toString()}`);
 
-      const activeServerIds = (response.servers || [])
-        .filter((s) => s.status)
-        .map((s) => s.id);
+      const activeServerIds = (response.servers || []).map((s) => s.id);
 
       setSelectedServers(new Set(activeServerIds));
 

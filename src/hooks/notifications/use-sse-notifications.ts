@@ -86,7 +86,7 @@ export function useSSENotifications(
                 }`,
                 {
                   description: `Score: ${message.data.score}% (${message.data.passed_rules}/${message.data.total_rules} rules passed)`,
-                  duration: 3000,
+                  duration: 300,
                   action: {
                     label: "View",
                     onClick: () => {
@@ -105,21 +105,25 @@ export function useSSENotifications(
               toast.error(
                 `Scan failed: ${message.message || "Unknown error"}`,
                 {
-                  duration: 5000,
+                  duration: 300,
                 }
               );
+
+              if (onComplianceCompleted) {
+                onComplianceCompleted(message.data as ComplianceResult);
+              }
               break;
 
             case "heartbeat":
-              console.log("💓 SSE Heartbeat received at:", message.timestamp); // THÊM LOG NÀY
+              console.log(" SSE Heartbeat received at:", message.timestamp);
               break;
 
             default:
-              console.log("❓ Unknown SSE message type:", message.type);
+              console.log(" Unknown SSE message type:", message.type);
           }
         } catch (error) {
           console.error(
-            "❌ Error parsing SSE message:",
+            " Error parsing SSE message:",
             error,
             "Raw data:",
             event.data
@@ -132,11 +136,9 @@ export function useSSENotifications(
         setIsConnected(false);
         setConnectionError("Connection failed");
 
-        // Close current connection
         eventSource.close();
-        eventSourceRef.current = null; // Đảm bảo ref được reset
+        eventSourceRef.current = null;
 
-        // Attempt to reconnect if authenticated and token exists
         if (
           isAuthenticated &&
           token &&
@@ -162,8 +164,6 @@ export function useSSENotifications(
           setConnectionError(
             "Session expired or not logged in. Please re-login."
           );
-          // Có thể emit một sự kiện để chuyển hướng người dùng đến trang đăng nhập
-          // window.dispatchEvent(new CustomEvent('auth:unauthorized'));
         } else {
           console.error(" Max reconnection attempts reached");
           setConnectionError("Unable to reconnect. Please refresh the page.");
@@ -173,7 +173,7 @@ export function useSSENotifications(
       console.error(" Failed to create SSE connection:", error);
       setConnectionError("Failed to create connection");
     }
-  }, [token, isAuthenticated, isLoading, onComplianceCompleted]); // Thêm token, isAuthenticated, isLoading vào dependency array
+  }, [token, isAuthenticated, isLoading, onComplianceCompleted]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {

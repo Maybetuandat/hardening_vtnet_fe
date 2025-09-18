@@ -196,12 +196,10 @@ export const ServerList: React.FC<ServerListProps> = ({
                 <TableHead>{t("serverList.tableHeader.workload")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.status")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.createdAt")}</TableHead>
-                {/* Chỉ hiển thị cột Actions cho user có quyền */}
-                <UserOnly>
-                  <TableHead className="text-center">
-                    {t("serverList.tableHeader.actions")}
-                  </TableHead>
-                </UserOnly>
+                <TableHead>{t("serverList.tableHeader.manager")}</TableHead>
+                <TableHead className="text-center">
+                  {t("serverList.tableHeader.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -241,7 +239,7 @@ export const ServerList: React.FC<ServerListProps> = ({
                   </TableCell>
                   <TableCell>{getStatusBadge(server.status)}</TableCell>
                   <TableCell>{formatDate(server.created_at)}</TableCell>
-
+                  <TableCell>{server.nameofmanager}</TableCell>
                   {/* Cột Actions với phân quyền */}
                   <UserOnly>
                     <TableCell className="text-center">
@@ -268,28 +266,22 @@ export const ServerList: React.FC<ServerListProps> = ({
                             {t("serverList.action.viewServer")}
                           </DropdownMenuItem>
 
-                          {/* Edit - Chỉ admin */}
-                          <AdminOnly>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleEdit(server)}
-                              className="cursor-pointer"
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              {t("serverList.action.editServer")}
-                            </DropdownMenuItem>
-                          </AdminOnly>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(server)}
+                            className="cursor-pointer"
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            {t("serverList.action.editServer")}
+                          </DropdownMenuItem>
 
-                          {/* Delete - Chỉ admin */}
-                          <AdminOnly>
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(server)}
-                              className="cursor-pointer text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t("serverList.action.deleteServer")}
-                            </DropdownMenuItem>
-                          </AdminOnly>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(server)}
+                            className="cursor-pointer text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {t("serverList.action.deleteServer")}
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

@@ -260,7 +260,8 @@
         "noParameters": "No parameters",
         "status": {
           "active": "Active",
-          "inactive": "Paused"
+          "inactive": "Inactive",
+          "pending": "Pending"
         },
         "actions": {
           "edit": "Edit",
@@ -304,7 +305,11 @@
     "parametersLabel": "Parameters (JSON)",
     "parametersHelp": "Enter parameters as JSON. For example: {\"key\": \"value\"}",
     "statusLabel": "Active Status",
-    "statusHelp": "Toggle the active status of the rule"
+    "statusHelp": "Toggle the active status of the rule",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
   },
   "ruleDeleteDialog": {
     "title": "Confirm Rule Deletion",

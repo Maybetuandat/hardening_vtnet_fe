@@ -23,6 +23,7 @@ import {
   Circle,
   Boxes,
   Shield,
+  UserCog,
 } from "lucide-react";
 import { Server } from "@/types/server";
 import { toast } from "sonner";
@@ -194,16 +195,30 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    {t("serverViewDialog.basicInfo.workload")}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <Boxes className="h-4 w-4 text-purple-600" />
-                    <p className="text-base">
-                      {serverData.workload_name ||
-                        t("serverViewDialog.basicInfo.noWorkload")}
-                    </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      {t("serverViewDialog.basicInfo.workload")}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <Boxes className="h-4 w-4 text-purple-600" />
+                      <p className="text-base">
+                        {serverData.workload_name ||
+                          t("serverViewDialog.basicInfo.noWorkload")}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      {t("serverViewDialog.basicInfo.manager")}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <UserCog className="h-4 w-4 text-orange-600" />
+                      <p className="text-base">
+                        {serverData.nameofmanager ||
+                          t("serverViewDialog.basicInfo.noManager")}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>

@@ -32,10 +32,6 @@ export const useDashboard = () => {
     }
   }, []);
 
-  /**
-   * Refresh dữ liệu với thông báo thành công
-   * Có callback để refresh compliance data từ component cha
-   */
   const refreshData = useCallback(
     async (refreshCompliance?: () => Promise<void>) => {
       try {

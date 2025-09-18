@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Upload, Server as ServerIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { AdminOnly } from "@/components/auth/role-guard";
+import { AdminOnly, UserOnly } from "@/components/auth/role-guard";
 import { ServerUploadDialogWithWorkload } from "../upload/server-upload-dialog-with-workload";
 
 interface ServerHeaderProps {
@@ -48,7 +48,7 @@ export const ServerHeader: React.FC<ServerHeaderProps> = ({
           </Button>
 
           {/* Chỉ admin mới thấy nút Upload */}
-          <AdminOnly>
+          <UserOnly>
             <Button
               onClick={handleUploadServers}
               disabled={loading}
@@ -57,18 +57,18 @@ export const ServerHeader: React.FC<ServerHeaderProps> = ({
               <Upload className="h-4 w-4" />
               {t("serverHeader.uploadButton")}
             </Button>
-          </AdminOnly>
+          </UserOnly>
         </div>
       </div>
 
       {/* Chỉ admin mới có dialog upload */}
-      <AdminOnly>
+      <UserOnly>
         <ServerUploadDialogWithWorkload
           open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
           onServerAdded={onRefresh}
         />
-      </AdminOnly>
+      </UserOnly>
     </div>
   );
 };

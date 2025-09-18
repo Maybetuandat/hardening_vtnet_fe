@@ -67,7 +67,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             description: rule.description || "",
             workload_id: 0,
             parameters: rule.parameters || {},
-            is_active: rule.is_active !== false,
+            is_active: "active",
             command: rule.command,
           }));
 
@@ -165,7 +165,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
           description: result.description || "",
           workload_id: workloadId,
           parameters: result.parameters || {},
-          is_active: result.is_active,
+          is_active: "active",
           command: result.command,
         }));
 

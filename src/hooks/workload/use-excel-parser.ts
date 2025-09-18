@@ -135,7 +135,7 @@ export function useExcelParser() {
               rowData["command"] && typeof rowData["command"] === "string"
                 ? rowData["command"].trim()
                 : "",
-            is_active: true,
+            is_active: "active",
           };
 
           rules.push(rule);

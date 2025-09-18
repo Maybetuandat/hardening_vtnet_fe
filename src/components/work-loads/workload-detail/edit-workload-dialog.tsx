@@ -110,7 +110,6 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       // Đóng dialog
       onOpenChange(false);
 
-      // Gọi callback để refresh dữ liệu ở component cha
       onSuccess();
     } catch (error: any) {
       // Hiển thị lỗi nếu có

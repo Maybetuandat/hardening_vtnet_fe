@@ -37,7 +37,8 @@
       "workload": "Workload",
       "status": "Status",
       "createdAt": "Created At",
-      "actions": "Actions"
+      "actions": "Actions",
+      "manager": "Manager"
     },
     "unknown": "N/A",
     "copyIpTooltip": "Copy IP address",
@@ -67,7 +68,8 @@
       "status": "Status",
       "workload": "Workload",
       "unknown": "Unknown",
-      "noWorkload": "No workload assigned"
+      "noWorkload": "No workload assigned",
+      "manager": "Manager"
     },
     "sshConfig": {
       "title": "SSH Configuration",

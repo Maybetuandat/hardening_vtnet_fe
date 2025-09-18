@@ -267,7 +267,8 @@
         "noParameters": "Không có tham số",
         "status": {
           "active": "Hoạt động",
-          "inactive": "Tạm dừng"
+          "inactive": "Tạm dừng",
+          "pending": "Đang chờ"
         },
         "actions": {
           "edit": "Chỉnh sửa",
@@ -304,7 +305,11 @@
     "parametersLabel": "Tham số (JSON)",
     "parametersHelp": "Nhập tham số dưới dạng JSON. Ví dụ: {\"key\": \"value\"}",
     "statusLabel": "Trạng thái hoạt động",
-    "statusHelp": "Bật/tắt trạng thái hoạt động của rule"
+    "statusHelp": "Bật/tắt trạng thái hoạt động của rule",
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Tạm dừng"
+    }
   },
   "ruleDeleteDialog": {
     "title": "Xác nhận xóa Rule",

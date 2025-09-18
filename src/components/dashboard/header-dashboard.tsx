@@ -32,7 +32,6 @@ export default function HeaderDashBoard({
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
-  // Format dữ liệu cho dashboard cards
   const dashboardData = useMemo(() => {
     const data = [
       {

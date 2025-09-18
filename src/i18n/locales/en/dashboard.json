@@ -131,7 +131,9 @@
       "scanStartedSelected": "Started scan for {{count}} selected servers",
       "scanRequestSent": "Scan request sent successfully",
       "scanError": "Error: {{message}}",
-      "loadServersError": "Unable to load server list"
+      "loadServersError": "Unable to load server list",
+      "selectedAllServers": "Selecting all {{count}} servers",
+      "selectAllError": "Unable to select all servers"
     }
   },
   "exportDialog": {

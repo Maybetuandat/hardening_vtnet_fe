@@ -202,7 +202,6 @@ export function WorkloadTable({
         )}
       </Card>
 
-      {/* Pagination - Luôn hiển thị khi có dữ liệu và không loading/error */}
       {!loading && !error && totalItems > 0 && (
         <Pagination
           currentPage={currentPage}

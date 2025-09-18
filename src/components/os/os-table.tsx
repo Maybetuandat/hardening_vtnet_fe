@@ -109,7 +109,7 @@ export const OSTable: React.FC<OSTableProps> = ({
                   <TableCell>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar className="h-4 w-4" />
-                      {formatDate(os.create_at)}
+                      {formatDate(os.created_at)}
                     </div>
                   </TableCell>
                   <TableCell>

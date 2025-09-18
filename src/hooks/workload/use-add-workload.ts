@@ -183,7 +183,7 @@ export function useAddWorkload() {
           description: rule.description || "",
           workload_id: 0, // Will be set by backend
           parameters: rule.parameters || {},
-          is_active: rule.is_active !== false,
+          is_active: "active",
           command: rule.command || "",
         }));
 
