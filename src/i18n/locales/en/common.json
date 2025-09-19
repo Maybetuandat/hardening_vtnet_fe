@@ -5,7 +5,8 @@
     "feedback": "Feedback",
     "workloads": "Workloads",
     "servers": "Servers",
-    "os": "Operating Systems"
+    "os": "Operating Systems",
+    "notification": "Notifications"
   },
   "common": {
     "search": "Search",

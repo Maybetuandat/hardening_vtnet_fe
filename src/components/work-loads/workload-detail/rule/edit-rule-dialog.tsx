@@ -235,8 +235,8 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
             </p>
           </div>
 
-          {/* Status Field - Only admin can see and edit status */}
-          {isAdmin() && (
+          {/* Status Field - Only admin can see and edit status, hide if original rule is pending */}
+          {isAdmin() && rule.is_active !== "pending" && (
             <div className="space-y-2">
               <Label htmlFor="is_active">{t("ruleDialog.statusLabel")}</Label>
               <Select

@@ -7,6 +7,7 @@ import {
   Server,
   Package,
   Shield,
+  Bell,
   HardDrive, // Thêm icon cho OS
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
@@ -61,9 +62,9 @@ export function AppSidebar({
     ],
     navSecondary: [
       {
-        title: t("navigation.feedback"),
-        url: "#",
-        icon: HelpCircleIcon,
+        title: t("navigation.notification"),
+        url: "/notifications",
+        icon: Bell,
       },
     ],
   };
