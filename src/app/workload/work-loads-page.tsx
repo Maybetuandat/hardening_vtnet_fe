@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+
 import { WorkloadDeleteDialog } from "@/components/work-loads/index/workload-delete-dialog";
 import WorkloadHeader from "@/components/work-loads/index/workload-header";
 import { WorkloadTable } from "@/components/work-loads/index/workload-table";
@@ -9,6 +9,7 @@ import FilterBar from "@/components/ui/filter-bar";
 import { useNavigate } from "react-router-dom";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
 import { WorkloadResponse } from "@/types/workload";
+import toastHelper from "@/utils/toast-helper";
 
 export default function WorkloadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,7 +58,7 @@ export default function WorkloadsPage() {
 
   const handleRefresh = useCallback(() => {
     searchWorkloads(searchKeyword, currentPage, pageSize);
-    toast.success(t("workloads.refreshed"));
+    toastHelper.success(t("workloads.refreshed"));
   }, [searchWorkloads, searchKeyword, currentPage, pageSize, t]);
 
   const handleAddWorkload = useCallback(() => {
@@ -96,13 +97,13 @@ export default function WorkloadsPage() {
     async (id: number) => {
       try {
         await deleteWorkload(id);
-        toast.success(t("workloads.workloadDeleted"));
+        toastHelper.success(t("workloads.workloadDeleted"));
         setDeletingWorkload(null);
         setDeleteDialogOpen(false);
         // Refresh lại danh sách sau khi xóa
         searchWorkloads(searchKeyword, currentPage, pageSize);
       } catch (error) {
-        toast.error(t("workloads.form.delete.messages.deleteError"));
+        toastHelper.error(t("workloads.form.delete.messages.deleteError"));
       }
     },
     [deleteWorkload, t, searchWorkloads, searchKeyword, currentPage, pageSize]
@@ -111,7 +112,7 @@ export default function WorkloadsPage() {
   const handleDeleteSuccess = useCallback(() => {
     setDeletingWorkload(null);
     setDeleteDialogOpen(false);
-    toast.success(t("workloads.workloadDeleted"));
+    toastHelper.success(t("workloads.workloadDeleted"));
     // Refresh lại danh sách
     searchWorkloads(searchKeyword, currentPage, pageSize);
   }, [t, searchWorkloads, searchKeyword, currentPage, pageSize]);
@@ -124,7 +125,7 @@ export default function WorkloadsPage() {
   // Handle error display
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      toastHelper.error(error);
     }
   }, [error]);
 

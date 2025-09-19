@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { toast } from "sonner";
+
 import { api } from "@/lib/api";
 import { OSVersion, OSCreate, OSUpdate, OSListResponse } from "@/types/os";
+import toastHelper from "@/utils/toast-helper";
 
 interface UseOSReturn {
   osVersions: OSVersion[];
@@ -41,7 +42,7 @@ export function useOS(): UseOSReturn {
     console.error(`Error ${action}:`, error);
     const message = error.message || `Failed to ${action}`;
     setError(message);
-    toast.error(message);
+    toastHelper.error(message);
   }, []);
 
   const fetchOSVersions = useCallback(
@@ -93,7 +94,7 @@ export function useOS(): UseOSReturn {
       try {
         setError(null);
         await api.post("/os_version/", osData);
-        toast.success("Create OS version successfully");
+        toastHelper.success("Create OS version successfully");
         // Refresh list sau khi tạo thành công
         await fetchOSVersions(undefined, currentPage, pageSize);
       } catch (err) {
@@ -118,7 +119,7 @@ export function useOS(): UseOSReturn {
           prev.map((os) => (os.id === osId ? updatedOS : os))
         );
 
-        toast.success("Update OS version successfully");
+        toastHelper.success("Update OS version successfully");
       } catch (err) {
         handleError(err, "update OS version");
         throw err;
@@ -137,7 +138,7 @@ export function useOS(): UseOSReturn {
         setOsVersions((prev) => prev.filter((os) => os.id !== osId));
         setTotalItems((prev) => prev - 1);
 
-        toast.success("Delete OS version successfully");
+        toastHelper.success("Delete OS version successfully");
       } catch (err) {
         handleError(err, "delete OS version");
         throw err;

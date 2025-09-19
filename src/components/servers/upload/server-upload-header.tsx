@@ -4,9 +4,10 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Upload, Download, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
+
 import { useServerTemplate } from "@/utils/excel-template-server";
 import { WorkloadResponse } from "@/types/workload";
+import toastHelper from "@/utils/toast-helper";
 
 interface ServerUploadHeaderProps {
   selectedWorkload: WorkloadResponse;
@@ -23,10 +24,12 @@ export const ServerUploadHeader: React.FC<ServerUploadHeaderProps> = ({
   const handleDownloadTemplate = useCallback(() => {
     const result = downloadTemplate();
     if (result.success) {
-      toast.success(t("serverUploadHeader.toast.downloadSuccess"));
+      toastHelper.success(t("serverUploadHeader.toastHelper.downloadSuccess"));
     } else {
-      toast.error(
-        t("serverUploadHeader.toast.downloadError", { message: result.message })
+      toastHelper.error(
+        t("serverUploadHeader.toastHelper.downloadError", {
+          message: result.message,
+        })
       );
     }
   }, [downloadTemplate, t]);

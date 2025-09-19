@@ -14,8 +14,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { ComplianceResult } from "@/types/compliance";
 import { Loader2, AlertTriangle, RefreshCw, Copy, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-import { toast } from "sonner";
+import toastHelper from "@/utils/toast-helper";
 
 interface ComplianceTableProps {
   complianceResults: ComplianceResult[];
@@ -130,14 +129,14 @@ export function ComplianceHistoryTable({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toast.success("Đã copy địa chỉ IP!");
+      toastHelper.success("Đã copy địa chỉ IP!");
 
       // Reset copy state after 2 seconds
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toast.error("Không thể copy địa chỉ IP!");
+      toastHelper.error("Không thể copy địa chỉ IP!");
       console.error("Copy failed:", error);
     }
   };

@@ -11,6 +11,7 @@ import { useOS } from "@/hooks/os/use-os";
 import { OSVersion, OSCreate, OSUpdate } from "@/types/os";
 import { use } from "i18next";
 import { useTranslation } from "react-i18next";
+import toastHelper from "@/utils/toast-helper";
 
 export default function OSPage() {
   const {
@@ -77,7 +78,7 @@ export default function OSPage() {
   // Event handlers
   const handleRefresh = useCallback(() => {
     fetchOSVersions(currentSearchTerm, currentPage, pageSize);
-    toast.success("Refreshed successfully");
+    toastHelper.success("Refreshed successfully");
   }, [fetchOSVersions, currentSearchTerm, currentPage, pageSize]);
 
   const handlePageChange = useCallback(

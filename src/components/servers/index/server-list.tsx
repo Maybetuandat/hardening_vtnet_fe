@@ -28,10 +28,11 @@ import {
   Check,
   Eye,
 } from "lucide-react";
-import { toast } from "sonner";
+
 import { useTranslation } from "react-i18next";
 import { AdminOnly, UserOnly } from "@/components/auth/role-guard";
 import { usePermissions } from "@/hooks/authentication/use-permissions";
+import toastHelper from "@/utils/toast-helper";
 
 interface ServerListProps {
   servers: Server[];
@@ -90,12 +91,12 @@ export const ServerList: React.FC<ServerListProps> = ({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toast.success(t("serverList.toast.copySuccess"));
+      toastHelper.success(t("serverList.toastHelper.copySuccess"));
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toast.error(t("serverList.toast.copyFail"));
+      toastHelper.error(t("serverList.toastHelper.copyFail"));
     }
   };
 
@@ -103,7 +104,7 @@ export const ServerList: React.FC<ServerListProps> = ({
     if (onEdit) {
       onEdit(server);
     } else {
-      toast.info(t("serverList.toast.editNotImplemented"));
+      toastHelper.info(t("serverList.toastHelper.editNotImplemented"));
     }
   };
 
@@ -111,7 +112,7 @@ export const ServerList: React.FC<ServerListProps> = ({
     if (onDelete) {
       onDelete(server);
     } else {
-      toast.info(t("serverList.toast.deleteNotImplemented"));
+      toastHelper.info(t("serverList.toastHelper.deleteNotImplemented"));
     }
   };
 
@@ -119,7 +120,7 @@ export const ServerList: React.FC<ServerListProps> = ({
     if (onView) {
       onView(server);
     } else {
-      toast.info(t("serverList.toast.viewNotImplemented"));
+      toastHelper.info(t("serverList.toastHelper.viewNotImplemented"));
     }
   };
 

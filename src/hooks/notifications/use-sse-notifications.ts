@@ -1,7 +1,8 @@
 import { ComplianceResult } from "@/types/compliance";
 import { useEffect, useRef, useCallback, useState } from "react";
-import { toast } from "sonner";
+
 import { useAuth } from "@/hooks/authentication/use-auth"; // Import useAuth hook
+import toastHelper from "@/utils/toast-helper";
 
 interface SSEMessage {
   type: string;
@@ -80,7 +81,7 @@ export function useSSENotifications(
             case "completed":
               console.log("🎉 Compliance scan completed:", message.data);
 
-              toast.success(
+              toastHelper.success(
                 `Scan successful for ${
                   message.data.server_hostname || message.data.server_ip
                 }`,
@@ -102,7 +103,7 @@ export function useSSENotifications(
               break;
 
             case "failed":
-              toast.error(
+              toastHelper.error(
                 `Scan failed: ${message.message || "Unknown error"}`,
                 {
                   duration: 300,

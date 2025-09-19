@@ -1,12 +1,13 @@
 import { UseServerUploadReturn } from "@/types/server";
 import { useCallback } from "react";
-import { toast } from "sonner";
+
 import {
   ExcelUtils,
   ConnectionUtils,
   ServerUtils,
 } from "./server-upload-utils";
 import { useServerUploadState } from "./use-server-upload-state";
+import toastHelper from "@/utils/toast-helper";
 
 export function useServerUpload(): UseServerUploadReturn {
   const {
@@ -55,7 +56,7 @@ export function useServerUpload(): UseServerUploadReturn {
 
         setServers(result.servers);
         setUploadedFileName(file.name);
-        toast.success(
+        toastHelper.success(
           `Successfully uploaded ${result.servers.length} servers!`
         );
       } catch (error: any) {
@@ -63,7 +64,7 @@ export function useServerUpload(): UseServerUploadReturn {
         const errorMessage =
           error.message || "An error occurred while processing the file";
         setErrors([errorMessage]);
-        toast.error(errorMessage);
+        toastHelper.error(errorMessage);
       } finally {
         setUploading(false);
       }
@@ -147,11 +148,11 @@ export function useServerUpload(): UseServerUploadReturn {
           })
         );
 
-        toast.success(
+        toastHelper.success(
           `Test connection completed: ${response.successful_connections}/${servers.length} successful`
         );
       } else {
-        toast.warning("No valid servers to test connection");
+        toastHelper.warning("No valid servers to test connection");
       }
 
       // Filter successful servers after 5 seconds
@@ -167,11 +168,11 @@ export function useServerUpload(): UseServerUploadReturn {
         ).length;
 
         if (successfulCount > 0) {
-          toast.success(
+          toastHelper.success(
             `Filtered and retained ${successfulCount} successful connected servers. You can add them to the system.`
           );
         } else {
-          toast.error(
+          toastHelper.error(
             "No servers connected successfully. Please check the information again."
           );
         }
@@ -187,7 +188,7 @@ export function useServerUpload(): UseServerUploadReturn {
         }))
       );
 
-      toast.error("An error occurred while testing connection");
+      toastHelper.error("An error occurred while testing connection");
     } finally {
       setTesting(false);
     }
@@ -200,12 +201,12 @@ export function useServerUpload(): UseServerUploadReturn {
       onRefreshList?: () => void
     ) => {
       if (servers.length === 0) {
-        toast.error("No servers to add");
+        toastHelper.error("No servers to add");
         return;
       }
 
       if (!canAddServers) {
-        toast.error(
+        toastHelper.error(
           "Please successfully test the connection for all servers before adding"
         );
         return;
@@ -222,7 +223,7 @@ export function useServerUpload(): UseServerUploadReturn {
           controller.signal
         );
 
-        toast.success(
+        toastHelper.success(
           `Successfully added ${servers.length} servers with workload!`
         );
 
@@ -236,7 +237,9 @@ export function useServerUpload(): UseServerUploadReturn {
         if (onRefreshList) onRefreshList();
       } catch (error: any) {
         console.error("Error adding servers with workload:", error);
-        toast.error(error.message || "An error occurred while adding server");
+        toastHelper.error(
+          error.message || "An error occurred while adding server"
+        );
       } finally {
         setAdding(false);
       }

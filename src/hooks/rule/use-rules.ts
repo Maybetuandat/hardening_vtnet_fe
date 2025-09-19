@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
-import { toast } from "sonner";
+
 import {
   RuleResponse,
   RuleCreate,
   RuleListResponse,
   RuleSearchParams,
 } from "@/types/rule";
+import toastHelper from "@/utils/toast-helper";
 
 interface UseRulesReturn {
   rules: RuleResponse[];
@@ -70,12 +71,12 @@ export function useRules(): UseRulesReturn {
       try {
         console.log("Creating rule with data:", data);
         const response = await api.post<RuleResponse>("/rules/", data);
-        toast.success("Create rule successfully");
+        toastHelper.success("Create rule successfully");
         return response;
       } catch (err: any) {
         console.error("Error creating rule:", err);
         const errorMessage = err.message || "Failed to create rule";
-        toast.error(`Failed to create rule: ${errorMessage}`);
+        toastHelper.error(`Failed to create rule: ${errorMessage}`);
         throw err;
       }
     },
@@ -87,11 +88,11 @@ export function useRules(): UseRulesReturn {
       try {
         console.log("Creating bulk rules with data:", data);
         const response = await api.post<RuleResponse[]>("/rules/bulk", data);
-        toast.success("Create bulk rules successfully");
+        toastHelper.success("Create bulk rules successfully");
         return response;
       } catch (err: any) {
         console.error("API error details:", err.response?.data || err);
-        toast.error(JSON.stringify(err.response?.data || err));
+        toastHelper.error(JSON.stringify(err.response?.data || err));
         throw err;
       }
     },
@@ -101,12 +102,12 @@ export function useRules(): UseRulesReturn {
     async (ruleId: number, data: RuleCreate): Promise<RuleResponse> => {
       try {
         const response = await api.put<RuleResponse>(`/rules/${ruleId}`, data);
-        toast.success("update rule successfully");
+        toastHelper.success("update rule successfully");
         return response;
       } catch (err: any) {
         console.error("Error updating rule:", err);
         const errorMessage = err.message || "Failed to update rule";
-        toast.error(`Failed to update rule: ${errorMessage}`);
+        toastHelper.error(`Failed to update rule: ${errorMessage}`);
         throw err;
       }
     },
@@ -116,11 +117,11 @@ export function useRules(): UseRulesReturn {
   const deleteRule = useCallback(async (ruleId: number): Promise<void> => {
     try {
       await api.delete(`/rules/${ruleId}`);
-      toast.success("delete rule successfully");
+      toastHelper.success("delete rule successfully");
     } catch (err: any) {
       console.error("Error deleting rule:", err);
       const errorMessage = err.message || "Failed to delete rule";
-      toast.error(`Failed to delete rule: ${errorMessage}`);
+      toastHelper.error(`Failed to delete rule: ${errorMessage}`);
       throw err;
     }
   }, []);

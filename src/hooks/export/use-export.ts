@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import { toast } from "sonner";
+
 import { api } from "@/lib/api"; // Import ApiClient instance
+import { toastHelper } from "@/utils/toast-helper";
 
 export interface ExportParams {
   keyword?: string;
@@ -110,8 +111,8 @@ export function useExport(): UseExportReturn {
         // Download file
         downloadFile(blob, filename);
 
-        // Show success toast
-        toast.success("Export report successfully!", {
+        // Show success toastHelper
+        toastHelper.success("Export report successfully!", {
           description: `File ${filename} has been downloaded`,
           duration: 3000,
         });
@@ -119,7 +120,7 @@ export function useExport(): UseExportReturn {
         console.error("Error exporting compliance report:", err);
         const errorMessage = err.message || "Error exporting report";
         setError(errorMessage);
-        toast.error("Error exporting report", {
+        toastHelper.error("Error exporting report", {
           description: errorMessage,
         });
         throw err;

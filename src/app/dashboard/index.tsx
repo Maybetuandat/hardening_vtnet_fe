@@ -9,6 +9,7 @@ import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
 import { useSSENotifications } from "@/hooks/notifications/use-sse-notifications";
 import { ComplianceResult } from "@/types/compliance";
+import toastHelper from "@/utils/toast-helper";
 
 export default function SystemHardeningDashboard() {
   const { t } = useTranslation("dashboard");
@@ -61,9 +62,9 @@ export default function SystemHardeningDashboard() {
 
   useEffect(() => {
     if (connectionError) {
-      toast.error(t("realtime.connectionError", { error: connectionError }), {
-        duration: 5000,
-      });
+      toastHelper.error(
+        t("realtime.connectionError", { error: connectionError })
+      );
     }
   }, [connectionError, t]);
 
@@ -94,7 +95,7 @@ export default function SystemHardeningDashboard() {
 
   const handleRefresh = useCallback(() => {
     refreshData();
-    toast.success(t("messages.dataRefreshed"));
+    toastHelper.success(t("messages.dataRefreshed"));
   }, [refreshData, t]);
 
   const handlePageChange = useCallback(

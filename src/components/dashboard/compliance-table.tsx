@@ -22,8 +22,7 @@ import {
   Check,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-import { toast } from "sonner";
+import toastHelper from "@/utils/toast-helper";
 
 interface ComplianceTableProps {
   complianceResults: ComplianceResult[];
@@ -147,14 +146,14 @@ export function ComplianceTable({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toast.success(t("table.messages.ipCopied"));
+      toastHelper.success(t("table.messages.ipCopied"));
 
       // Reset copy state after 2 seconds
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toast.error(t("table.messages.ipCopyFailed"));
+      toastHelper.error(t("table.messages.ipCopyFailed"));
       console.error("Copy failed:", error);
     }
   };

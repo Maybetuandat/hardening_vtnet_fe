@@ -26,7 +26,7 @@ import {
   UserCog,
 } from "lucide-react";
 import { Server } from "@/types/server";
-import { toast } from "sonner";
+import toastHelper from "@/utils/toast-helper";
 
 interface ServerViewDialogProps {
   open: boolean;
@@ -61,7 +61,7 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
       setServerData(data);
     } catch (error) {
       console.error("Failed to load server data:", error);
-      toast.error(t("serverViewDialog.toast.loadError"));
+      toastHelper.error(t("serverViewDialog.toastHelper.loadError"));
     } finally {
       setLoading(false);
     }
@@ -73,10 +73,10 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
     try {
       await navigator.clipboard.writeText(serverData.ip_address);
       setCopiedIP(true);
-      toast.success(t("serverViewDialog.toast.copySuccess"));
+      toastHelper.success(t("serverViewDialog.toastHelper.copySuccess"));
       setTimeout(() => setCopiedIP(false), 2000);
     } catch (error) {
-      toast.error(t("serverViewDialog.toast.copyError"));
+      toastHelper.error(t("serverViewDialog.toastHelper.copyError"));
     }
   };
 

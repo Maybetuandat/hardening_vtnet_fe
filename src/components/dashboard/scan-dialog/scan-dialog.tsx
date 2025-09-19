@@ -12,7 +12,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useScanDialog } from "@/hooks/scan-server/use-scan-dialog";
 import { ScanTypeSelector } from "./scan-type-selector";
 import { ServerSelector } from "./server-selector";
-import { toast } from "sonner";
 
 interface ScanDialogProps {
   open: boolean;

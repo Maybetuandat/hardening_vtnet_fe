@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
-import { toast } from "sonner";
+
 import { Server } from "@/types/server";
 import { useServers } from "../server/use-servers";
+import toastHelper from "@/utils/toast-helper";
 
 export const useScanDialog = (open: boolean) => {
   const { t } = useTranslation("dashboard");
@@ -96,7 +97,7 @@ export const useScanDialog = (open: boolean) => {
           }
         } catch (error) {
           console.error("Error searching servers:", error);
-          toast.error(t("scanDialog.messages.loadServersError"));
+          toastHelper.error(t("scanDialog.messages.loadServersError"));
         }
       }, 300);
 
@@ -126,7 +127,7 @@ export const useScanDialog = (open: boolean) => {
       setCurrentPageInDialog(nextPage);
     } catch (error) {
       console.error("Error loading more servers:", error);
-      toast.error(t("scanDialog.messages.loadServersError"));
+      toastHelper.error(t("scanDialog.messages.loadServersError"));
     } finally {
       setLoadingMore(false);
     }
@@ -188,14 +189,14 @@ export const useScanDialog = (open: boolean) => {
 
       setSelectedServers(new Set(activeServerIds));
 
-      toast.success(
+      toastHelper.success(
         t("scanDialog.messages.selectedAllServers", {
           count: activeServerIds.length,
         })
       );
     } catch (error) {
       console.error("Error selecting all servers:", error);
-      toast.error(t("scanDialog.messages.selectAllError"));
+      toastHelper.error(t("scanDialog.messages.selectAllError"));
     } finally {
       setLoadingMore(false);
     }
@@ -233,7 +234,7 @@ export const useScanDialog = (open: boolean) => {
                 count: selectedServers.size,
               });
 
-        toast.success(successMessage);
+        toastHelper.success(successMessage);
         onClose();
         onScanComplete();
 
@@ -244,20 +245,20 @@ export const useScanDialog = (open: boolean) => {
           .post("/compliance/scan", scanRequest)
           .then((response) => {
             console.log("Scan started:", response);
-            toast.success(t("scanDialog.messages.scanRequestSent"));
+            toastHelper.success(t("scanDialog.messages.scanRequestSent"));
           })
           .catch((error) => {
             console.error("Error starting scan:", error);
             const errorMessage =
               error.response?.data?.message || "Unable to start scan";
-            toast.error(
+            toastHelper.error(
               t("scanDialog.messages.scanError", { message: errorMessage })
             );
           });
       } catch (error: any) {
         console.error("Error starting scan:", error);
         const errorMessage = error.message || "Unable to start scan";
-        toast.error(
+        toastHelper.error(
           t("scanDialog.messages.scanError", { message: errorMessage })
         );
       } finally {

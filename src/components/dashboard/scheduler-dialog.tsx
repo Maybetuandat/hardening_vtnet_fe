@@ -3,11 +3,12 @@ import { useTranslation } from "react-i18next";
 import { X, Clock, Save, Pause, AlertCircle, CheckCircle } from "lucide-react";
 
 import { useScheduler } from "../../hooks/scheduler/use-scheduler";
-import { toast } from "sonner";
+
 import { Button } from "../ui/button";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import TimePicker from "../ui/time-picker";
+import toastHelper from "@/utils/toast-helper";
 
 interface ScheduleDialogProps {
   isOpen: boolean;
@@ -49,20 +50,20 @@ const ScheduleDialog: React.FC<ScheduleDialogProps> = ({ isOpen, onClose }) => {
   const handleSave = async () => {
     const success = await updateScanSchedule(formData);
     if (success) {
-      toast.success(t("scheduleDialog.messages.updateSuccess"));
+      toastHelper.success(t("scheduleDialog.messages.updateSuccess"));
       onClose();
     } else {
-      toast.error(t("scheduleDialog.messages.updateError"));
+      toastHelper.error(t("scheduleDialog.messages.updateError"));
     }
   };
 
   const handleDisable = async () => {
     const success = await disableScanSchedule();
     if (success) {
-      toast.success(t("scheduleDialog.messages.disableSuccess"));
+      toastHelper.success(t("scheduleDialog.messages.disableSuccess"));
       onClose();
     } else {
-      toast.error(t("scheduleDialog.messages.disableError"));
+      toastHelper.error(t("scheduleDialog.messages.disableError"));
     }
   };
 

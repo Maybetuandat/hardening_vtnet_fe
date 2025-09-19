@@ -13,6 +13,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ServerHeader } from "@/components/servers/index/server-header";
+import toastHelper from "@/utils/toast-helper";
 
 export default function ServersPage() {
   const { t } = useTranslation("server");
@@ -137,7 +138,7 @@ export default function ServersPage() {
 
   const handleFormSuccess = useCallback(
     (message: string) => {
-      toast.success(message);
+      toastHelper.success(message);
       handleRefresh();
     },
     [handleRefresh]
@@ -145,7 +146,7 @@ export default function ServersPage() {
 
   const handleDeleteSuccess = useCallback(
     (message: string) => {
-      toast.success(message);
+      toastHelper.success(message);
       handleRefresh();
     },
     [handleRefresh]
@@ -167,7 +168,7 @@ export default function ServersPage() {
 
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      toastHelper.error(error);
     }
   }, [error]);
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { DashboardStats } from "@/types/dashboard";
 import { api } from "@/lib/api";
-import { toast } from "sonner";
+import toastHelper from "@/utils/toast-helper";
 
 export const useDashboard = () => {
   const [stats, setStats] = useState<DashboardStats>({
@@ -43,9 +43,9 @@ export const useDashboard = () => {
           await refreshCompliance();
         }
 
-        toast.success("Data has been updated");
+        toastHelper.success("Data has been updated");
       } catch (err) {
-        toast.error("Error updating dashboard data  ");
+        toastHelper.error("Error updating dashboard data  ");
       }
     },
     [fetchStatistics]

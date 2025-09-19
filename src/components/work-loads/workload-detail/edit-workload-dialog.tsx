@@ -16,8 +16,9 @@ import { useTranslation } from "react-i18next";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
 import { OSSelector } from "@/components/work-loads/create-workload/os-selector/os-selector";
 import { useOS } from "@/hooks/os/use-os";
-import { toast } from "sonner";
+
 import { WorkloadUpdate, WorkloadResponse } from "@/types/workload";
+import toastHelper from "@/utils/toast-helper";
 
 interface EditWorkloadDialogProps {
   workload: WorkloadResponse;
@@ -89,12 +90,12 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
     e.preventDefault();
 
     if (!formData.name?.trim()) {
-      toast.error(t("workloadDetail.editDialog.validation.nameRequired"));
+      toastHelper.error(t("workloadDetail.editDialog.validation.nameRequired"));
       return;
     }
 
     if (!formData.os_id) {
-      toast.error(t("workloadDetail.editDialog.validation.osRequired"));
+      toastHelper.error(t("workloadDetail.editDialog.validation.osRequired"));
       return;
     }
 
@@ -105,7 +106,9 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       await updateWorkload(workload.id, formData);
 
       // Hiển thị thông báo thành công
-      toast.success(t("workloadDetail.editDialog.messages.updateSuccess"));
+      toastHelper.success(
+        t("workloadDetail.editDialog.messages.updateSuccess")
+      );
 
       // Đóng dialog
       onOpenChange(false);
@@ -113,7 +116,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       onSuccess();
     } catch (error: any) {
       // Hiển thị lỗi nếu có
-      toast.error(
+      toastHelper.error(
         error.message || t("workloadDetail.editDialog.messages.updateError")
       );
     } finally {

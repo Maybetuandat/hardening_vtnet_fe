@@ -1,12 +1,13 @@
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
-import { toast } from "sonner";
+
 import { RuleCreate } from "@/types/rule";
 
 import { ExcelUploadResult } from "@/types/workload";
 import { useExcelParser } from "@/hooks/workload/use-excel-parser";
 
 import { useRules } from "@/hooks/rule/use-rules";
+import toastHelper from "@/utils/toast-helper";
 
 export interface RuleCheckResult {
   name: string;
@@ -93,7 +94,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   const checkRulesExistence = useCallback(
     async (workloadId: number): Promise<void> => {
       if (rules.length === 0) {
-        toast.error("No rules to check");
+        toastHelper.error("No rules to check");
         return;
       }
 
@@ -126,7 +127,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         console.error(" Error checking rules existence:", err);
         const errorMessage = err.message || "Error checking rules existence";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toastHelper.error(errorMessage);
       } finally {
         setCheckingExistence(false);
       }
@@ -137,7 +138,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
   const createUniqueRules = useCallback(
     async (workloadId: number): Promise<void> => {
       if (!checkResults) {
-        toast.error("Please check rules existence first");
+        toastHelper.error("Please check rules existence first");
         return;
       }
 
@@ -150,7 +151,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         );
 
         if (uniqueResults.length === 0) {
-          toast.error("Do not have unique rules to add");
+          toastHelper.error("Do not have unique rules to add");
           return;
         }
 
@@ -174,7 +175,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         const createdRules = await createBulkRules?.(ruleDataList);
 
         if (createdRules) {
-          toast.success(
+          toastHelper.success(
             `Created  ${createdRules.length} new rules successfully`
           );
         }
@@ -182,7 +183,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
         console.error("Error creating rules:", err);
         const errorMessage = err.message || "Cannot create new rules";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toastHelper.error(errorMessage);
       } finally {
         setLoading(false);
       }

@@ -18,6 +18,7 @@ import { ExcelUploadForm } from "@/components/work-loads/create-workload/excel-u
 import { WorkloadBasicForm } from "@/components/work-loads/create-workload/workload-basic-form";
 import { useAddWorkload } from "@/hooks/workload/use-add-workload";
 import { CreateWorkloadRequest } from "@/types/workload";
+import toastHelper from "@/utils/toast-helper";
 
 export default function AddWorkloadPage() {
   const { t } = useTranslation("workload");
@@ -62,10 +63,10 @@ export default function AddWorkloadPage() {
 
       await createWorkloadWithRules(requestData);
 
-      toast.success(t("add.messages.createSuccess"));
+      toastHelper.success(t("add.messages.createSuccess"));
       navigate("/workloads");
     } catch (error: any) {
-      toast.error(error.message || t("add.messages.createError"));
+      toastHelper.error(error.message || t("add.messages.createError"));
     }
   };
 
@@ -74,13 +75,13 @@ export default function AddWorkloadPage() {
     // Kiểm tra validation trước khi tiếp tục
     if (currentStep === 0) {
       if (!workloadNameValidation.isValid || validatingWorkloadName) {
-        toast.error(t("add.basicInfo.nameValidation.waitValidation"));
+        toastHelper.error(t("add.basicInfo.nameValidation.waitValidation"));
         return;
       }
 
       // Kiểm tra os_version
       if (!formData.workload.os_id) {
-        toast.error(t("add.basicInfo.osRequired"));
+        toastHelper.error(t("add.basicInfo.osRequired"));
         return;
       }
     }
@@ -146,9 +147,7 @@ export default function AddWorkloadPage() {
               <Package className="h-8 w-8" />
               {t("add.title")}
             </h1>
-            <p className="text-gray-600">
-              {t("add.subtitle")}
-            </p>
+            <p className="text-gray-600">{t("add.subtitle")}</p>
           </div>
         </div>
 
@@ -218,12 +217,16 @@ export default function AddWorkloadPage() {
                     workloadNameValidation.isValid ? (
                       <>
                         <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-green-600">{t("add.basicInfo.nameValidation.valid")}</span>
+                        <span className="text-green-600">
+                          {t("add.basicInfo.nameValidation.valid")}
+                        </span>
                       </>
                     ) : (
                       <>
                         <AlertTriangle className="h-4 w-4 text-red-500" />
-                        <span className="text-red-600">{t("add.basicInfo.nameValidation.invalid")}</span>
+                        <span className="text-red-600">
+                          {t("add.basicInfo.nameValidation.invalid")}
+                        </span>
                       </>
                     )
                   ) : null}

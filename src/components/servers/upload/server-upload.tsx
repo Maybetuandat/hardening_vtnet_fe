@@ -1,11 +1,11 @@
 import React, { useCallback, useImperativeHandle, forwardRef } from "react";
-import { toast } from "sonner";
 
 import { useServerUpload } from "@/hooks/server/server-upload/use-server-upload";
 import { WorkloadResponse } from "@/types/workload";
 import { ServerManagement } from "./server-management";
 import { ServerUploadArea } from "./server-upload-area";
 import { ServerUploadHeader } from "./server-upload-header";
+import { toastHelper } from "@/utils/toast-helper";
 
 export interface ServerUploadWithWorkloadRef {
   cancelAllOperations: () => void;
@@ -60,7 +60,7 @@ export const ServerUpload = forwardRef<
 
   const handleAddServersWrapper = useCallback(async () => {
     if (!selectedWorkload.id) {
-      toast.error("can't find workload ID");
+      toastHelper.error("can't find workload ID");
       return;
     }
 

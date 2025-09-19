@@ -12,6 +12,7 @@ import FilterBar from "@/components/ui/filter-bar";
 
 import { ComplianceHistoryTable } from "@/components/dashboard/compliance-history/compliance-history-table";
 import { useHistoryCompliance } from "@/hooks/compliance/use-history-compliance";
+import toastHelper from "@/utils/toast-helper";
 
 export default function ServerHardeningHistoryPage() {
   const { t } = useTranslation("compliance");
@@ -58,7 +59,7 @@ export default function ServerHardeningHistoryPage() {
 
   const handleRefresh = useCallback(() => {
     refreshData();
-    toast.success(t("history.messages.dataRefreshed"));
+    toastHelper.success(t("history.messages.dataRefreshed"));
   }, [refreshData, t]);
 
   const handlePageChange = useCallback(

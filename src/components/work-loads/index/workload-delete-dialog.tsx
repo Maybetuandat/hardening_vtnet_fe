@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertTriangle, Trash2 } from "lucide-react";
 import { WorkloadResponse } from "@/types/workload";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import toastHelper from "@/utils/toast-helper";
 
 interface WorkloadDeleteDialogProps {
   open: boolean;
@@ -41,12 +41,12 @@ export function WorkloadDeleteDialog({
     setLoading(true);
     try {
       await onConfirm(workload.id);
-      toast.success(t("workloads.workloadDeleted"));
+      toastHelper.success(t("workloads.workloadDeleted"));
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error("Delete error:", error);
-      toast.error(error.message || t("delete.messages.deleteError"));
+      toastHelper.error(error.message || t("delete.messages.deleteError"));
     } finally {
       setLoading(false);
     }

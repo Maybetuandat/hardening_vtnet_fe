@@ -15,9 +15,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { useDashboard } from "@/hooks/dashboard/use-dashboard";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
+
 import ScheduleDialog from "./scheduler-dialog";
 import { ExportDialog } from "./export-dialog";
+import toastHelper from "@/utils/toast-helper";
 
 interface HeaderDashBoardProps {
   onRefreshCompliance?: () => Promise<void>;
@@ -76,7 +77,7 @@ export default function HeaderDashBoard({
   }, [stats, loading, t]);
 
   const handleExport = () => {
-    // Mở dialog xuất báo cáo thay vì toast
+    // Mở dialog xuất báo cáo thay vì toastHelper
     setExportDialogOpen(true);
   };
 
@@ -97,7 +98,7 @@ export default function HeaderDashBoard({
   };
 
   if (error) {
-    toast.error(t("messages.dashboardLoadError", { error }));
+    toastHelper.error(t("messages.dashboardLoadError", { error }));
   }
 
   return (

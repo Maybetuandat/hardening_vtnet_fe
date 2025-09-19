@@ -13,6 +13,7 @@ import { ComplianceDetailInfo } from "@/components/dashboard/compliance-detail-i
 import { RuleResultTable } from "@/components/rule-result/rule-result-table";
 import { useRuleResults } from "@/hooks/rule-result/use-rule-result";
 import { ComplianceResultDetail } from "@/types/compliance";
+import toastHelper from "@/utils/toast-helper";
 
 export default function ComplianceDetailPage() {
   const { t } = useTranslation("compliance");
@@ -54,7 +55,7 @@ export default function ComplianceDetailPage() {
       const detail = await getComplianceDetail(complianceId);
       setComplianceDetail(detail);
     } catch (err) {
-      toast.error(t("detail.messages.loadDetailError"));
+      toastHelper.error(t("detail.messages.loadDetailError"));
     } finally {
       setLoadingDetail(false);
     }
@@ -131,13 +132,13 @@ export default function ComplianceDetailPage() {
             ? t("detail.status.passed")
             : t("detail.status.failed");
 
-        toast.success(
+        toastHelper.success(
           t("detail.messages.updateStatusSuccess", { status: statusText })
         );
         // Refresh compliance detail to update scores
         await loadComplianceDetail();
       } else {
-        toast.error(t("detail.messages.updateStatusError"));
+        toastHelper.error(t("detail.messages.updateStatusError"));
       }
     },
     [updateRuleStatus, loadComplianceDetail, t]
@@ -146,7 +147,7 @@ export default function ComplianceDetailPage() {
   const handleRefresh = useCallback(() => {
     refreshData();
     loadComplianceDetail();
-    toast.success(t("detail.messages.dataRefreshed"));
+    toastHelper.success(t("detail.messages.dataRefreshed"));
   }, [refreshData, loadComplianceDetail, t]);
 
   const handleBack = () => {
