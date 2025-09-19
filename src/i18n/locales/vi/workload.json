@@ -304,11 +304,14 @@
     "commandHelp": "Lệnh này sẽ được thực thi khi rule được kích hoạt. Ví dụ: bash script, API call, etc.",
     "parametersLabel": "Tham số (JSON)",
     "parametersHelp": "Nhập tham số dưới dạng JSON. Ví dụ: {\"key\": \"value\"}",
-    "statusLabel": "Trạng thái hoạt động",
-    "statusHelp": "Bật/tắt trạng thái hoạt động của rule",
+    "statusLabel": "Trạng thái",
+    "selectStatusPlaceholder": "Chọn trạng thái...",
     "status": {
       "active": "Hoạt động",
       "inactive": "Tạm dừng"
+    },
+    "permissions": {
+      "waitForApproval": "Bạn cần đợi sự chấp thuận của admin"
     }
   },
   "ruleDeleteDialog": {

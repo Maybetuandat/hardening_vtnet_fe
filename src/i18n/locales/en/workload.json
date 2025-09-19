@@ -304,11 +304,14 @@
     "commandHelp": "This command will be executed when the rule is triggered. For example: bash script, API call, etc.",
     "parametersLabel": "Parameters (JSON)",
     "parametersHelp": "Enter parameters as JSON. For example: {\"key\": \"value\"}",
-    "statusLabel": "Active Status",
-    "statusHelp": "Toggle the active status of the rule",
+    "statusLabel": "Status",
+    "selectStatusPlaceholder": "Select status...",
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "permissions": {
+      "waitForApproval": "You need to wait for the acceptance of admin"
     }
   },
   "ruleDeleteDialog": {

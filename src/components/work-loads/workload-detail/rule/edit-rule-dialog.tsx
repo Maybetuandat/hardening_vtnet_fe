@@ -17,8 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, X, Terminal } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Save, X, Terminal, Lock, Info } from "lucide-react";
 import { useRules } from "@/hooks/rule/use-rules";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { RuleCreate, RuleResponse } from "@/types/rule";
 import { useTranslation } from "react-i18next";
 
@@ -42,6 +44,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   onSuccess,
 }) => {
   const { t } = useTranslation("workload");
+  const { isAdmin } = usePermissions();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<RuleCreate>({
     name: rule.name,
@@ -53,6 +56,18 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   });
 
   const { updateRule } = useRules();
+
+  // Kiểm tra quyền chỉnh sửa
+  const canEdit = () => {
+    if (isAdmin()) {
+      return true; // Admin luôn có quyền edit
+    }
+
+    // User thường chỉ có quyền edit nếu can_be_copied là true
+    return rule.can_be_copied === true;
+  };
+
+  const isEditDisabled = !canEdit();
 
   useEffect(() => {
     if (open) {
@@ -68,7 +83,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   }, [open, rule]);
 
   const handleSubmit = async () => {
-    if (!formData.name.trim() || !formData.command.trim()) {
+    if (!formData.name.trim() || !formData.command.trim() || isEditDisabled) {
       return;
     }
 
@@ -101,7 +116,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !isEditDisabled) {
       e.preventDefault();
       handleSubmit();
     }
@@ -114,9 +129,22 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
           <DialogTitle className="flex items-center gap-2">
             <Terminal className="h-5 w-5" />
             {t("ruleDialog.title")}
+            {isEditDisabled && (
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            )}
           </DialogTitle>
           <DialogDescription>{t("ruleDialog.description")}</DialogDescription>
         </DialogHeader>
+
+        {/* Hiển thị thông báo nếu user không có quyền edit */}
+        {isEditDisabled && (
+          <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+            <Info className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            <AlertDescription className="text-orange-800 dark:text-orange-200">
+              {t("ruleDialog.permissions.waitForApproval")}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="space-y-6" onKeyDown={handleKeyDown}>
           {/* Name Field */}
@@ -133,7 +161,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
               placeholder={t("ruleDialog.namePlaceholder")}
-              disabled={loading}
+              disabled={loading || isEditDisabled}
               required
             />
           </div>
@@ -154,7 +182,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               }
               placeholder={t("ruleDialog.descriptionPlaceholder")}
               rows={3}
-              disabled={loading}
+              disabled={loading || isEditDisabled}
             />
           </div>
 
@@ -172,7 +200,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               }
               placeholder={t("ruleDialog.commandPlaceholder")}
               rows={4}
-              disabled={loading}
+              disabled={loading || isEditDisabled}
               className="font-mono text-sm"
               required
             />
@@ -199,7 +227,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               }}
               placeholder='{"key": "value"}'
               rows={4}
-              disabled={loading}
+              disabled={loading || isEditDisabled}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
@@ -207,39 +235,43 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
             </p>
           </div>
 
-          {/* Status Field - Updated to use Select instead of Switch */}
-          <div className="space-y-2">
-            <Label htmlFor="is_active">{t("ruleDialog.statusLabel")}</Label>
-            <Select
-              value={formData.is_active}
-              onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, is_active: value }))
-              }
-              disabled={loading}
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("ruleDialog.selectStatusPlaceholder")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          option.value === "active"
-                            ? "bg-green-500"
-                            : "bg-gray-400"
-                        }`}
-                      />
-                      {getStatusLabel(option.value)}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Status Field - Only admin can see and edit status */}
+          {isAdmin() && (
+            <div className="space-y-2">
+              <Label htmlFor="is_active">{t("ruleDialog.statusLabel")}</Label>
+              <Select
+                value={formData.is_active}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, is_active: value }))
+                }
+                disabled={loading}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t("ruleDialog.selectStatusPlaceholder")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            option.value === "active"
+                              ? "bg-green-500"
+                              : option.value === "inactive"
+                              ? "bg-gray-400"
+                              : "bg-yellow-500"
+                          }`}
+                        />
+                        {getStatusLabel(option.value)}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-end space-x-3 pt-4 border-t">
@@ -256,7 +288,10 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               type="button"
               onClick={handleSubmit}
               disabled={
-                loading || !formData.name.trim() || !formData.command.trim()
+                loading ||
+                !formData.name.trim() ||
+                !formData.command.trim() ||
+                isEditDisabled
               }
             >
               <Save className="h-4 w-4 mr-2" />

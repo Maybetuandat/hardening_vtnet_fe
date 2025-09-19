@@ -8,6 +8,7 @@ export interface RuleResponse {
   is_active: string;
   created_at: string;
   updated_at: string;
+  can_be_copied: boolean;
 }
 
 export interface RuleCreate {
