@@ -124,7 +124,6 @@ export function RulePreviewDialog({
           </div>
         </div>
 
-        
         <div className="flex-1 min-h-0 overflow-hidden">
           <ScrollArea className="h-full w-full">
             <div className="space-y-4 pr-4 pb-4">
@@ -132,9 +131,7 @@ export function RulePreviewDialog({
                 <div className="text-center py-12 text-muted-foreground">
                   <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p className="text-lg mb-2">{t("add.preview.noRules")}</p>
-                  <p className="text-sm">
-                    {t("add.preview.tryFilters")}
-                  </p>
+                  <p className="text-sm">{t("add.preview.tryFilters")}</p>
                 </div>
               ) : (
                 filteredRules.map((rule, index) => (
@@ -189,8 +186,21 @@ export function RulePreviewDialog({
                           </div>
                         </div>
                       )}
+                      {/* Suggested Fix */}
+                      {rule.suggested_fix && (
+                        <div>
+                          <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                            <Terminal className="h-4 w-4" />
+                            <span>{t("add.preview.suggestedFix")}</span>
+                          </p>
+                          <div className="bg-slate-900 text-slate-100 p-3 rounded-md border">
+                            <code className="text-sm font-mono whitespace-pre-wrap break-all">
+                              {rule.suggested_fix}
+                            </code>
+                          </div>
+                        </div>
+                      )}
 
-                      
                       {rule.parameters && (
                         <div>
                           <p className="font-medium text-sm mb-2 flex items-center gap-2">
@@ -207,7 +217,6 @@ export function RulePreviewDialog({
           </ScrollArea>
         </div>
 
-        
         <div className="flex-shrink-0 flex justify-between items-center pt-4 border-t bg-background">
           <div className="text-sm text-muted-foreground"></div>
           <Button onClick={() => onOpenChange(false)} size="sm">

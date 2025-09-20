@@ -9,8 +9,8 @@ import { useCompliance } from "@/hooks/compliance/use-compliance";
 
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
-import { ComplianceDetailInfo } from "@/components/dashboard/compliance-detail-info";
-import { RuleResultTable } from "@/components/rule-result/rule-result-table";
+import { ComplianceDetailInfo } from "@/components/dashboard/compliance-detail/compliance-detail-info";
+import { RuleResultTable } from "@/components/dashboard/compliance-detail/rule-result-table";
 import { useRuleResults } from "@/hooks/rule-result/use-rule-result";
 import { ComplianceResultDetail } from "@/types/compliance";
 import toastHelper from "@/utils/toast-helper";

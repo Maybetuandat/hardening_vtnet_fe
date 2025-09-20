@@ -96,8 +96,9 @@ export function useExcelParser() {
         const ruleColumns = [
           "Name",
           "Description",
-          "Parameters_JSON",
-          "command",
+          "Parameters",
+          "Command",
+          "Suggested_fix",
         ];
 
         const missingColumns = ruleColumns.filter(
@@ -130,12 +131,13 @@ export function useExcelParser() {
           const rule: RuleCreate = {
             name: rowData["Name"] || `Rule ${rowIndex}`,
             description: rowData["Description"] || "",
-            parameters: parseJsonSafely(rowData["Parameters_JSON"]) || {},
+            parameters: parseJsonSafely(rowData["Parameters"]) || {},
             command:
-              rowData["command"] && typeof rowData["command"] === "string"
-                ? rowData["command"].trim()
+              rowData["Command"] && typeof rowData["Command"] === "string"
+                ? rowData["Command"].trim()
                 : "",
             is_active: "active",
+            suggested_fix: rowData["Suggested_fix"] || "",
           };
 
           rules.push(rule);
@@ -149,13 +151,13 @@ export function useExcelParser() {
           totalRules: rules.length,
           uniqueRules: uniqueRules.length,
           duplicatesRemoved: removedCount,
-          format: "Name | Description | Parameters_JSON | command",
+          format: "Name | Description | Parameters | Command | Suggested_fix",
         });
 
         // Tạo warnings và errors
         const warnings: string[] = [
           `Parsed ${uniqueRules.length} rules from Excel file`,
-          `Format: Name | Description | Parameters_JSON | command`,
+          `Format: Name | Description | Parameters | Command | Suggested_fix`,
         ];
 
         const errors: string[] = [];

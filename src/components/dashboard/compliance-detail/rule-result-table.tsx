@@ -112,11 +112,6 @@ export function RuleResultTable({
     return values.map((v) => JSON.stringify(v)).join(", ");
   };
 
-  const getOutputTooltip = (output: Record<string, any> | null | undefined) => {
-    if (!output) return t("table.values.noOutput");
-    return JSON.stringify(output, null, 2);
-  };
-
   const handleStatusToggle = (ruleResult: RuleResult) => {
     if (!isAdmin()) return; // Chỉ admin mới có thể toggle
     const newStatus = ruleResult.status === "passed" ? "failed" : "passed";

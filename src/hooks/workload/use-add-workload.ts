@@ -185,6 +185,7 @@ export function useAddWorkload() {
           parameters: rule.parameters || {},
           is_active: "active",
           command: rule.command || "",
+          suggested_fix: rule.suggested_fix || "",
         }));
 
         const requestData: CreateWorkloadRequest = {

@@ -13,8 +13,9 @@ export interface WorkloadWithRulesAndCommandsRequest {
 interface SimpleTemplateRow {
   Name: string;
   Description: string;
-  Parameters_JSON: string;
-  command: string;
+  Parameters: string;
+  Command: string;
+  Suggested_fix: string;
 }
 
 export class ExcelTemplateGenerator {
@@ -24,28 +25,22 @@ export class ExcelTemplateGenerator {
         Name: "file-max",
         Description:
           "Giới hạn tối đa số file mà toàn bộ hệ thống Linux có thể mở cùng lúc",
-        Parameters_JSON: JSON.stringify({
+        Parameters: JSON.stringify({
           default_value: "9223372036854775807",
         }),
-        command: "cat /proc/sys/fs/file-max",
+        Command: "cat /proc/sys/fs/file-max",
+        Suggested_fix: "echo 9223372036854775807 > /proc/sys/fs/file-max",
       },
       {
         Name: "net.ipv4.tcp_rmem",
         Description:
           "Tham số quy định ba giá trị ngưỡng cho bộ đệm nhận của TCP socket, tính theo byte",
-        Parameters_JSON: JSON.stringify({
+        Parameters: JSON.stringify({
           recommended: "4096 87380 56623104",
         }),
-        command: "cat /proc/sys/net/ipv4/tcp_rmem",
-      },
-      {
-        Name: "password_policy",
-        Description: "Chính sách mật khẩu cho tài khoản",
-        Parameters_JSON: JSON.stringify({
-          condition: "ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1",
-        }),
-        command:
-          "grep -E 'ucredit\\|lcredit\\|dcredit\\|ocredit' /etc/pam.d/common-password /etc/security/pwquality.conf 2>/dev/null",
+        Command: "cat /proc/sys/net/ipv4/tcp_rmem",
+        Suggested_fix:
+          "echo '4096 87380 56623104' > /proc/sys/net/ipv4/tcp_rmem",
       },
     ];
   }
@@ -59,9 +54,10 @@ export class ExcelTemplateGenerator {
       const rule: RuleCreate = {
         name: row.Name || "",
         description: row.Description || "",
-        parameters: this.parseJsonSafely(row.Parameters_JSON),
-        is_active: true,
-        command: row.command || "",
+        parameters: this.parseJsonSafely(row.Parameters) || {},
+        suggested_fix: row.Suggested_fix || "",
+        is_active: "active",
+        command: row.Command || "",
       };
 
       rules.push(rule);

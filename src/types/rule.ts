@@ -9,6 +9,7 @@ export interface RuleResponse {
   created_at: string;
   updated_at: string;
   can_be_copied: boolean;
+  suggested_fix: string;
 }
 
 export interface RuleCreate {
@@ -19,6 +20,7 @@ export interface RuleCreate {
   parameters?: Record<string, any>;
   is_active: string;
   command: string;
+  suggested_fix: string;
 }
 
 export interface RuleListResponse {
