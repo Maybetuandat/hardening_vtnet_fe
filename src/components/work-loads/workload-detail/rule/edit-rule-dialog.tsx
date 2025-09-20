@@ -46,6 +46,11 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   const { t } = useTranslation("workload");
   const { isAdmin } = usePermissions();
   const [loading, setLoading] = useState(false);
+
+  // State riêng cho parameters text để user có thể edit một cách tự nhiên
+  const [parametersText, setParametersText] = useState("");
+  const [isValidJson, setIsValidJson] = useState(true);
+
   const [formData, setFormData] = useState<RuleCreate>({
     name: rule.name,
     description: rule.description || "",
@@ -53,6 +58,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     parameters: rule.parameters || {},
     is_active: rule.is_active,
     command: rule.command || "",
+    suggested_fix: rule.suggested_fix || "",
   });
 
   const { updateRule } = useRules();
@@ -71,6 +77,14 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
 
   useEffect(() => {
     if (open) {
+      const initialParametersText = JSON.stringify(
+        rule.parameters || {},
+        null,
+        2
+      );
+      setParametersText(initialParametersText);
+      setIsValidJson(true);
+
       setFormData({
         name: rule.name,
         description: rule.description || "",
@@ -78,12 +92,18 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
         parameters: rule.parameters || {},
         is_active: rule.is_active,
         command: rule.command || "",
+        suggested_fix: rule.suggested_fix || "",
       });
     }
   }, [open, rule]);
 
   const handleSubmit = async () => {
-    if (!formData.name.trim() || !formData.command.trim() || isEditDisabled) {
+    if (
+      !formData.name.trim() ||
+      !formData.command.trim() ||
+      isEditDisabled ||
+      !isValidJson
+    ) {
       return;
     }
 
@@ -99,6 +119,14 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   };
 
   const handleCancel = () => {
+    const initialParametersText = JSON.stringify(
+      rule.parameters || {},
+      null,
+      2
+    );
+    setParametersText(initialParametersText);
+    setIsValidJson(true);
+
     setFormData({
       name: rule.name,
       description: rule.description || "",
@@ -106,6 +134,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
       parameters: rule.parameters || {},
       is_active: rule.is_active,
       command: rule.command || "",
+      suggested_fix: rule.suggested_fix || "",
     });
     onOpenChange(false);
   };
@@ -116,9 +145,31 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !isEditDisabled) {
+    if (
+      e.key === "Enter" &&
+      (e.ctrlKey || e.metaKey) &&
+      !isEditDisabled &&
+      isValidJson
+    ) {
       e.preventDefault();
       handleSubmit();
+    }
+  };
+
+  // Xử lý thay đổi parameters
+  const handleParametersChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newText = e.target.value;
+    setParametersText(newText); // Luôn update text hiển thị
+
+    try {
+      const params = JSON.parse(newText);
+      setFormData((prev) => ({ ...prev, parameters: params }));
+      setIsValidJson(true);
+    } catch {
+      // JSON không hợp lệ, chỉ update text, không update formData.parameters
+      setIsValidJson(false);
     }
   };
 
@@ -209,29 +260,54 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
             </p>
           </div>
 
-          {/* Parameters Field */}
+          {/* Parameters Field - Fixed with separate text state */}
           <div className="space-y-2">
             <Label htmlFor="parameters">
               {t("ruleDialog.parametersLabel")}
             </Label>
             <Textarea
               id="parameters"
-              value={JSON.stringify(formData.parameters, null, 2)}
-              onChange={(e) => {
-                try {
-                  const params = JSON.parse(e.target.value);
-                  setFormData((prev) => ({ ...prev, parameters: params }));
-                } catch {
-                  // Ignore invalid JSON and do not update parameters
-                }
-              }}
+              value={parametersText}
+              onChange={handleParametersChange}
               placeholder='{"key": "value"}'
               rows={4}
               disabled={loading || isEditDisabled}
-              className="font-mono text-sm"
+              className={`font-mono text-sm ${
+                !isValidJson ? "border-red-300 focus:border-red-500" : ""
+              }`}
+            />
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-muted-foreground">
+                {t("ruleDialog.parametersHelp")}
+              </p>
+              {!isValidJson && (
+                <p className="text-xs text-red-500">
+                  Invalid JSON format. Please check your syntax.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Suggested Fix Field */}
+          <div className="space-y-2">
+            <Label htmlFor="suggested_fix">
+              {t("ruleDialog.suggestedFixLabel")}
+            </Label>
+            <Textarea
+              id="suggested_fix"
+              value={formData.suggested_fix}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  suggested_fix: e.target.value,
+                }))
+              }
+              placeholder={t("ruleDialog.suggestedFixPlaceholder")}
+              rows={3}
+              disabled={loading || isEditDisabled}
             />
             <p className="text-xs text-muted-foreground">
-              {t("ruleDialog.parametersHelp")}
+              {t("ruleDialog.suggestedFixHelp")}
             </p>
           </div>
 
@@ -291,6 +367,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                 loading ||
                 !formData.name.trim() ||
                 !formData.command.trim() ||
+                !isValidJson ||
                 isEditDisabled
               }
             >
