@@ -19,15 +19,18 @@ import { RuleResult } from "@/types/rule-result";
 import { useRules } from "@/hooks/rule/use-rules";
 import { RuleResponse } from "@/types/rule";
 import { SuggestedFixDialog } from "./suggest_fix_dialog";
+import { useServerFix } from "@/hooks/rule-result/use-fix-rule-result";
 
 interface RuleResultTableProps {
   ruleResults: RuleResult[];
+  serverId: number;
   loading: boolean;
   error: string | null;
   currentPage: number;
   totalPages: number;
   totalItems: number;
   pageSize: number;
+  handleRefresh: () => void;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onStatusToggle: (
@@ -38,6 +41,7 @@ interface RuleResultTableProps {
 
 export function RuleResultTable({
   ruleResults,
+  serverId,
   loading,
   error,
   currentPage,
@@ -47,10 +51,12 @@ export function RuleResultTable({
   onPageChange,
   onPageSizeChange,
   onStatusToggle,
+  handleRefresh,
 }: RuleResultTableProps) {
   const { t } = useTranslation("compliance");
   const { isAdmin } = usePermissions();
   const { getRuleById } = useRules();
+  const { executing, executeServerFix } = useServerFix();
 
   // State for suggested fix dialog
   const [fixDialogState, setFixDialogState] = useState<{
@@ -136,8 +142,6 @@ export function RuleResultTable({
 
     try {
       // Fetch rule details to get suggested_fix
-
-      console.log("Fetching rule details for rule ID:", ruleResult.rule_id);
       const rule: RuleResponse = await getRuleById(ruleResult.rule_id);
 
       if (!rule.suggested_fix || rule.suggested_fix.trim() === "") {
@@ -169,16 +173,28 @@ export function RuleResultTable({
     });
   };
 
-  const handleExecuteFix = (ruleResultId: number, fixCommand: string) => {
-    // TODO: Implement the API call to execute the fix
-    console.log("Executing fix for rule result:", ruleResultId);
-    console.log("Fix command:", fixCommand);
+  const handleExecuteFix = async (ruleResultId: number) => {
+    try {
+      // Gọi API thông qua hook với single rule result
+      const result = await executeServerFix(serverId, [ruleResultId]);
 
-    // Close dialog after execution
-    handleCloseSuggestedFixDialog();
+      if (result.successful_fixes === 1) {
+        // Show success toast
+        handleRefresh();
+      }
+      // Close dialog after successful execution
+      handleCloseSuggestedFixDialog();
 
-    // Show success message or handle the execution result
-    // This will be implemented when you need the actual API call
+      // Log kết quả chi tiết
+      console.log("Fix execution completed:", result);
+
+      // Có thể trigger refresh data hoặc update UI state
+      // refreshData(); // nếu cần
+    } catch (error) {
+      console.error("Failed to execute fix:", error);
+      // Error đã được handle trong hook và hiển thị toast
+      // Không cần close dialog nếu có lỗi
+    }
   };
 
   const getSuggestedFixButton = (ruleResult: RuleResult) => {
@@ -193,10 +209,10 @@ export function RuleResultTable({
         size="sm"
         onClick={() => handleShowSuggestedFix(ruleResult)}
         className="flex items-center gap-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-        disabled={fixDialogState.loading}
+        disabled={fixDialogState.loading || executing}
       >
         <Wrench className="h-3.5 w-3.5" />
-        {t("suggestedFix.viewFix")}
+        {executing ? t("suggestedFix.executing") : t("suggestedFix.viewFix")}
       </Button>
     );
   };

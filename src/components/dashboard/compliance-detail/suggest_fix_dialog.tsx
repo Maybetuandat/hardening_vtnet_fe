@@ -19,7 +19,7 @@ interface SuggestedFixDialogProps {
   ruleResult: RuleResult | null;
   suggestedFix: string;
   ruleName: string;
-  onExecuteFix: (ruleResultId: number, fixCommand: string) => void;
+  onExecuteFix: (ruleResultId: number) => void;
 }
 
 export function SuggestedFixDialog({
@@ -31,21 +31,10 @@ export function SuggestedFixDialog({
   onExecuteFix,
 }: SuggestedFixDialogProps) {
   const { t } = useTranslation("compliance");
-  const [isCopied, setIsCopied] = useState(false);
-
-  const handleCopyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(suggestedFix);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy to clipboard:", err);
-    }
-  };
 
   const handleExecuteFix = () => {
     if (ruleResult) {
-      onExecuteFix(ruleResult.id, suggestedFix);
+      onExecuteFix(ruleResult.id);
     }
   };
 
@@ -100,15 +89,6 @@ export function SuggestedFixDialog({
                 <h4 className="font-medium text-sm text-muted-foreground">
                   {t("suggestedFix.command")}
                 </h4>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyToClipboard}
-                  className="flex items-center gap-2"
-                >
-                  <Copy className="h-4 w-4" />
-                  {isCopied ? t("suggestedFix.copied") : t("suggestedFix.copy")}
-                </Button>
               </div>
               <div className="bg-slate-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-auto max-h-60">
                 <pre className="whitespace-pre-wrap break-words">

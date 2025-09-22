@@ -56,12 +56,13 @@
     "empty": "Không tìm thấy rule results nào",
     "headers": {
       "index": "#",
-      "ruleName": "Rule Name",
-      "status": "Status",
-      "parameter": "Parameter",
-      "output": "Output",
+      "ruleName": "Tên quy tắc",
+      "status": "Trạng thái",
+      "parameter": "Tham số",
+      "output": "Đầu ra",
       "createdDate": "Ngày tạo",
-      "toggle": "Toggle"
+      "toggle": "Chuyển đổi",
+      "actions": "Hành động"
     },
     "status": {
       "passed": "Đạt",

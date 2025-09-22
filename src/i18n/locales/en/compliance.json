@@ -61,7 +61,8 @@
       "parameter": "Parameter",
       "output": "Output",
       "createdDate": "Created Date",
-      "toggle": "Toggle"
+      "toggle": "Toggle",
+      "actions": "Actions"
     },
     "status": {
       "passed": "Passed",

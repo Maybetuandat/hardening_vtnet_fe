@@ -248,12 +248,14 @@ export default function ComplianceDetailPage() {
       {/* Rule Results Table */}
       <RuleResultTable
         ruleResults={ruleResults}
+        serverId={complianceDetail?.server_id || 0}
         loading={loadingRules}
         error={error}
         currentPage={currentPage}
         totalPages={totalPages}
         totalItems={totalItems}
         pageSize={pageSize}
+        handleRefresh={handleRefresh}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onStatusToggle={handleStatusToggle}
