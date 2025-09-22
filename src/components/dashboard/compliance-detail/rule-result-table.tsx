@@ -136,6 +136,8 @@ export function RuleResultTable({
 
     try {
       // Fetch rule details to get suggested_fix
+
+      console.log("Fetching rule details for rule ID:", ruleResult.rule_id);
       const rule: RuleResponse = await getRuleById(ruleResult.rule_id);
 
       if (!rule.suggested_fix || rule.suggested_fix.trim() === "") {
