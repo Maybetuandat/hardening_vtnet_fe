@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Table,
@@ -11,17 +11,14 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  XCircle,
-  MinusCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, XCircle, Wrench } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { AdminOnly } from "@/components/auth/role-guard";
 import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { RuleResult } from "@/types/rule-result";
+import { useRules } from "@/hooks/rule/use-rules";
+import { RuleResponse } from "@/types/rule";
+import { SuggestedFixDialog } from "./suggest_fix_dialog";
 
 interface RuleResultTableProps {
   ruleResults: RuleResult[];
@@ -53,6 +50,22 @@ export function RuleResultTable({
 }: RuleResultTableProps) {
   const { t } = useTranslation("compliance");
   const { isAdmin } = usePermissions();
+  const { getRuleById } = useRules();
+
+  // State for suggested fix dialog
+  const [fixDialogState, setFixDialogState] = useState<{
+    isOpen: boolean;
+    ruleResult: RuleResult | null;
+    suggestedFix: string;
+    ruleName: string;
+    loading: boolean;
+  }>({
+    isOpen: false,
+    ruleResult: null,
+    suggestedFix: "",
+    ruleName: "",
+    loading: false,
+  });
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -113,9 +126,77 @@ export function RuleResultTable({
   };
 
   const handleStatusToggle = (ruleResult: RuleResult) => {
-    if (!isAdmin()) return; // Chỉ admin mới có thể toggle
+    if (!isAdmin()) return;
     const newStatus = ruleResult.status === "passed" ? "failed" : "passed";
     onStatusToggle(ruleResult.id, newStatus);
+  };
+
+  const handleShowSuggestedFix = async (ruleResult: RuleResult) => {
+    setFixDialogState((prev) => ({ ...prev, loading: true }));
+
+    try {
+      // Fetch rule details to get suggested_fix
+      const rule: RuleResponse = await getRuleById(ruleResult.rule_id);
+
+      if (!rule.suggested_fix || rule.suggested_fix.trim() === "") {
+        // Show error toast or message that no suggested fix available
+        console.error("No suggested fix available for this rule");
+        return;
+      }
+
+      setFixDialogState({
+        isOpen: true,
+        ruleResult,
+        suggestedFix: rule.suggested_fix,
+        ruleName: rule.name,
+        loading: false,
+      });
+    } catch (error) {
+      console.error("Error fetching rule details:", error);
+      setFixDialogState((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handleCloseSuggestedFixDialog = () => {
+    setFixDialogState({
+      isOpen: false,
+      ruleResult: null,
+      suggestedFix: "",
+      ruleName: "",
+      loading: false,
+    });
+  };
+
+  const handleExecuteFix = (ruleResultId: number, fixCommand: string) => {
+    // TODO: Implement the API call to execute the fix
+    console.log("Executing fix for rule result:", ruleResultId);
+    console.log("Fix command:", fixCommand);
+
+    // Close dialog after execution
+    handleCloseSuggestedFixDialog();
+
+    // Show success message or handle the execution result
+    // This will be implemented when you need the actual API call
+  };
+
+  const getSuggestedFixButton = (ruleResult: RuleResult) => {
+    // Only show for failed status
+    if (ruleResult.status !== "failed") {
+      return null;
+    }
+
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleShowSuggestedFix(ruleResult)}
+        className="flex items-center gap-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+        disabled={fixDialogState.loading}
+      >
+        <Wrench className="h-3.5 w-3.5" />
+        {t("suggestedFix.viewFix")}
+      </Button>
+    );
   };
 
   const getToggleButton = (ruleResult: RuleResult) => {
@@ -133,7 +214,6 @@ export function RuleResultTable({
       );
     }
 
-    // Chỉ admin mới thấy toggle button hoạt động
     if (!isAdmin()) {
       return (
         <div className="w-14 h-7 bg-gray-200 rounded-full flex items-center justify-center">
@@ -212,120 +292,137 @@ export function RuleResultTable({
   }
 
   return (
-    <Card>
-      {ruleResults && ruleResults.length > 0 ? (
-        <>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">
-                    {t("table.headers.index")}
-                  </TableHead>
-                  <TableHead className="min-w-[200px]">
-                    {t("table.headers.ruleName")}
-                  </TableHead>
-                  <TableHead className="w-[120px]">
-                    {t("table.headers.status")}
-                  </TableHead>
-                  <TableHead className="min-w-[250px]">
-                    {t("table.headers.parameter")}
-                  </TableHead>
-                  <TableHead className="min-w-[250px]">
-                    {t("table.headers.output")}
-                  </TableHead>
-                  <TableHead className="w-[180px]">
-                    {t("table.headers.createdDate")}
-                  </TableHead>
-                  {/* Chỉ hiển thị cột Toggle cho admin */}
-                  <AdminOnly>
-                    <TableHead className="w-[100px] text-center">
-                      {t("table.headers.toggle")}
+    <>
+      <Card>
+        {ruleResults && ruleResults.length > 0 ? (
+          <>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">
+                      {t("table.headers.index")}
                     </TableHead>
-                  </AdminOnly>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ruleResults.map((ruleResult, index) => (
-                  <TableRow key={ruleResult.id} className="hover:bg-muted/50">
-                    <TableCell className="font-mono text-sm text-muted-foreground align-top">
-                      {(currentPage - 1) * pageSize + index + 1}
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="space-y-1">
-                        <div className="font-medium text-foreground break-words">
-                          {ruleResult.rule_name || `Rule ${ruleResult.rule_id}`}
-                        </div>
-                        {ruleResult.message && (
-                          <div className="text-sm text-muted-foreground break-words">
-                            {ruleResult.message}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      {getStatusBadge(ruleResult.status)}
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="max-w-[250px]">
-                        <div className="text-sm font-mono break-words whitespace-pre-wrap">
-                          {formatOutput(ruleResult.parameters)}
-                        </div>
-                        {ruleResult.details && (
-                          <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
-                            {ruleResult.details}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="max-w-[250px]">
-                        <div className="text-sm font-mono break-words whitespace-pre-wrap">
-                          {formatOutput(ruleResult.output)}
-                        </div>
-                        {ruleResult.details && (
-                          <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
-                            {ruleResult.details}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="align-top">
-                      <div className="text-sm whitespace-nowrap">
-                        {formatDate(ruleResult.created_at)}
-                      </div>
-                    </TableCell>
-                    {/* Chỉ hiển thị Toggle cho admin */}
+                    <TableHead className="min-w-[200px]">
+                      {t("table.headers.ruleName")}
+                    </TableHead>
+                    <TableHead className="w-[120px]">
+                      {t("table.headers.status")}
+                    </TableHead>
+                    <TableHead className="min-w-[250px]">
+                      {t("table.headers.parameter")}
+                    </TableHead>
+                    <TableHead className="min-w-[250px]">
+                      {t("table.headers.output")}
+                    </TableHead>
+                    <TableHead className="w-[180px]">
+                      {t("table.headers.createdDate")}
+                    </TableHead>
+                    <TableHead className="w-[150px] text-center">
+                      {t("table.headers.actions")}
+                    </TableHead>
                     <AdminOnly>
-                      <TableCell className="text-center align-top">
-                        {getToggleButton(ruleResult)}
-                      </TableCell>
+                      <TableHead className="w-[100px] text-center">
+                        {t("table.headers.toggle")}
+                      </TableHead>
                     </AdminOnly>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {ruleResults.map((ruleResult, index) => (
+                    <TableRow key={ruleResult.id} className="hover:bg-muted/50">
+                      <TableCell className="font-mono text-sm text-muted-foreground align-top">
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <div className="space-y-1">
+                          <div className="font-medium text-foreground break-words">
+                            {ruleResult.rule_name ||
+                              `Rule ${ruleResult.rule_id}`}
+                          </div>
+                          {ruleResult.message && (
+                            <div className="text-sm text-muted-foreground break-words">
+                              {ruleResult.message}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-top">
+                        {getStatusBadge(ruleResult.status)}
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <div className="max-w-[250px]">
+                          <div className="text-sm font-mono break-words whitespace-pre-wrap">
+                            {formatOutput(ruleResult.parameters)}
+                          </div>
+                          {ruleResult.details && (
+                            <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
+                              {ruleResult.details}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <div className="max-w-[250px]">
+                          <div className="text-sm font-mono break-words whitespace-pre-wrap">
+                            {formatOutput(ruleResult.output)}
+                          </div>
+                          {ruleResult.details && (
+                            <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">
+                              {ruleResult.details}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-top">
+                        <div className="text-sm whitespace-nowrap">
+                          {formatDate(ruleResult.created_at)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center align-top">
+                        {getSuggestedFixButton(ruleResult)}
+                      </TableCell>
+                      <AdminOnly>
+                        <TableCell className="text-center align-top">
+                          {getToggleButton(ruleResult)}
+                        </TableCell>
+                      </AdminOnly>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-          {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalElements={totalItems}
-            pageSize={pageSize}
-            onPageChange={onPageChange}
-            onPageSizeChange={onPageSizeChange}
-            loading={loading}
-            showInfo={true}
-            showPageSizeSelector={true}
-            className="px-6 py-4"
-          />
-        </>
-      ) : (
-        <div className="p-8 text-center">
-          <div className="text-muted-foreground">{t("table.empty")}</div>
-        </div>
-      )}
-    </Card>
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalElements={totalItems}
+              pageSize={pageSize}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              loading={loading}
+              showInfo={true}
+              showPageSizeSelector={true}
+              className="px-6 py-4"
+            />
+          </>
+        ) : (
+          <div className="p-8 text-center">
+            <div className="text-muted-foreground">{t("table.empty")}</div>
+          </div>
+        )}
+      </Card>
+
+      {/* Suggested Fix Dialog */}
+      <SuggestedFixDialog
+        isOpen={fixDialogState.isOpen}
+        onClose={handleCloseSuggestedFixDialog}
+        ruleResult={fixDialogState.ruleResult}
+        suggestedFix={fixDialogState.suggestedFix}
+        ruleName={fixDialogState.ruleName}
+        onExecuteFix={handleExecuteFix}
+      />
+    </>
   );
 }

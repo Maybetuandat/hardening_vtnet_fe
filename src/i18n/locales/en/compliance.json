@@ -95,5 +95,21 @@
     "messages": {
       "dataRefreshed": "Data has been refreshed"
     }
+  },
+  "suggestedFix": {
+    "title": "Suggested Fix",
+    "description": "Review and execute the suggested fix command for this failed rule",
+    "viewFix": "View Fix",
+    "ruleInfo": "Rule Information",
+    "message": "Message",
+    "command": "Fix Command",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "cancel": "Cancel",
+    "execute": "Execute Fix",
+    "warning": {
+      "title": "Warning",
+      "description": "Please review the command carefully before executing. This action may modify system configuration and should be tested in a safe environment first."
+    }
   }
 }
