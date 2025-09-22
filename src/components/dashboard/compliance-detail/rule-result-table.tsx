@@ -76,36 +76,29 @@ export function RuleResultTable({
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       passed: {
-        variant: "success",
+        bgClass: "bg-green-100 text-green-800 border-green-200",
         icon: CheckCircle,
         label: t("table.status.passed"),
-        color: "text-green-600",
       },
       failed: {
-        variant: "destructive",
+        bgClass: "bg-red-100 text-red-800 border-red-200",
         icon: XCircle,
         label: t("table.status.failed"),
-        color: "text-red-600",
       },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || {
-      variant: "secondary",
-      icon: AlertCircle,
-      label: status,
-      color: "text-gray-600",
-    };
+    const config = statusConfig[status as keyof typeof statusConfig];
+    if (!config) return null;
 
     const Icon = config.icon;
 
     return (
-      <Badge
-        variant={config.variant as any}
-        className="flex items-center gap-1.5 px-2.5 py-1"
+      <div
+        className={`rounded-full border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center gap-1.5 px-2.5 py-1 ${config.bgClass}`}
       >
         <Icon className="h-3.5 w-3.5" />
         {config.label}
-      </Badge>
+      </div>
     );
   };
 
