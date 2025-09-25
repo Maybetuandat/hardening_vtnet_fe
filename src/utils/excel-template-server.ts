@@ -3,13 +3,13 @@ import * as XLSX from "xlsx";
 export const downloadServerTemplate = () => {
   try {
     // Định nghĩa headers
-    const headers = ["IP Server", "SSH User", "SSH Port", "SSH Password"];
+    const headers = ["IP Server", "Instance Role"];
 
     // Tạo dữ liệu mẫu
     const sampleData = [
-      ["192.168.1.100", "root", 22, "password123"],
-      ["192.168.1.101", "admin", 22, "admin123"],
-      ["10.0.0.50", "ubuntu", 2222, "ubuntu@123"],
+      ["192.168.1.3", "compute-server"], // for user1
+      ["192.168.1.5", "web-server"], // for user2
+      ["192.168.1.34", "db-server"], // for user2
     ];
 
     // Tạo worksheet từ array of arrays
@@ -18,10 +18,8 @@ export const downloadServerTemplate = () => {
 
     // Set độ rộng cột
     const columnWidths = [
-      { wch: 20 }, // IP Server
-      { wch: 15 }, // SSH User
-      { wch: 10 }, // SSH Port
-      { wch: 20 }, // SSH Password
+      { wch: 40 }, // IP Server
+      { wch: 45 }, // Instance Role
     ];
     worksheet["!cols"] = columnWidths;
 

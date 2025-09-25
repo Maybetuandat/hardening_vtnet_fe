@@ -21,19 +21,6 @@ export const ServerUploadHeader: React.FC<ServerUploadHeaderProps> = ({
   const { t } = useTranslation("server");
   const { downloadTemplate } = useServerTemplate();
 
-  const handleDownloadTemplate = useCallback(() => {
-    const result = downloadTemplate();
-    if (result.success) {
-      toastHelper.success(t("serverUploadHeader.toastHelper.downloadSuccess"));
-    } else {
-      toastHelper.error(
-        t("serverUploadHeader.toastHelper.downloadError", {
-          message: result.message,
-        })
-      );
-    }
-  }, [downloadTemplate, t]);
-
   return (
     <Card>
       <CardHeader>
@@ -60,7 +47,7 @@ export const ServerUploadHeader: React.FC<ServerUploadHeaderProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleDownloadTemplate}
+            onClick={downloadTemplate}
             className="flex items-center gap-2"
           >
             <Download className="h-4 w-4" />
