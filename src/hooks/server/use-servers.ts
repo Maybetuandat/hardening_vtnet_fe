@@ -72,7 +72,7 @@ export function useServers(): UseServersReturn {
         );
 
         setServers(response.instances);
-        setTotalServers(response.total_servers);
+        setTotalServers(response.total_instances);
         setTotalPages(response.total_pages);
         setCurrentPage(response.page);
         setPageSize(response.page_size);

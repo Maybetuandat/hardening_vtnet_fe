@@ -45,7 +45,7 @@ export interface ServerResponse extends Server {
 // Response từ API list servers
 export interface ServerListResponse {
   instances: ServerResponse[];
-  total_servers: number;
+  total_instances: number;
   page: number;
   page_size: number;
   total_pages: number;
