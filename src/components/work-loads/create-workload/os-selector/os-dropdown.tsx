@@ -92,7 +92,7 @@ export const OSDropdown: React.FC<OSDropdownProps> = ({
               )}
             />
             <div className="flex flex-col">
-              <span className="font-medium">{os.version}</span>
+              <span className="font-medium">{os.name}</span>
               <span className="text-xs text-muted-foreground">ID: {os.id}</span>
             </div>
           </div>

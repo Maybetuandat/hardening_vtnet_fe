@@ -28,7 +28,7 @@ export interface WorkloadResponse {
   description?: string;
   created_at: string;
   updated_at: string;
-  os_version: string;
+  os_name: string;
 }
 
 export interface WorkloadUpdate {

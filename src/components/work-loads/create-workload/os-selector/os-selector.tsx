@@ -174,7 +174,7 @@ export const OSSelector: React.FC<OSSelectorProps> = ({
           disabled={disabled}
         >
           <span className="truncate">
-            {selectedOS ? selectedOS.version : finalPlaceholder}
+            {selectedOS ? selectedOS.name : finalPlaceholder}
           </span>
           <ChevronDown
             className={cn(

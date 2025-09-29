@@ -92,7 +92,7 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
                   {t("workloadDetail.info.fields.operatingSystem")}
                 </p>
                 <p className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-md inline-block">
-                  {workload.os_version}
+                  {workload.os_name}
                 </p>
               </div>
             </div>
