@@ -1,7 +1,7 @@
 export interface Server {
   id: number;
-  hostname: string;
-  ip_address: string;
+  name: string;
+
   os_version?: string;
   ssh_port: number;
   ssh_user?: string;
@@ -15,8 +15,8 @@ export interface Server {
 }
 
 export interface ServerCreate {
-  hostname: string;
-  ip_address: string;
+  name: string;
+
   os_version: string;
   ssh_port: number;
   ssh_user: string;
@@ -25,8 +25,8 @@ export interface ServerCreate {
 }
 
 export interface ServerUpdate {
-  hostname?: string;
-  ip_address?: string;
+  name?: string;
+
   os_version?: string;
   ssh_port?: number;
   ssh_user?: string;
@@ -44,7 +44,7 @@ export interface ServerResponse extends Server {
 
 // Response từ API list servers
 export interface ServerListResponse {
-  servers: ServerResponse[];
+  instances: ServerResponse[];
   total_servers: number;
   page: number;
   page_size: number;

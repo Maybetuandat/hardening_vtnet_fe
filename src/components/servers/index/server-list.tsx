@@ -57,6 +57,7 @@ export const ServerList: React.FC<ServerListProps> = ({
   const { isAdmin } = usePermissions();
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
+  console.log("Rendering ServerList with servers:", servers);
   const getStatusBadge = (status?: boolean) => {
     if (status === true) {
       return (
@@ -191,8 +192,8 @@ export const ServerList: React.FC<ServerListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("serverList.tableHeader.hostname")}</TableHead>
-                <TableHead>{t("serverList.tableHeader.ipAddress")}</TableHead>
+                <TableHead>{t("serverList.tableHeader.name")}</TableHead>
+
                 <TableHead>{t("serverList.tableHeader.osVersion")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.workload")}</TableHead>
                 <TableHead>{t("serverList.tableHeader.status")}</TableHead>
@@ -206,30 +207,22 @@ export const ServerList: React.FC<ServerListProps> = ({
             <TableBody>
               {servers.map((server) => (
                 <TableRow key={server.id}>
-                  <TableCell className="font-medium">
-                    {server.hostname}
-                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm">
-                        {server.ip_address}
-                      </span>
-                      {/* User có thể copy IP */}
-                      <UserOnly>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 hover:bg-muted"
-                          onClick={() => handleCopyIP(server.ip_address)}
-                          title={t("serverList.copyIpTooltip")}
-                        >
-                          {copiedIP === server.ip_address ? (
-                            <Check className="h-3 w-3 text-green-600" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                        </Button>
-                      </UserOnly>
+                      <span className="font-medium">{server.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-muted"
+                        onClick={() => handleCopyIP(server.name)}
+                        title={t("serverList.copyIpTooltip")}
+                      >
+                        {copiedIP === server.name ? (
+                          <Check className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
                     </div>
                   </TableCell>
                   <TableCell>

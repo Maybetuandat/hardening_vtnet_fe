@@ -33,8 +33,8 @@
       "historyNotImplemented": "Chức năng xem lịch sử hardening sẽ được triển khai sau"
     },
     "tableHeader": {
-      "hostname": "Hostname",
-      "ipAddress": "Địa chỉ IP",
+      "name": "Địa chỉ ip",
+
       "osVersion": "Phiên bản OS",
       "workload": "Workload",
       "status": "Trạng thái",

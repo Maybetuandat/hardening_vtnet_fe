@@ -71,7 +71,7 @@ export function useServers(): UseServersReturn {
           `/servers/?${params.toString()}`
         );
 
-        setServers(response.servers);
+        setServers(response.instances);
         setTotalServers(response.total_servers);
         setTotalPages(response.total_pages);
         setCurrentPage(response.page);

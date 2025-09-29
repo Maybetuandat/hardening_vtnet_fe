@@ -31,8 +31,8 @@
       "historyNotImplemented": "Hardening history view functionality will be implemented later"
     },
     "tableHeader": {
-      "hostname": "Hostname",
-      "ipAddress": "IP Address",
+      "name": "Ip address",
+
       "osVersion": "OS Version",
       "workload": "Workload",
       "status": "Status",

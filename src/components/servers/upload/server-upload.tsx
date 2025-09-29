@@ -77,15 +77,6 @@ export const ServerUpload = forwardRef<
     <div className="space-y-6">
       <ServerUploadHeader selectedWorkload={selectedWorkload} onBack={onBack} />
 
-      <ServerUploadArea
-        dragActive={dragActive}
-        uploading={uploading}
-        errors={errors}
-        hasServers={servers.length > 0}
-        setDragActive={setDragActive}
-        handleFileUpload={handleFileUpload}
-      />
-
       <ServerManagement
         servers={servers}
         uploadedFileName={uploadedFileName}
