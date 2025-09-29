@@ -80,10 +80,9 @@ export const ServerList = ({
         <ServerIcon className="h-4 w-4 text-muted-foreground" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
-            <span className="font-medium truncate">{server.ip_address}</span>
+            <span className="font-medium truncate">{server.name}</span>
           </div>
           <div className="text-sm text-muted-foreground truncate">
-            {server.hostname}
             {server.workload_name && (
               <span className="ml-2">• {server.workload_name}</span>
             )}

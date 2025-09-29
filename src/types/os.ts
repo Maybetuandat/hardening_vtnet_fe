@@ -1,16 +1,15 @@
 export interface OSVersion {
   id: number;
-  version: string;
-  created_at: string;
-  updated_at: string;
+  name: string;
+  display: string;
 }
 
 export interface OSCreate {
-  version: string;
+  name: string;
 }
 
 export interface OSUpdate {
-  version: string;
+  name: string;
 }
 
 export interface OSListResponse {

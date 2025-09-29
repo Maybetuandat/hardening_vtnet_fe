@@ -55,20 +55,10 @@ export const OSTable: React.FC<OSTableProps> = ({
                 {t("osTable.headers.id")}
               </TableHead>
               <TableHead className="font-semibold text-gray-900">
-                {t("osTable.headers.version")}
+                {t("osTable.headers.name")}
               </TableHead>
-              <TableHead className="font-semibold text-gray-900">
-                {t("osTable.headers.createdAt")}
-              </TableHead>
-              <TableHead className="font-semibold text-gray-900">
-                {t("osTable.headers.updatedAt")}
-              </TableHead>
+
               {/* Chỉ hiển thị cột Actions cho admin */}
-              <AdminOnly>
-                <TableHead className="font-semibold text-gray-900 text-right">
-                  {t("osTable.headers.actions")}
-                </TableHead>
-              </AdminOnly>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,45 +92,12 @@ export const OSTable: React.FC<OSTableProps> = ({
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="font-mono">
-                        {os.version}
+                        {os.display}
                       </Badge>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(os.created_at)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(os.updated_at)}
-                    </div>
-                  </TableCell>
+
                   {/* Chỉ hiển thị Actions cho admin */}
-                  <AdminOnly>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onEdit(os)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onDelete(os)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </AdminOnly>
                 </TableRow>
               ))
             )}

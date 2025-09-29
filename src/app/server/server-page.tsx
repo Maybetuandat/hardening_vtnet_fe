@@ -33,7 +33,7 @@ export default function ServersPage() {
   } = useServers();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [status, setStatus] = useState("status");
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);

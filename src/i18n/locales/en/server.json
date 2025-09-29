@@ -9,16 +9,16 @@
     }
   },
   "serverHeader": {
-    "title": "Server Management",
-    "description": "Manage and monitor servers in the system",
+    "title": "Instances Management",
+    "description": "Manage and monitor instances in the system",
     "refreshButton": "Refresh",
-    "uploadButton": "Upload Server"
+    "uploadButton": "Upload Instance"
   },
   "serverList": {
-    "title": "Server List",
+    "title": "List Instances",
     "loading": "Loading data...",
     "errorOccurred": "An error occurred:",
-    "noServersFound": "No servers found.",
+    "noServersFound": "No instances found.",
     "status": {
       "online": "Online",
       "offline": "Offline"
@@ -26,8 +26,8 @@
     "toast": {
       "copySuccess": "IP address copied!",
       "copyFail": "Failed to copy IP address",
-      "editNotImplemented": "Server edit functionality will be implemented later",
-      "deleteNotImplemented": "Server delete functionality will be implemented later",
+      "editNotImplemented": "Instance edit functionality will be implemented later",
+      "deleteNotImplemented": "Instance delete functionality will be implemented later",
       "historyNotImplemented": "Hardening history view functionality will be implemented later"
     },
     "tableHeader": {
@@ -45,18 +45,18 @@
     "actionsMenuTooltip": "View more actions",
     "openActionsMenu": "Open actions menu",
     "action": {
-      "editServer": "Edit server",
-      "deleteServer": "Delete server",
+      "editServer": "Edit instance",
+      "deleteServer": "Delete instance",
       "viewHistory": "View hardening history",
       "viewServer": "Detail"
     }
   },
   "serverViewDialog": {
-    "title": "Server Information",
+    "title": "Instance Information",
     "loading": "Loading information...",
-    "errorMessage": "Unable to load server information",
+    "errorMessage": "Unable to load instance information",
     "toast": {
-      "loadError": "Unable to load server information",
+      "loadError": "Unable to load instance information",
       "copySuccess": "IP address copied successfully",
       "copyError": "Unable to copy IP address"
     },
@@ -82,11 +82,11 @@
       "title": "Additional Information",
       "createdDate": "Created Date",
       "lastUpdated": "Last Updated",
-      "serverId": "Server ID"
+      "serverId": "Instance ID"
     }
   },
   "serverFormDialog": {
-    "title": "Edit Server",
+    "title": "Edit Instance",
     "loadingData": "Loading data...",
     "loadingWorkloads": "Loading...",
     "fields": {
@@ -183,7 +183,7 @@
     "fileSupport": "Supports .xlsx, .xls files (max 10MB)"
   },
   "serverManagement": {
-    "title": "Server List ({{count}} servers)",
+    "title": "Instances List ({{count}} instances)",
     "notDetermined": "Not determined",
     "status": {
       "testing": "Testing...",

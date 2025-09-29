@@ -12,7 +12,7 @@
   "osTable": {
     "headers": {
       "id": "ID",
-      "version": "Phiên bản",
+      "Tên": "Tên",
       "createdAt": "Ngày tạo",
       "updatedAt": "Cập nhật cuối",
       "actions": "Thao tác"

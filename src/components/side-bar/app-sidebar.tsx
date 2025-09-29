@@ -48,10 +48,10 @@ export function AppSidebar({
         isActive: location.pathname.startsWith("/workloads"),
       },
       {
-        title: t("navigation.servers"),
-        url: "/servers",
+        title: t("navigation.instances"),
+        url: "/instances",
         icon: Server,
-        isActive: location.pathname.startsWith("/servers"),
+        isActive: location.pathname.startsWith("/instances"),
       },
       {
         title: t("navigation.os"),

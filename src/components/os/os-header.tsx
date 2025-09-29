@@ -43,12 +43,12 @@ export const OSHeader: React.FC<OSHeaderProps> = ({
           </Button>
 
           {/* Chỉ admin mới thấy nút Add */}
-          <AdminOnly>
+          {/* <AdminOnly>
             <Button onClick={onAddClick} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               {t("osHeader.addButton")}
             </Button>
-          </AdminOnly>
+          </AdminOnly> */}
         </div>
       </div>
     </div>

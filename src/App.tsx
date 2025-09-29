@@ -123,7 +123,7 @@ function App() {
           />
 
           <Route
-            path="/servers"
+            path="/instances"
             element={
               <UserRoute>
                 <MainLayout>
