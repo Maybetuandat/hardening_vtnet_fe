@@ -3,54 +3,54 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Search, Users, CheckCheck, X } from "lucide-react";
-import { ServerList } from "./server-list";
-import { Server } from "@/types/instance";
+import { InstanceList } from "./server-list";
+import { Instance } from "@/types/instance";
 
-interface ServerSelectorProps {
-  servers: Server[];
-  selectedServers: Set<number>;
+interface InstanceSelectorProps {
+  instances: Instance[];
+  selectedInstances: Set<number>;
   searchTerm: string;
   loading: boolean;
   loadingMore: boolean;
   hasMore: boolean;
-  totalServers: number;
+  totalInstances: number;
   totalSelected: number;
   onSearchChange: (value: string) => void;
-  onServerToggle: (serverId: number) => void;
-  onSelectAllServers: () => void;
+  onInstanceToggle: (instanceId: number) => void;
+  onSelectAllInstances: () => void;
   onSelectNone: () => void;
   onLoadMore: () => void;
   t: (key: string, options?: any) => string;
 }
 
-export const ServerSelector = ({
-  servers,
-  selectedServers,
+export const InstanceSelector = ({
+  instances,
+  selectedInstances,
   searchTerm,
   loading,
   loadingMore,
   hasMore,
-  totalServers,
+  totalInstances,
   totalSelected,
   onSearchChange,
-  onServerToggle,
-  onSelectAllServers,
+  onInstanceToggle,
+  onSelectAllInstances,
   onSelectNone,
   onLoadMore,
   t,
-}: ServerSelectorProps) => {
+}: InstanceSelectorProps) => {
   return (
     <div className="space-y-4">
       {/* Header with server info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Label className="text-sm font-medium">
-            {t("scanDialog.selectServers")}
+            {t("scanDialog.selectinstances")}
           </Label>
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Users className="h-3 w-3" />
             <span>
-              {totalServers.toLocaleString()} {t("scanDialog.totalServers")}
+              {totalInstances.toLocaleString()} {t("scanDialog.totalinstances")}
               {searchTerm && ` (${t("scanDialog.filtered")})`}
             </span>
           </div>
@@ -62,13 +62,13 @@ export const ServerSelector = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onSelectAllServers}
-              disabled={loading || totalServers === 0}
+              onClick={onSelectAllInstances}
+              disabled={loading || totalInstances === 0}
               className="text-xs"
             >
               <CheckCheck className="h-3 w-3 mr-1" />
-              {t("scanDialog.selectAllServers")} (
-              {totalServers.toLocaleString()})
+              {t("scanDialog.selectAllinstances")} (
+              {totalInstances.toLocaleString()})
             </Button>
           )}
 
@@ -76,7 +76,7 @@ export const ServerSelector = ({
             variant="outline"
             size="sm"
             onClick={onSelectNone}
-            disabled={selectedServers.size === 0}
+            disabled={selectedInstances.size === 0}
             className="text-xs"
           >
             <X className="h-3 w-3 mr-1" />
@@ -102,36 +102,38 @@ export const ServerSelector = ({
           <div className="flex items-center space-x-2">
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               {totalSelected.toLocaleString()}{" "}
-              {totalSelected === 1 ? "server selected" : "servers selected"}
+              {totalSelected === 1 ? "server selected" : "instances selected"}
             </Badge>
-            {totalSelected !== selectedServers.size && (
+            {totalSelected !== selectedInstances.size && (
               <Badge variant="outline" className="text-xs">
-                {t("scanDialog.inCurrentView", { count: selectedServers.size })}
+                {t("scanDialog.inCurrentView", {
+                  count: selectedInstances.size,
+                })}
               </Badge>
             )}
           </div>
         ) : (
           <div className="text-xs text-muted-foreground">
-            {t("scanDialog.noServersSelected")}
+            {t("scanDialog.noinstancesSelected")}
           </div>
         )}
 
         {/* Performance info */}
         <div className="text-xs text-muted-foreground">
-          {t("scanDialog.showing")} {servers.length.toLocaleString()} /{" "}
-          {totalServers.toLocaleString()}
+          {t("scanDialog.showing")} {instances.length.toLocaleString()} /{" "}
+          {totalInstances.toLocaleString()}
         </div>
       </div>
 
-      {/* Server List */}
-      <ServerList
-        servers={servers}
-        selectedServers={selectedServers}
+      {/* Instance List */}
+      <InstanceList
+        Instances={instances}
+        selectedInstances={selectedInstances}
         loading={loading}
         loadingMore={loadingMore}
         hasMore={hasMore}
         searchTerm={searchTerm}
-        onServerToggle={onServerToggle}
+        onInstanceToggle={onInstanceToggle}
         onLoadMore={onLoadMore}
         t={t}
       />

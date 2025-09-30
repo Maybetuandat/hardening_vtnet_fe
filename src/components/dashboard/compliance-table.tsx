@@ -239,7 +239,7 @@ export function ComplianceTable({
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
                         <div className="font-medium">
-                          {compliance.server_ip}
+                          {compliance.instance_ip}
                         </div>
                         <Button
                           variant="ghost"
@@ -247,11 +247,11 @@ export function ComplianceTable({
                           className="h-6 w-6 p-0 hover:bg-muted"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleCopyIP(compliance.server_ip || "");
+                            handleCopyIP(compliance.instance_ip || "");
                           }}
                           title={t("table.actions.copyIP")}
                         >
-                          {copiedIP === compliance.server_ip ? (
+                          {copiedIP === compliance.instance_ip ? (
                             <Check className="h-3 w-3 text-green-600" />
                           ) : (
                             <Copy className="h-3 w-3" />
@@ -288,7 +288,7 @@ export function ComplianceTable({
                       size="sm"
                       className="h-8 w-8 p-0 hover:bg-muted"
                       onClick={() =>
-                        handleViewHardeningHistory(compliance.server_ip || "")
+                        handleViewHardeningHistory(compliance.instance_ip || "")
                       }
                       title={t("table.actions.viewHistory")}
                     >

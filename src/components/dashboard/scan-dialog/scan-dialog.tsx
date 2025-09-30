@@ -11,7 +11,7 @@ import { Play, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useScanDialog } from "@/hooks/scan-server/use-scan-dialog";
 import { ScanTypeSelector } from "./scan-type-selector";
-import { ServerSelector } from "./server-selector";
+import { InstanceSelector } from "./instance-selector";
 
 interface ScanDialogProps {
   open: boolean;
@@ -29,27 +29,26 @@ export default function ScanDialog({
   const {
     // State
     scanType,
-    servers,
-    selectedServers,
+    instances,
+    selectedInstances,
     searchTerm,
     loading,
     loadingMore,
     scanning,
     hasMore,
-    totalServers,
+    totalInstances,
     totalSelected,
     t,
 
     // Actions
     setScanType,
     setSearchTerm,
-    handleServerToggle,
-
-    handleSelectAllServers,
+    handleInstanceToggle,
+    handleSelectAllInstances,
     handleSelectNone,
     handleStartScan,
     resetState,
-    loadMoreServers,
+    loadMoreInstances,
   } = useScanDialog(open);
 
   // Handle close with state reset
@@ -65,7 +64,7 @@ export default function ScanDialog({
   };
 
   // Calculate scan info
-  const scanCount = scanType === "all" ? totalServers : totalSelected;
+  const scanCount = scanType === "all" ? totalInstances : totalSelected;
   const isLargeScan = scanCount > 1000;
   const canStartScan = scanType === "all" || totalSelected > 0;
 
@@ -76,10 +75,10 @@ export default function ScanDialog({
           <DialogTitle className="flex items-center space-x-2">
             <Play className="h-5 w-5" />
             <span>{t("scanDialog.title")}</span>
-            {totalServers > 0 && (
+            {totalInstances > 0 && (
               <span className="text-sm font-normal text-muted-foreground">
-                ({totalServers.toLocaleString()}{" "}
-                {t("scanDialog.serversAvailable")})
+                ({totalInstances.toLocaleString()}{" "}
+                {t("scanDialog.instancesAvailable")})
               </span>
             )}
           </DialogTitle>
@@ -87,12 +86,12 @@ export default function ScanDialog({
 
         <div className="space-y-6">
           {/* Large dataset warning */}
-          {totalServers > 5000 && (
+          {totalInstances > 5000 && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {t("scanDialog.warnings.largeDataset", {
-                  count: totalServers,
+                  count: totalInstances,
                 })}
               </AlertDescription>
             </Alert>
@@ -105,22 +104,22 @@ export default function ScanDialog({
             t={t}
           />
 
-          {/* Server Selection */}
+          {/* Instance Selection */}
           {scanType === "selected" && (
-            <ServerSelector
-              servers={servers}
-              selectedServers={selectedServers}
+            <InstanceSelector
+              instances={instances}
+              selectedInstances={selectedInstances}
               searchTerm={searchTerm}
               loading={loading}
               loadingMore={loadingMore}
               hasMore={hasMore}
-              totalServers={totalServers}
+              totalInstances={totalInstances}
               totalSelected={totalSelected}
               onSearchChange={setSearchTerm}
-              onServerToggle={handleServerToggle}
-              onSelectAllServers={handleSelectAllServers}
+              onInstanceToggle={handleInstanceToggle}
+              onSelectAllInstances={handleSelectAllInstances}
               onSelectNone={handleSelectNone}
-              onLoadMore={loadMoreServers}
+              onLoadMore={loadMoreInstances}
               t={t}
             />
           )}

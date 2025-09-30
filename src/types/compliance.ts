@@ -1,6 +1,6 @@
 export interface ComplianceResult {
   id: number;
-  server_id: number;
+  instance_id: number;
   status: string; // "pending" | "running" | "completed" | "failed"
   total_rules: number;
   passed_rules: number;
@@ -10,31 +10,13 @@ export interface ComplianceResult {
 
   updated_at: string;
   detail_error?: string;
-  server_ip?: string;
+  instance_ip?: string;
   workload_name?: string;
 }
 
 export interface ComplianceResultDetail extends ComplianceResult {
   server_hostname: string;
   workload_name: string;
-}
-
-export interface ComplianceResultCreate {
-  server_id: number;
-  status: string;
-  total_rules?: number;
-  passed_rules?: number;
-  failed_rules?: number;
-  score?: number;
-  server_ip?: string;
-}
-
-export interface ComplianceResultUpdate {
-  status?: string;
-  total_rules?: number;
-  passed_rules?: number;
-  failed_rules?: number;
-  score?: number;
 }
 
 export interface ComplianceSearchParams {

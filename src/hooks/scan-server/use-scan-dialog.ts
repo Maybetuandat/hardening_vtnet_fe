@@ -110,8 +110,8 @@ export const useScanDialog = (open: boolean) => {
     }
   }, [searchTerm, open, scanType]);
 
-  // Load more servers (infinite scroll)
-  const loadMoreServers = useCallback(async () => {
+  // Load more instances (infinite scroll)
+  const loadMoreInstances = useCallback(async () => {
     if (!hasMore || loadingMore || loading) return;
 
     try {
@@ -127,8 +127,8 @@ export const useScanDialog = (open: boolean) => {
 
       setCurrentPageInDialog(nextPage);
     } catch (error) {
-      console.error("Error loading more servers:", error);
-      toastHelper.error(t("scanDialog.messages.loadServersError"));
+      console.error("Error loading more instances:", error);
+      toastHelper.error(t("scanDialog.messages.loadInstancesError"));
     } finally {
       setLoadingMore(false);
     }
@@ -166,12 +166,12 @@ export const useScanDialog = (open: boolean) => {
     });
   }, []);
 
-  // Select all servers (including not loaded ones)
-  const handleSelectAllServers = useCallback(async () => {
+  // Select all instances (including not loaded ones)
+  const handleSelectAllInstances = useCallback(async () => {
     try {
       setLoadingMore(true);
 
-      // API call để lấy tất cả server IDs (chỉ lấy id và status để tối ưu)
+      // API call để lấy tất cả instance IDs (chỉ lấy id và status để tối ưu)
       const params = new URLSearchParams({
         page: "1",
         page_size: totalInstances.toString(),
@@ -182,11 +182,11 @@ export const useScanDialog = (open: boolean) => {
       }
 
       const response = await api.get<{
-        servers: Instance[];
-        total_servers: number;
-      }>(`/servers/?${params.toString()}`);
+        instances: Instance[];
+        total_instances: number;
+      }>(`/instance/?${params.toString()}`);
 
-      const activeInstanceIds = (response.servers || []).map((s) => s.id);
+      const activeInstanceIds = (response.instances || []).map((s) => s.id);
 
       setSelectedInstances(new Set(activeInstanceIds));
 
@@ -224,7 +224,7 @@ export const useScanDialog = (open: boolean) => {
         const batchSize = instanceIds && instanceIds.length > 1000 ? 50 : 10;
 
         const scanRequest = {
-          server_ids: instanceIds,
+          server_ids: instanceIds, // Backend vẫn dùng server_ids
           batch_size: batchSize,
         };
 
@@ -304,11 +304,10 @@ export const useScanDialog = (open: boolean) => {
     setScanType,
     setSearchTerm,
     handleInstanceToggle,
-
-    handleSelectAllServers,
+    handleSelectAllInstances,
     handleSelectNone,
     handleStartScan,
     resetState,
-    loadMoreServers,
+    loadMoreInstances,
   };
 };

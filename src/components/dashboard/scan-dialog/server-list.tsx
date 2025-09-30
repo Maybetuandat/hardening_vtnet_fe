@@ -3,37 +3,37 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Server as ServerIcon, Loader2 } from "lucide-react";
-import { Server } from "@/types/instance";
+import { Server as InstanceIcon, Loader2 } from "lucide-react";
+import { Instance } from "@/types/instance";
 
-interface ServerListProps {
-  servers: Server[];
-  selectedServers: Set<number>;
+interface InstanceListProps {
+  Instances: Instance[];
+  selectedInstances: Set<number>;
   loading: boolean;
   loadingMore: boolean;
   hasMore: boolean;
   searchTerm: string;
-  onServerToggle: (serverId: number) => void;
+  onInstanceToggle: (InstanceId: number) => void;
   onLoadMore: () => void;
   t: (key: string, options?: any) => string;
 }
 
-export const ServerList = ({
-  servers,
-  selectedServers,
+export const InstanceList = ({
+  Instances,
+  selectedInstances,
   loading,
   loadingMore,
   hasMore,
   searchTerm,
-  onServerToggle,
+  onInstanceToggle,
   onLoadMore,
   t,
-}: ServerListProps) => {
+}: InstanceListProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for infinite scroll
-  const handleObserver = useCallback(
+  // Intersection ObInstance for infinite scroll
+  const handleObInstance = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && hasMore && !loading && !loadingMore) {
@@ -50,68 +50,68 @@ export const ServerList = ({
       threshold: 0,
     };
 
-    const observer = new IntersectionObserver(handleObserver, option);
+    const obInstance = new IntersectionObserver(handleObInstance, option);
 
     if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+      obInstance.observe(loadMoreRef.current);
     }
 
     return () => {
-      observer.disconnect();
+      obInstance.disconnect();
     };
-  }, [handleObserver]);
+  }, [handleObInstance]);
 
-  // Memoized server row component for better performance
-  const ServerRow = useCallback(
-    ({ server }: { server: Server }) => (
+  // Memoized Instance row component for better performance
+  const InstanceRow = useCallback(
+    ({ Instance }: { Instance: Instance }) => (
       <div
-        key={server.id}
+        key={Instance.id}
         className={`flex items-center space-x-3 p-2 rounded-lg border cursor-pointer transition-colors ${
-          selectedServers.has(server.id)
+          selectedInstances.has(Instance.id)
             ? "bg-primary/10 border-primary"
             : "hover:bg-muted"
         }`}
-        onClick={() => onServerToggle(server.id)}
+        onClick={() => onInstanceToggle(Instance.id)}
       >
         <Checkbox
-          checked={selectedServers.has(server.id)}
-          onChange={() => onServerToggle(server.id)}
+          checked={selectedInstances.has(Instance.id)}
+          onChange={() => onInstanceToggle(Instance.id)}
         />
-        <ServerIcon className="h-4 w-4 text-muted-foreground" />
+        <InstanceIcon className="h-4 w-4 text-muted-foreground" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2">
-            <span className="font-medium truncate">{server.name}</span>
+            <span className="font-medium truncate">{Instance.name}</span>
           </div>
           <div className="text-sm text-muted-foreground truncate">
-            {server.workload_name && (
-              <span className="ml-2">• {server.workload_name}</span>
+            {Instance.workload_name && (
+              <span className="ml-2">• {Instance.workload_name}</span>
             )}
           </div>
         </div>
       </div>
     ),
-    [selectedServers, onServerToggle, t]
+    [selectedInstances, onInstanceToggle, t]
   );
 
   return (
     <ScrollArea className="h-80 border rounded-md" ref={scrollAreaRef}>
       <div className="p-3 space-y-2">
-        {loading && servers.length === 0 ? (
+        {loading && Instances.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
             {t("scanDialog.loading")}
           </div>
-        ) : servers.length === 0 ? (
+        ) : Instances.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             {searchTerm.trim()
               ? t("scanDialog.noResults")
-              : t("scanDialog.noServers")}
+              : t("scanDialog.noInstances")}
           </div>
         ) : (
           <>
-            {/* Server list */}
-            {servers.map((server) => (
-              <ServerRow key={server.id} server={server} />
+            {/* Instance list */}
+            {Instances.map((Instance) => (
+              <InstanceRow key={Instance.id} Instance={Instance} />
             ))}
 
             {/* Load more section */}
@@ -138,10 +138,10 @@ export const ServerList = ({
             )}
 
             {/* End message */}
-            {!hasMore && servers.length > 20 && (
+            {!hasMore && Instances.length > 20 && (
               <div className="text-center py-2 text-xs text-muted-foreground border-t">
-                {t("scanDialog.endOfList")} ({servers.length}{" "}
-                {t("scanDialog.serversLoaded")})
+                {t("scanDialog.endOfList")} ({Instances.length}{" "}
+                {t("scanDialog.InstancesLoaded")})
               </div>
             )}
           </>
