@@ -192,9 +192,22 @@
     "noResults": "Không tìm thấy hệ điều hành nào"
   },
   "workloadDetail": {
+    "title": "Chi tiết Workload",
     "actions": {
       "back": "Quay lại",
       "backToList": "Quay lại danh sách"
+    },
+    "tabs": {
+      "rules": "Quy tắc",
+      "instances": "Máy chủ"
+    },
+    "instances": {
+      "title": "Danh sách máy chủ",
+      "loading": "Đang tải danh sách máy chủ...",
+      "empty": {
+        "noInstances": "Không có máy chủ",
+        "description": "Workload này chưa có máy chủ nào."
+      }
     },
     "info": {
       "title": "Thông tin Workload",

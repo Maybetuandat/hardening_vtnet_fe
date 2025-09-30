@@ -192,14 +192,27 @@
     "noResults": "No operating systems found"
   },
   "workloadDetail": {
+    "title": "Workload Details",
     "actions": {
       "back": "Back",
       "backToList": "Back to list"
+    },
+    "tabs": {
+      "rules": "Rules",
+      "instances": "Instances"
     },
     "errors": {
       "notFound": "Workload not found",
       "loadError": "An error occurred while loading workload information",
       "invalidId": "Invalid workload ID"
+    },
+    "instances": {
+      "title": "Instances",
+      "loading": "Loading instances...",
+      "empty": {
+        "noInstances": "No Instances Found",
+        "description": "This workload doesn't have any instances yet."
+      }
     },
     "searchPlaceholder": "Search rule result by rule name or command...",
     "info": {

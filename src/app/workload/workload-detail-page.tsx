@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Shield, Server } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
+import { WorkloadInstancesSection } from "@/components/work-loads/workload-detail/workload-instances-section";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
 import { WorkloadResponse } from "@/types/workload";
 import toastHelper from "@/utils/toast-helper";
@@ -19,6 +21,7 @@ export const WorkloadDetailPage: React.FC = () => {
   const [workload, setWorkload] = useState<WorkloadResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("rules");
   const hasInitialized = useRef(false);
 
   const { getWorkloadById } = useWorkloads();
@@ -91,17 +94,18 @@ export const WorkloadDetailPage: React.FC = () => {
   if (error || !workload) {
     return (
       <div className="p-6">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold mb-2">
-            {t("workloadDetail.notFound.title")}
-          </h2>
-          <p className="text-muted-foreground mb-4">
-            {error || t("workloadDetail.notFound.description")}
-          </p>
-          <Button onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("workloadDetail.actions.backToList")}
+        <div className="flex items-center space-x-4 mb-6">
+          <Button variant="ghost" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
+          <h1 className="text-2xl font-semibold">
+            {t("workloadDetail.title")}
+          </h1>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-destructive">
+            {error || t("workloadDetail.errors.notFound")}
+          </p>
         </div>
       </div>
     );
@@ -112,32 +116,63 @@ export const WorkloadDetailPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="hover:bg-muted"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("workloadDetail.actions.back")}
+          <Button variant="ghost" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
+          <div>
+            <h1 className="text-2xl font-semibold">
+              {t("workloadDetail.title")}
+            </h1>
+            <p className="text-sm text-muted-foreground">{workload.name}</p>
+          </div>
         </div>
       </div>
 
       <Separator />
 
-      <div className="space-y-6">
-        <WorkloadInfoSection
-          workload={workload}
-          onUpdate={handleUpdateWorkload}
-        />
+      {/* Workload Info Section */}
+      <WorkloadInfoSection
+        workload={workload}
+        onUpdate={handleUpdateWorkload}
+      />
 
-        <RulesSection
-          workloadId={workload.id}
-          onRuleSelect={setSelectedRuleId}
-          selectedRuleId={selectedRuleId}
-        />
-      </div>
+      <Separator />
+
+      {/* Tabs for Rules and Instances */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger
+            value="rules"
+            className="flex items-center justify-center gap-2"
+          >
+            <Shield className="h-4 w-4" />
+            {t("workloadDetail.tabs.rules")}
+          </TabsTrigger>
+          <TabsTrigger
+            value="instances"
+            className="flex items-center justify-center gap-2"
+          >
+            <Server className="h-4 w-4" />
+            {t("workloadDetail.tabs.instances")}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="rules" className="space-y-4">
+          <RulesSection
+            workloadId={workload.id}
+            selectedRuleId={selectedRuleId}
+            onRuleSelect={setSelectedRuleId}
+          />
+        </TabsContent>
+
+        <TabsContent value="instances" className="space-y-4">
+          <WorkloadInstancesSection workloadId={workload.id} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
