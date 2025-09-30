@@ -54,7 +54,7 @@ export const InstanceList: React.FC<InstanceListProps> = ({
   onView,
 }) => {
   const { t } = useTranslation("instance");
-  const { isAdmin } = usePermissions();
+
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
   console.log("Rendering InstanceList with instances:", instances);
@@ -79,22 +79,6 @@ export const InstanceList: React.FC<InstanceListProps> = ({
       }, 2000);
     } catch (error) {
       toastHelper.error(t("InstanceList.toastHelper.copyFail"));
-    }
-  };
-
-  const handleEdit = (Instance: Instance) => {
-    if (onEdit) {
-      onEdit(Instance);
-    } else {
-      toastHelper.info(t("InstanceList.toastHelper.editNotImplemented"));
-    }
-  };
-
-  const handleDelete = (Instance: Instance) => {
-    if (onDelete) {
-      onDelete(Instance);
-    } else {
-      toastHelper.info(t("InstanceList.toastHelper.deleteNotImplemented"));
     }
   };
 

@@ -40,6 +40,7 @@ interface UseInstancesReturn {
     workloadId: number,
     instanceIds: number[]
   ) => Promise<AssignInstancesResponse>;
+  syncFromDCIM: () => Promise<void>;
 }
 
 export function useInstances(): UseInstancesReturn {
@@ -62,7 +63,6 @@ export function useInstances(): UseInstancesReturn {
       setLoading(true);
       setError(null);
       try {
-        // Build query parameters
         const params = new URLSearchParams();
         params.append("page", page.toString());
         params.append("page_size", size.toString());
@@ -72,7 +72,6 @@ export function useInstances(): UseInstancesReturn {
         }
 
         if (status && status !== "status") {
-          // Skip default filter value
           params.append("status", status);
         }
 
@@ -122,6 +121,7 @@ export function useInstances(): UseInstancesReturn {
     },
     [handleError]
   );
+
   const assignInstancesToWorkload = useCallback(
     async (
       workloadId: number,
@@ -132,7 +132,6 @@ export function useInstances(): UseInstancesReturn {
           `/instance/assign-workload?workload_id=${workloadId}`,
           instanceIds
         );
-
         return response;
       } catch (err) {
         handleError(err, "assign instances to workload");
@@ -146,7 +145,6 @@ export function useInstances(): UseInstancesReturn {
     async (InstanceData: InstanceCreate): Promise<Instance> => {
       try {
         const newInstance = await api.post<Instance>("/instance", InstanceData);
-        // Refresh Instance list after creation
         await fetchInstances(currentPage, pageSize);
         return newInstance;
       } catch (err) {
@@ -164,7 +162,6 @@ export function useInstances(): UseInstancesReturn {
           `/instance/${id}`,
           InstanceData
         );
-        // Update local state
         setInstances((prev) =>
           prev.map((Instance) =>
             Instance.id === id ? updatedInstance : Instance
@@ -183,7 +180,6 @@ export function useInstances(): UseInstancesReturn {
     async (id: number): Promise<void> => {
       try {
         await api.delete(`/instance/${id}`);
-        // Remove from local state
         setInstances((prev) => prev.filter((Instance) => Instance.id !== id));
         setTotalInstances((prev) => prev - 1);
       } catch (err) {
@@ -194,7 +190,17 @@ export function useInstances(): UseInstancesReturn {
     [handleError]
   );
 
-  // Fetch Instances on mount
+  const syncFromDCIM = useCallback(async (): Promise<void> => {
+    try {
+      const response = await api.get<InstanceListResponse>("/dcim/instances");
+      console.log("DCIM Sync result:", response);
+      return;
+    } catch (err) {
+      handleError(err, "sync from DCIM");
+      throw err;
+    }
+  }, [handleError]);
+
   useEffect(() => {
     fetchInstances(1, 10);
   }, [fetchInstances]);
@@ -214,5 +220,6 @@ export function useInstances(): UseInstancesReturn {
     deleteInstance,
     searchInstances,
     assignInstancesToWorkload,
+    syncFromDCIM,
   };
 }

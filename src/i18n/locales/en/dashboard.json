@@ -88,6 +88,10 @@
   },
   "scanDialog": {
     "title": "Start Compliance Scan",
+    "instancesAvailable": "Instance ",
+
+    "totalinstances": "Total instances",
+    "noinstancesSelected": " No instances selected",
     "scanMethod": "Scan Method",
     "scanAll": "Scan all servers",
     "scanSelected": "Scan selected servers",
@@ -108,10 +112,10 @@
 
     "selectVisible": "Select Visible",
     "selectAll": "Select All",
-    "selectAllServers": "Select All Servers",
+    "selectAllInstances": "Select All Instances",
     "deselectAll": "Deselect All",
-
-    "selectedCount": "{count, plural, =0 {No servers selected} =1 {1 server selected} other {{count} servers selected}}",
+    "selectInstances": "Select Instances",
+    "selectedCount": "{count, plural, =0 {No instances selected} =1 {1 instance selected} other {{count} instances selected}}",
     "inCurrentView": "{count} in view",
 
     "serverStatus": {

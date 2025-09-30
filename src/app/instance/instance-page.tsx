@@ -31,11 +31,13 @@ export default function ServersPage() {
     updateInstance,
     deleteInstance,
     getInstanceById,
+    syncFromDCIM,
   } = useInstances();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [status, setStatus] = useState("status");
+  const [syncing, setSyncing] = useState(false);
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -44,12 +46,10 @@ export default function ServersPage() {
   const [deletingServer, setDeletingServer] = useState<Instance | null>(null);
   const [viewingServer, setViewingServer] = useState<Instance | null>(null);
 
-  // Initial data load
   useEffect(() => {
     searchInstances("", status === "status" ? undefined : status, 1, pageSize);
   }, [searchInstances, pageSize]);
 
-  // Effect khi searchKeyword hoặc status thay đổi
   useEffect(() => {
     searchInstances(
       searchKeyword,
@@ -63,19 +63,16 @@ export default function ServersPage() {
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-    // KHÔNG tự động search gì cả, chỉ update UI
   }, []);
 
-  // Xử lý khi nhấn Enter
   const handleSearchSubmit = useCallback(() => {
     const trimmedSearch = searchTerm.trim();
     setSearchKeyword(trimmedSearch);
   }, [searchTerm]);
 
-  // Xử lý khi clear search
   const handleSearchClear = useCallback(() => {
     setSearchTerm("");
-    setSearchKeyword(""); // Reset về rỗng để fetch lại all data
+    setSearchKeyword("");
   }, []);
 
   const handleRefresh = useCallback(() => {
@@ -89,6 +86,37 @@ export default function ServersPage() {
       t("instancePage.refreshSuccess") || "Refreshed successfully"
     );
   }, [searchInstances, searchKeyword, status, currentPage, pageSize, t]);
+
+  const handleSyncDCIM = useCallback(async () => {
+    setSyncing(true);
+    try {
+      await syncFromDCIM();
+
+      toastHelper.success(t("dcimSync.successMessage"));
+
+      await searchInstances(
+        searchKeyword,
+        status === "status" ? undefined : status,
+        currentPage,
+        pageSize
+      );
+    } catch (error) {
+      console.error("Sync DCIM error:", error);
+      toastHelper.error(
+        error instanceof Error ? error.message : t("dcimSync.errorMessage")
+      );
+    } finally {
+      setSyncing(false);
+    }
+  }, [
+    syncFromDCIM,
+    searchInstances,
+    searchKeyword,
+    status,
+    currentPage,
+    pageSize,
+    t,
+  ]);
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -114,7 +142,6 @@ export default function ServersPage() {
     [searchInstances, searchKeyword, status]
   );
 
-  // Dialog event handlers
   const handleViewServer = useCallback((instance: Instance) => {
     setViewingServer(instance);
     setViewDialogOpen(true);
@@ -145,10 +172,13 @@ export default function ServersPage() {
 
   return (
     <div className="min-h-screen w-full px-6 space-y-6 mb-10">
-      {/* Header */}
-      <InstanceHeader onRefresh={handleRefresh} loading={loading} />
+      <InstanceHeader
+        onRefresh={handleRefresh}
+        onSyncDCIM={handleSyncDCIM}
+        loading={loading}
+        syncing={syncing}
+      />
 
-      {/* Search and Filters */}
       <Card className="p-6">
         <FilterBar
           searchTerm={searchTerm}
@@ -175,7 +205,6 @@ export default function ServersPage() {
         />
       </Card>
 
-      {/* Instance List */}
       <InstanceList
         key={`instance-list-${Date.now()}`}
         instances={instances}
@@ -187,7 +216,6 @@ export default function ServersPage() {
         onViewHardeningHistory={handleViewHardeningHistory}
       />
 
-      {/* Pagination */}
       {!loading && !error && (
         <Pagination
           currentPage={currentPage}
@@ -203,7 +231,6 @@ export default function ServersPage() {
         />
       )}
 
-      {/* View Dialog - Chỉ cần quyền user */}
       <InstanceViewDialog
         open={viewDialogOpen}
         onOpenChange={setViewDialogOpen}

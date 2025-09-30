@@ -12,7 +12,18 @@
     "title": "Quản lý instance",
     "description": "Quản lý và giám sát các instance trong hệ thống",
     "refreshButton": "Làm mới",
-    "uploadButton": "Upload instance"
+    "uploadButton": "Upload instance",
+    "syncDCIMButton": "Đồng bộ DCIM",
+    "syncing": "Đang đồng bộ..."
+  },
+  "dcimSync": {
+    "confirmTitle": "Xác nhận đồng bộ dữ liệu",
+    "confirmDescription": "Bạn có chắc chắn muốn đồng bộ dữ liệu từ DCIM không?",
+    "confirmNote": "Thao tác này sẽ cập nhật thông tin instances từ hệ thống DCIM về database của bạn.",
+    "cancelButton": "Hủy",
+    "confirmButton": "Đồng bộ",
+    "successMessage": "Đồng bộ dữ liệu từ DCIM thành công!",
+    "errorMessage": "Có lỗi xảy ra khi đồng bộ dữ liệu từ DCIM"
   },
   "instanceList": {
     "title": "Danh sách instance",
@@ -24,7 +35,7 @@
       "online": "Online",
       "offline": "Offline"
     },
-
+    "noInstancesFound": "Không có instance nào được tìm thấy.",
     "toast": {
       "copySuccess": "Đã copy địa chỉ IP!",
       "copyFail": "Không thể copy địa chỉ IP",

@@ -12,7 +12,18 @@
     "title": "Instances Management",
     "description": "Manage and monitor instances in the system",
     "refreshButton": "Refresh",
-    "uploadButton": "Upload Instance"
+    "uploadButton": "Upload Instance",
+    "syncDCIMButton": "Sync DCIM",
+    "syncing": "Syncing..."
+  },
+  "dcimSync": {
+    "confirmTitle": "Confirm Data Synchronization",
+    "confirmDescription": "Are you sure you want to sync data from DCIM?",
+    "confirmNote": "This operation will update instance information from the DCIM system to your database.",
+    "cancelButton": "Cancel",
+    "confirmButton": "Sync",
+    "successMessage": "Successfully synced data from DCIM!",
+    "errorMessage": "An error occurred while syncing data from DCIM"
   },
   "instanceList": {
     "title": "List Instances",
@@ -23,6 +34,7 @@
       "online": "Online",
       "offline": "Offline"
     },
+    "noInstancesFound": "No instances found.",
     "toast": {
       "copySuccess": "IP address copied!",
       "copyFail": "Failed to copy IP address",

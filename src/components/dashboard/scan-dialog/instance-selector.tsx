@@ -45,7 +45,7 @@ export const InstanceSelector = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Label className="text-sm font-medium">
-            {t("scanDialog.selectinstances")}
+            {t("scanDialog.selectInstances")}
           </Label>
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Users className="h-3 w-3" />
@@ -67,7 +67,7 @@ export const InstanceSelector = ({
               className="text-xs"
             >
               <CheckCheck className="h-3 w-3 mr-1" />
-              {t("scanDialog.selectAllinstances")} (
+              {t("scanDialog.selectAllInstances")} (
               {totalInstances.toLocaleString()})
             </Button>
           )}

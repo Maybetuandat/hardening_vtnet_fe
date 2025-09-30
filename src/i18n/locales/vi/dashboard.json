@@ -89,6 +89,7 @@
   "scanDialog": {
     "title": "Khởi động Compliance Scan",
     "scanMethod": "Chọn phương thức scan:",
+    "instancesAvailable": "Máy Chủ",
     "scanAll": "Scan toàn bộ server",
     "scanSelected": "Scan server được chọn",
     "selectServers": "Chọn server để scan:",
