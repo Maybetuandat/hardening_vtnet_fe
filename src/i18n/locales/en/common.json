@@ -6,7 +6,8 @@
     "workloads": "Workloads",
     "instances": "Instances",
     "os": "Operating Systems",
-    "notification": "Notifications"
+    "notification": "Notifications",
+    "log": "Logs"
   },
   "common": {
     "search": "Search",

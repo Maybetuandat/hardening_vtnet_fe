@@ -6,7 +6,8 @@
     "workloads": "Máy chủ đặc thù",
     "instances": "Máy chủ",
     "os": "Hệ điều hành",
-    "notification": "Thông báo"
+    "notification": "Thông báo",
+    "log": "Lịch sử chỉnh sửa"
   },
   "common": {
     "search": "Tìm kiếm",

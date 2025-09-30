@@ -59,6 +59,12 @@ export function AppSidebar({
         icon: HardDrive, // Hoặc Terminal tùy bạn chọn
         isActive: location.pathname.startsWith("/os"),
       },
+      {
+        title: t("navigation.log"),
+        url: "/logs",
+        icon: HardDrive, // Hoặc Terminal tùy bạn chọn
+        isActive: location.pathname.startsWith("/logs"),
+      },
     ],
     navSecondary: [
       {
