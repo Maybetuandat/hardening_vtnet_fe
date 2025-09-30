@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Server as ServerIcon, Loader2 } from "lucide-react";
-import { Server } from "@/types/server";
+import { Server } from "@/types/instance";
 
 interface ServerListProps {
   servers: Server[];

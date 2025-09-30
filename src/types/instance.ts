@@ -1,4 +1,4 @@
-export interface Server {
+export interface Instance {
   id: number;
   name: string;
 
@@ -14,7 +14,7 @@ export interface Server {
   nameofmanager: string;
 }
 
-export interface ServerCreate {
+export interface InstanceCreate {
   name: string;
 
   os_version: string;
@@ -24,7 +24,7 @@ export interface ServerCreate {
   workload_id?: number;
 }
 
-export interface ServerUpdate {
+export interface InstanceUpdate {
   name?: string;
 
   os_version?: string;
@@ -34,7 +34,7 @@ export interface ServerUpdate {
   workload_id?: number;
 }
 
-export interface ServerResponse extends Server {
+export interface InstanceResponse extends Instance {
   workload?: {
     id: number;
     name: string;
@@ -42,23 +42,23 @@ export interface ServerResponse extends Server {
   };
 }
 
-// Response từ API list servers
-export interface ServerListResponse {
-  instances: ServerResponse[];
+// Response từ API list Instances
+export interface InstanceListResponse {
+  instances: InstanceResponse[];
   total_instances: number;
   page: number;
   page_size: number;
   total_pages: number;
 }
 
-export interface ServerConnectionInfo {
+export interface InstanceConnectionInfo {
   ip: string;
   ssh_user: string;
   ssh_password: string;
   ssh_port: number;
 }
 
-export interface ServerConnectionResult {
+export interface InstanceConnectionResult {
   ip: string;
   ssh_user: string;
   ssh_port: number;
@@ -70,12 +70,12 @@ export interface ServerConnectionResult {
 }
 
 export interface TestConnectionRequest {
-  servers: ServerConnectionInfo[];
+  Instances: InstanceConnectionInfo[];
 }
 
 export interface TestConnectionResponse {
-  results: ServerConnectionResult[];
-  total_servers: number;
+  results: InstanceConnectionResult[];
+  total_Instances: number;
   successful_connections: number;
   failed_connections: number;
 }
@@ -94,8 +94,8 @@ export interface IpValidationResult {
   message: string;
 }
 
-// doi tuong su dung trong form upload server
-export interface ServerUploadData {
+// doi tuong su dung trong form upload Instance
+export interface InstanceUploadData {
   id: string;
   ip_address: string;
   ssh_user: string;
@@ -107,27 +107,27 @@ export interface ServerUploadData {
   connection_status?: "untested" | "testing" | "success" | "failed";
   connection_message?: string;
 }
-export interface UseServerUploadReturn {
+export interface UseInstanceUploadReturn {
   dragActive: boolean;
   uploading: boolean;
   testing: boolean;
   adding: boolean;
-  servers: ServerUploadData[];
+  Instances: InstanceUploadData[];
   uploadedFileName: string;
   errors: string[];
   isDirty: boolean;
-  allServersConnected: boolean;
-  anyServerTesting: boolean;
+  allInstancesConnected: boolean;
+  anyInstanceTesting: boolean;
   hasFailedConnections: boolean;
-  canAddServers: boolean;
+  canAddInstances: boolean;
 
   setDragActive: (active: boolean) => void;
   handleFileUpload: (file: File) => Promise<void>;
-  removeServer: (serverId: string) => void;
+  removeInstance: (InstanceId: string) => void;
   handleDiscard: () => void;
   handleTestConnection: () => Promise<void>;
   cancelAllOperations: () => void;
-  handleAddServersWithWorkload: (
+  handleAddInstancesWithWorkload: (
     workloadId: number,
     onSuccess?: () => void,
     onRefreshList?: () => void

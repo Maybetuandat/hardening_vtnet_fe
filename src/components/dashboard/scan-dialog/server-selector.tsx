@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Search, Users, CheckCheck, X } from "lucide-react";
 import { ServerList } from "./server-list";
-import { Server } from "@/types/server";
+import { Server } from "@/types/instance";
 
 interface ServerSelectorProps {
   servers: Server[];

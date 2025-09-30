@@ -14,8 +14,8 @@ import enDashboard from "./locales/en/dashboard.json";
 import viDashboard from "./locales/vi/dashboard.json";
 import enCompliance from "./locales/en/compliance.json";
 import viCompliance from "./locales/vi/compliance.json";
-import viServer from "./locales/vi/server.json";
-import enServer from "./locales/en/server.json";
+import viInstance from "./locales/vi/instance.json";
+import enInstance from "./locales/en/instance.json";
 import enOs from "./locales/en/os.json";
 import viOs from "./locales/vi/os.json";
 import viAuth from "./locales/vi/auth.json";
@@ -48,7 +48,7 @@ i18n.use(initReactI18next).init({
       notfound: viNotfound,
       dashboard: viDashboard,
       compliance: viCompliance,
-      server: viServer,
+      instance: viInstance,
       auth: viAuth,
       os: viOs,
       user: viUser,
@@ -60,7 +60,7 @@ i18n.use(initReactI18next).init({
       notfound: enNotfound,
       dashboard: enDashboard,
       compliance: enCompliance,
-      server: enServer,
+      instance: enInstance,
       os: enOs,
       auth: enAuth,
       user: enUser,

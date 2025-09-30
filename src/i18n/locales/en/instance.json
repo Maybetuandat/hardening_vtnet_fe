@@ -1,5 +1,5 @@
 {
-  "serverPage": {
+  "instancePage": {
     "filter": {
       "allStatuses": "All Status",
       "active": "Active",
@@ -8,17 +8,17 @@
       "searchPlaceholder": "Search by IP address or hostname"
     }
   },
-  "serverHeader": {
+  "instanceHeader": {
     "title": "Instances Management",
     "description": "Manage and monitor instances in the system",
     "refreshButton": "Refresh",
     "uploadButton": "Upload Instance"
   },
-  "serverList": {
+  "instanceList": {
     "title": "List Instances",
     "loading": "Loading data...",
     "errorOccurred": "An error occurred:",
-    "noServersFound": "No instances found.",
+    "noinstancesFound": "No instances found.",
     "status": {
       "online": "Online",
       "offline": "Offline"
@@ -45,13 +45,13 @@
     "actionsMenuTooltip": "View more actions",
     "openActionsMenu": "Open actions menu",
     "action": {
-      "editServer": "Edit instance",
-      "deleteServer": "Delete instance",
+      "editInstance": "Edit instance",
+      "deleteInstance": "Delete instance",
       "viewHistory": "View hardening history",
-      "viewServer": "Detail"
+      "viewInstance": "Detail"
     }
   },
-  "serverViewDialog": {
+  "instanceViewDialog": {
     "title": "Instance Information",
     "loading": "Loading information...",
     "errorMessage": "Unable to load instance information",
@@ -82,10 +82,10 @@
       "title": "Additional Information",
       "createdDate": "Created Date",
       "lastUpdated": "Last Updated",
-      "serverId": "Instance ID"
+      "instanceId": "Instance ID"
     }
   },
-  "serverFormDialog": {
+  "instanceFormDialog": {
     "title": "Edit Instance",
     "loadingData": "Loading data...",
     "loadingWorkloads": "Loading...",
@@ -99,7 +99,7 @@
       "sshPassword": "SSH Password"
     },
     "placeholders": {
-      "hostname": "web-server-01",
+      "hostname": "web-instance-01",
       "ipAddress": "192.168.1.100",
       "osVersion": "Ubuntu 24.04 LTS",
       "workload": "Select workload...",
@@ -120,17 +120,17 @@
     },
     "alerts": {
       "fixValidationErrors": "Please fix validation errors before testing connection.",
-      "testConnectionRequired": "You have changed server information. Please test connection before updating.",
-      "connectionTestMustSucceed": "Connection test must succeed before server can be updated."
+      "testConnectionRequired": "You have changed instance information. Please test connection before updating.",
+      "connectionTestMustSucceed": "Connection test must succeed before instance can be updated."
     },
     "buttons": {
       "cancel": "Cancel",
       "update": "Update"
     }
   },
-  "serverDeleteDialog": {
-    "title": "Confirm Server Deletion",
-    "description": "Are you sure you want to delete this server? This action cannot be undone.",
+  "instanceDeleteDialog": {
+    "title": "Confirm instance Deletion",
+    "description": "Are you sure you want to delete this instance? This action cannot be undone.",
     "fields": {
       "hostname": "Hostname",
       "ipAddress": "IP Address",
@@ -138,25 +138,25 @@
     },
     "unknown": "N/A",
     "messages": {
-      "deleteSuccess": "Server \"{{hostname}}\" deleted successfully!",
-      "deleteError": "Error deleting server: {{error}}",
-      "deleteErrorDefault": "Unable to delete server"
+      "deleteSuccess": "instance \"{{hostname}}\" deleted successfully!",
+      "deleteError": "Error deleting instance: {{error}}",
+      "deleteErrorDefault": "Unable to delete instance"
     },
     "buttons": {
       "cancel": "Cancel",
-      "delete": "Delete Server"
+      "delete": "Delete instance"
     }
   },
-  "serverUploadDialog": {
-    "title": "Upload Server",
+  "instanceUploadDialog": {
+    "title": "Upload instance",
     "descriptions": {
-      "selectWorkload": "Select workload to apply to uploaded servers",
-      "uploadFile": "Upload Excel file containing server information"
+      "selectWorkload": "Select workload to apply to uploaded instances",
+      "uploadFile": "Upload Excel file containing instance information"
     }
   },
   "workloadSelector": {
     "title": "Select Workload",
-    "label": "Workload to apply to servers",
+    "label": "Workload to apply to instances",
     "placeholder": "Select workload...",
     "loading": "Loading...",
     "buttons": {
@@ -164,15 +164,15 @@
       "continue": "Continue"
     }
   },
-  "serverUploadHeader": {
-    "title": "Upload Server for Workload",
+  "instanceUploadHeader": {
+    "title": "Upload instance for Workload",
     "downloadTemplate": "Download Template",
     "toast": {
       "downloadSuccess": "Template downloaded successfully!",
       "downloadError": "Error downloading template: {{message}}"
     }
   },
-  "serverUploadArea": {
+  "instanceUploadArea": {
     "errors": {
       "title": "Errors occurred"
     },
@@ -182,7 +182,7 @@
     },
     "fileSupport": "Supports .xlsx, .xls files (max 10MB)"
   },
-  "serverManagement": {
+  "instanceManagement": {
     "title": "Instances List ({{count}} instances)",
     "notDetermined": "Not determined",
     "status": {
@@ -194,15 +194,15 @@
     "buttons": {
       "cancel": "Cancel",
       "testConnection": "Test Connection",
-      "addServers": "Add Servers ({{count}})"
+      "addinstances": "Add instances ({{count}})"
     },
     "tooltips": {
-      "testConnectionRequired": "Please test connection successfully for all servers before adding"
+      "testConnectionRequired": "Please test connection successfully for all instances before adding"
     },
     "alerts": {
-      "allConnected": "All servers connected successfully! You can add them to the system.",
-      "failedConnections": "Some servers could not connect or already exist in the system. Failed servers will be automatically removed after testing connection.",
-      "testRequired": "Please test connection to verify server validity before adding to the system."
+      "allConnected": "All instances connected successfully! You can add them to the system.",
+      "failedConnections": "Some instances could not connect or already exist in the system. Failed instances will be automatically removed after testing connection.",
+      "testRequired": "Please test connection to verify instance validity before adding to the system."
     },
     "tableHeaders": {
       "ipAddress": "IP Address",

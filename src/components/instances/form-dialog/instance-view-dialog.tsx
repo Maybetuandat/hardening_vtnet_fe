@@ -25,58 +25,58 @@ import {
   Shield,
   UserCog,
 } from "lucide-react";
-import { Server } from "@/types/server";
+import { Instance } from "@/types/instance";
 import toastHelper from "@/utils/toast-helper";
 
-interface ServerViewDialogProps {
+interface InstanceViewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  server: Server | null;
-  getServerById: (id: number) => Promise<Server>;
+  instance: Instance | null;
+  getInstanceById: (id: number) => Promise<Instance>;
 }
 
-export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
+export const InstanceViewDialog: React.FC<InstanceViewDialogProps> = ({
   open,
   onOpenChange,
-  server,
-  getServerById,
+  instance,
+  getInstanceById,
 }) => {
-  const { t, i18n } = useTranslation("server");
-  const [serverData, setServerData] = useState<Server | null>(null);
+  const { t, i18n } = useTranslation("instance");
+  const [serverData, setServerData] = useState<Instance | null>(null);
   const [loading, setLoading] = useState(false);
   const [copiedIP, setCopiedIP] = useState(false);
 
   useEffect(() => {
-    if (server && open) {
-      loadServerData();
+    if (instance && open) {
+      loadInstanceData();
     }
-  }, [server, open]);
+  }, [instance, open]);
 
-  const loadServerData = async () => {
-    if (!server) return;
+  const loadInstanceData = async () => {
+    if (!instance) return;
 
     setLoading(true);
     try {
-      const data = await getServerById(server.id);
+      const data = await getInstanceById(instance.id);
       setServerData(data);
     } catch (error) {
       console.error("Failed to load server data:", error);
-      toastHelper.error(t("serverViewDialog.toastHelper.loadError"));
+      toastHelper.error(t("instanceViewDialog.toastHelper.loadError"));
     } finally {
       setLoading(false);
     }
   };
 
   const handleCopyIP = async () => {
-    if (!serverData?.ip_address) return;
+    if (!serverData?.name) return;
 
     try {
-      await navigator.clipboard.writeText(serverData.ip_address);
+      await navigator.clipboard.writeText(serverData.name);
       setCopiedIP(true);
-      toastHelper.success(t("serverViewDialog.toastHelper.copySuccess"));
+      toastHelper.success(t("instanceViewDialog.toastHelper.copySuccess"));
       setTimeout(() => setCopiedIP(false), 2000);
     } catch (error) {
-      toastHelper.error(t("serverViewDialog.toastHelper.copyError"));
+      toastHelper.error(t("instanceViewDialog.toastHelper.copyError"));
     }
   };
 
@@ -99,19 +99,19 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
           className="flex items-center gap-1 bg-green-100 text-green-800"
         >
           <Circle className="h-2 w-2 fill-green-500 text-green-500" />
-          {t("serverList.status.online")}
+          {t("instanceList.status.online")}
         </Badge>
       );
     } else {
       return (
         <Badge variant="destructive" className="bg-red-100 text-red-800">
-          {t("serverList.status.offline")}
+          {t("instanceList.status.offline")}
         </Badge>
       );
     }
   };
 
-  if (!server) return null;
+  if (!instance) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,14 +119,14 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ServerIcon className="h-5 w-5" />
-            {t("serverViewDialog.title")}
+            {t("instanceViewDialog.title")}
           </DialogTitle>
         </DialogHeader>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">{t("serverViewDialog.loading")}</span>
+            <span className="ml-2">{t("instanceViewDialog.loading")}</span>
           </div>
         ) : serverData ? (
           <div className="space-y-6">
@@ -135,27 +135,22 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  {t("serverViewDialog.basicInfo.title")}
+                  {t("instanceViewDialog.basicInfo.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.hostname")}
+                      {t("instanceViewDialog.basicInfo.hostname")}
                     </label>
-                    <p className="text-base font-semibold">
-                      {serverData.hostname}
-                    </p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.ipAddress")}
+                      {t("instanceViewDialog.basicInfo.ipAddress")}
                     </label>
                     <div className="flex items-center gap-2">
-                      <p className="text-base font-mono">
-                        {serverData.ip_address}
-                      </p>
+                      <p className="text-base font-mono">{serverData.name}</p>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -175,19 +170,19 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.osVersion")}
+                      {t("instanceViewDialog.basicInfo.osVersion")}
                     </label>
                     <div className="flex items-center gap-2">
                       <Monitor className="h-4 w-4 text-blue-600" />
                       <p className="text-base">
                         {serverData.os_version ||
-                          t("serverViewDialog.basicInfo.unknown")}
+                          t("instanceViewDialog.basicInfo.unknown")}
                       </p>
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.status")}
+                      {t("instanceViewDialog.basicInfo.status")}
                     </label>
                     <div className="flex items-center">
                       {getStatusBadge(serverData.status)}
@@ -198,25 +193,25 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.workload")}
+                      {t("instanceViewDialog.basicInfo.workload")}
                     </label>
                     <div className="flex items-center gap-2">
                       <Boxes className="h-4 w-4 text-purple-600" />
                       <p className="text-base">
                         {serverData.workload_name ||
-                          t("serverViewDialog.basicInfo.noWorkload")}
+                          t("instanceViewDialog.basicInfo.noWorkload")}
                       </p>
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.basicInfo.manager")}
+                      {t("instanceViewDialog.basicInfo.manager")}
                     </label>
                     <div className="flex items-center gap-2">
                       <UserCog className="h-4 w-4 text-orange-600" />
                       <p className="text-base">
                         {serverData.nameofmanager ||
-                          t("serverViewDialog.basicInfo.noManager")}
+                          t("instanceViewDialog.basicInfo.noManager")}
                       </p>
                     </div>
                   </div>
@@ -229,14 +224,14 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  {t("serverViewDialog.sshConfig.title")}
+                  {t("instanceViewDialog.sshConfig.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.sshConfig.port")}
+                      {t("instanceViewDialog.sshConfig.port")}
                     </label>
                     <p className="text-base font-mono">
                       {serverData.ssh_port || "22"}
@@ -244,13 +239,13 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.sshConfig.user")}
+                      {t("instanceViewDialog.sshConfig.user")}
                     </label>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-green-600" />
                       <p className="text-base">
                         {serverData.ssh_user ||
-                          t("serverViewDialog.sshConfig.notConfigured")}
+                          t("instanceViewDialog.sshConfig.notConfigured")}
                       </p>
                     </div>
                   </div>
@@ -258,14 +253,14 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
 
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    {t("serverViewDialog.sshConfig.password")}
+                    {t("instanceViewDialog.sshConfig.password")}
                   </label>
                   <div className="flex items-center gap-2">
                     <Key className="h-4 w-4 text-amber-600" />
                     <p className="text-base text-gray-500">
                       {serverData.ssh_password
                         ? "••••••••"
-                        : t("serverViewDialog.sshConfig.notConfigured")}
+                        : t("instanceViewDialog.sshConfig.notConfigured")}
                     </p>
                   </div>
                 </div>
@@ -277,14 +272,14 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  {t("serverViewDialog.metadata.title")}
+                  {t("instanceViewDialog.metadata.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.metadata.createdDate")}
+                      {t("instanceViewDialog.metadata.createdDate")}
                     </label>
                     <p className="text-base">
                       {formatDate(serverData.created_at)}
@@ -292,7 +287,7 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">
-                      {t("serverViewDialog.metadata.lastUpdated")}
+                      {t("instanceViewDialog.metadata.lastUpdated")}
                     </label>
                     <p className="text-base">
                       {formatDate(serverData.updated_at)}
@@ -302,7 +297,7 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
 
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    {t("serverViewDialog.metadata.serverId")}
+                    {t("instanceViewDialog.metadata.serverId")}
                   </label>
                   <p className="text-base font-mono text-gray-500">
                     #{serverData.id}
@@ -314,7 +309,7 @@ export const ServerViewDialog: React.FC<ServerViewDialogProps> = ({
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500">
-              {t("serverViewDialog.errorMessage")}
+              {t("instanceViewDialog.errorMessage")}
             </p>
           </div>
         )}

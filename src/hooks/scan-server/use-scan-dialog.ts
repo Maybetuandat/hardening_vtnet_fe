@@ -2,34 +2,34 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
 
-import { Server } from "@/types/server";
-import { useServers } from "../server/use-servers";
+import { Instance } from "@/types/instance";
+import { useInstances } from "../instance/use-instance";
 import toastHelper from "@/utils/toast-helper";
 
 export const useScanDialog = (open: boolean) => {
   const { t } = useTranslation("dashboard");
   const [scanType, setScanType] = useState<"all" | "selected">("all");
-  const [selectedServers, setSelectedServers] = useState<Set<number>>(
+  const [selectedInstances, setSelectedInstances] = useState<Set<number>>(
     new Set()
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [scanning, setScanning] = useState(false);
 
-  // Sử dụng useServers hook có sẵn
+  // Sử dụng useInstances hook có sẵn
   const {
-    servers: currentPageServers,
+    instances: currentPageInstances,
     loading,
-    totalServers,
+    totalInstances,
     totalPages,
     currentPage,
     pageSize,
-    fetchServers,
-    searchServers,
-  } = useServers();
+    fetchInstances,
+    searchInstances,
+  } = useInstances();
 
   // State cho infinite scroll
   const [loadingMore, setLoadingMore] = useState(false);
-  const [allLoadedServers, setAllLoadedServers] = useState<Server[]>([]);
+  const [allLoadedInstances, setAllLoadedInstances] = useState<Instance[]>([]);
   const [totalSelected, setTotalSelected] = useState(0);
   const [currentPageInDialog, setCurrentPageInDialog] = useState(1);
 
@@ -37,42 +37,43 @@ export const useScanDialog = (open: boolean) => {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialLoad = useRef(true);
 
-  // Calculate hasMore based on current loaded servers vs total
-  const hasMore = allLoadedServers.length < totalServers && totalServers > 0;
+  // Calculate hasMore based on current loaded instances vs total
+  const hasMore =
+    allLoadedInstances.length < totalInstances && totalInstances > 0;
 
   // Reset state khi dialog mở
   useEffect(() => {
     if (open && scanType === "selected") {
-      setAllLoadedServers([]);
+      setAllLoadedInstances([]);
       setCurrentPageInDialog(1);
       isInitialLoad.current = true;
 
       // Load initial data nếu không có search term
       if (!searchTerm.trim()) {
-        fetchServers(1, pageSize);
+        fetchInstances(1, pageSize);
       }
     }
   }, [open, scanType]);
 
-  // Xử lý khi có dữ liệu mới từ useServers
+  // Xử lý khi có dữ liệu mới từ useInstances
   useEffect(() => {
     if (!open || scanType !== "selected") return;
 
     if (isInitialLoad.current || currentPageInDialog === 1) {
       // Lần đầu load hoặc search mới - reset data
-      setAllLoadedServers(currentPageServers);
+      setAllLoadedInstances(currentPageInstances);
       isInitialLoad.current = false;
     } else {
       // Load more - append new data
-      setAllLoadedServers((prev) => {
+      setAllLoadedInstances((prev) => {
         const existingIds = new Set(prev.map((s) => s.id));
-        const newServers = currentPageServers.filter(
+        const newInstances = currentPageInstances.filter(
           (s) => !existingIds.has(s.id)
         );
-        return [...prev, ...newServers];
+        return [...prev, ...newInstances];
       });
     }
-  }, [currentPageServers, open, scanType, currentPageInDialog]);
+  }, [currentPageInstances, open, scanType, currentPageInDialog]);
 
   // Debounced search
   useEffect(() => {
@@ -84,20 +85,20 @@ export const useScanDialog = (open: boolean) => {
 
       // Reset state cho search mới
       setCurrentPageInDialog(1);
-      setAllLoadedServers([]);
+      setAllLoadedInstances([]);
       isInitialLoad.current = true;
 
       // Debounce search
       searchTimeoutRef.current = setTimeout(async () => {
         try {
           if (searchTerm.trim()) {
-            await searchServers(searchTerm.trim(), undefined, 1, pageSize);
+            await searchInstances(searchTerm.trim(), undefined, 1, pageSize);
           } else {
-            await fetchServers(1, pageSize);
+            await fetchInstances(1, pageSize);
           }
         } catch (error) {
-          console.error("Error searching servers:", error);
-          toastHelper.error(t("scanDialog.messages.loadServersError"));
+          console.error("Error searching instances:", error);
+          toastHelper.error(t("scanDialog.messages.loadInstancesError"));
         }
       }, 300);
 
@@ -119,9 +120,9 @@ export const useScanDialog = (open: boolean) => {
 
       // Đảm bảo dùng đúng API call với page_size
       if (searchTerm.trim()) {
-        await searchServers(searchTerm.trim(), undefined, nextPage, pageSize);
+        await searchInstances(searchTerm.trim(), undefined, nextPage, pageSize);
       } else {
-        await fetchServers(nextPage, pageSize);
+        await fetchInstances(nextPage, pageSize);
       }
 
       setCurrentPageInDialog(nextPage);
@@ -138,8 +139,8 @@ export const useScanDialog = (open: boolean) => {
     searchTerm,
     currentPageInDialog,
     pageSize,
-    searchServers,
-    fetchServers,
+    searchInstances,
+    fetchInstances,
     t,
   ]);
 
@@ -152,14 +153,14 @@ export const useScanDialog = (open: boolean) => {
     };
   }, []);
 
-  // Handle server selection
-  const handleServerToggle = useCallback((serverId: number) => {
-    setSelectedServers((prev) => {
+  // Handle instance selection
+  const handleInstanceToggle = useCallback((instanceId: number) => {
+    setSelectedInstances((prev) => {
       const newSelected = new Set(prev);
-      if (newSelected.has(serverId)) {
-        newSelected.delete(serverId);
+      if (newSelected.has(instanceId)) {
+        newSelected.delete(instanceId);
       } else {
-        newSelected.add(serverId);
+        newSelected.add(instanceId);
       }
       return newSelected;
     });
@@ -173,7 +174,7 @@ export const useScanDialog = (open: boolean) => {
       // API call để lấy tất cả server IDs (chỉ lấy id và status để tối ưu)
       const params = new URLSearchParams({
         page: "1",
-        page_size: totalServers.toString(),
+        page_size: totalInstances.toString(),
       });
 
       if (searchTerm.trim()) {
@@ -181,36 +182,36 @@ export const useScanDialog = (open: boolean) => {
       }
 
       const response = await api.get<{
-        servers: Server[];
+        servers: Instance[];
         total_servers: number;
       }>(`/servers/?${params.toString()}`);
 
-      const activeServerIds = (response.servers || []).map((s) => s.id);
+      const activeInstanceIds = (response.servers || []).map((s) => s.id);
 
-      setSelectedServers(new Set(activeServerIds));
+      setSelectedInstances(new Set(activeInstanceIds));
 
       toastHelper.success(
-        t("scanDialog.messages.selectedAllServers", {
-          count: activeServerIds.length,
+        t("scanDialog.messages.selectedAllInstances", {
+          count: activeInstanceIds.length,
         })
       );
     } catch (error) {
-      console.error("Error selecting all servers:", error);
+      console.error("Error selecting all instances:", error);
       toastHelper.error(t("scanDialog.messages.selectAllError"));
     } finally {
       setLoadingMore(false);
     }
-  }, [searchTerm, totalServers, t]);
+  }, [searchTerm, totalInstances, t]);
 
-  // Deselect all servers
+  // Deselect all instances
   const handleSelectNone = useCallback(() => {
-    setSelectedServers(new Set());
+    setSelectedInstances(new Set());
   }, []);
 
   // Update total selected count
   useEffect(() => {
-    setTotalSelected(selectedServers.size);
-  }, [selectedServers]);
+    setTotalSelected(selectedInstances.size);
+  }, [selectedInstances]);
 
   // Handle scan
   const handleStartScan = useCallback(
@@ -218,20 +219,20 @@ export const useScanDialog = (open: boolean) => {
       try {
         setScanning(true);
 
-        const serverIds =
-          scanType === "all" ? null : Array.from(selectedServers);
-        const batchSize = serverIds && serverIds.length > 1000 ? 50 : 10;
+        const instanceIds =
+          scanType === "all" ? null : Array.from(selectedInstances);
+        const batchSize = instanceIds && instanceIds.length > 1000 ? 50 : 10;
 
         const scanRequest = {
-          server_ids: serverIds,
+          server_ids: instanceIds,
           batch_size: batchSize,
         };
 
         const successMessage =
           scanType === "all"
-            ? t("scanDialog.messages.scanStartedAll", { count: totalServers })
+            ? t("scanDialog.messages.scanStartedAll", { count: totalInstances })
             : t("scanDialog.messages.scanStartedSelected", {
-                count: selectedServers.size,
+                count: selectedInstances.size,
               });
 
         toastHelper.success(successMessage);
@@ -265,7 +266,7 @@ export const useScanDialog = (open: boolean) => {
         setScanning(false);
       }
     },
-    [scanType, selectedServers, totalServers, t]
+    [scanType, selectedInstances, totalInstances, t]
   );
 
   // Reset state
@@ -275,9 +276,9 @@ export const useScanDialog = (open: boolean) => {
     }
 
     setScanType("all");
-    setSelectedServers(new Set());
+    setSelectedInstances(new Set());
     setSearchTerm("");
-    setAllLoadedServers([]);
+    setAllLoadedInstances([]);
     setTotalSelected(0);
     setCurrentPageInDialog(1);
     setLoadingMore(false);
@@ -285,16 +286,16 @@ export const useScanDialog = (open: boolean) => {
   }, []);
 
   return {
-    // State - sử dụng allLoadedServers để support infinite scroll
+    // State - sử dụng allLoadedInstances để support infinite scroll
     scanType,
-    servers: allLoadedServers,
-    selectedServers,
+    instances: allLoadedInstances,
+    selectedInstances,
     searchTerm,
     loading,
     loadingMore,
     scanning,
     hasMore,
-    totalServers,
+    totalInstances,
     totalSelected,
     currentPage: currentPageInDialog,
     t,
@@ -302,7 +303,7 @@ export const useScanDialog = (open: boolean) => {
     // Actions
     setScanType,
     setSearchTerm,
-    handleServerToggle,
+    handleInstanceToggle,
 
     handleSelectAllServers,
     handleSelectNone,

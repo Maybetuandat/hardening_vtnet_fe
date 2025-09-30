@@ -1,5 +1,5 @@
 import React from "react";
-import { Server } from "@/types/server";
+import { Instance } from "@/types/instance";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,18 +34,18 @@ import { AdminOnly, UserOnly } from "@/components/auth/role-guard";
 import { usePermissions } from "@/hooks/authentication/use-permissions";
 import toastHelper from "@/utils/toast-helper";
 
-interface ServerListProps {
-  servers: Server[];
+interface InstanceListProps {
+  instances: Instance[];
   loading: boolean;
   error: string | null;
-  onEdit?: (server: Server) => void;
-  onDelete?: (server: Server) => void;
-  onViewHardeningHistory?: (server: Server) => void;
-  onView?: (server: Server) => void;
+  onEdit?: (instance: Instance) => void;
+  onDelete?: (instance: Instance) => void;
+  onViewHardeningHistory?: (instance: Instance) => void;
+  onView?: (instance: Instance) => void;
 }
 
-export const ServerList: React.FC<ServerListProps> = ({
-  servers,
+export const InstanceList: React.FC<InstanceListProps> = ({
+  instances,
   loading,
   error,
   onEdit,
@@ -53,11 +53,11 @@ export const ServerList: React.FC<ServerListProps> = ({
   onViewHardeningHistory,
   onView,
 }) => {
-  const { t } = useTranslation("server");
+  const { t } = useTranslation("instance");
   const { isAdmin } = usePermissions();
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
-  console.log("Rendering ServerList with servers:", servers);
+  console.log("Rendering InstanceList with instances:", instances);
   const getStatusBadge = (status?: boolean) => {
     if (status === true) {
       return (
@@ -66,13 +66,13 @@ export const ServerList: React.FC<ServerListProps> = ({
           className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-100"
         >
           <Circle className="h-2 w-2 fill-green-500 text-green-500" />
-          {t("serverList.status.online")}
+          {t("instanceList.status.online")}
         </Badge>
       );
     } else {
       return (
         <Badge variant="destructive" className="bg-red-100 text-red-800">
-          {t("serverList.status.offline")}
+          {t("instanceList.status.offline")}
         </Badge>
       );
     }
@@ -92,36 +92,36 @@ export const ServerList: React.FC<ServerListProps> = ({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toastHelper.success(t("serverList.toastHelper.copySuccess"));
+      toastHelper.success(t("InstanceList.toastHelper.copySuccess"));
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toastHelper.error(t("serverList.toastHelper.copyFail"));
+      toastHelper.error(t("InstanceList.toastHelper.copyFail"));
     }
   };
 
-  const handleEdit = (server: Server) => {
+  const handleEdit = (Instance: Instance) => {
     if (onEdit) {
-      onEdit(server);
+      onEdit(Instance);
     } else {
-      toastHelper.info(t("serverList.toastHelper.editNotImplemented"));
+      toastHelper.info(t("InstanceList.toastHelper.editNotImplemented"));
     }
   };
 
-  const handleDelete = (server: Server) => {
+  const handleDelete = (Instance: Instance) => {
     if (onDelete) {
-      onDelete(server);
+      onDelete(Instance);
     } else {
-      toastHelper.info(t("serverList.toastHelper.deleteNotImplemented"));
+      toastHelper.info(t("InstanceList.toastHelper.deleteNotImplemented"));
     }
   };
 
-  const handleView = (server: Server) => {
+  const handleView = (Instance: Instance) => {
     if (onView) {
-      onView(server);
+      onView(Instance);
     } else {
-      toastHelper.info(t("serverList.toastHelper.viewNotImplemented"));
+      toastHelper.info(t("InstanceList.toastHelper.viewNotImplemented"));
     }
   };
 
@@ -129,13 +129,15 @@ export const ServerList: React.FC<ServerListProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("serverList.title")}</CardTitle>
+          <CardTitle>{t("instanceList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">{t("serverList.loading")}</p>
+              <p className="text-muted-foreground">
+                {t("instanceList.loading")}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -147,13 +149,13 @@ export const ServerList: React.FC<ServerListProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("serverList.title")}</CardTitle>
+          <CardTitle>{t("instanceList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-destructive mb-2">
-                {t("serverList.errorOccurred")}
+                {t("instanceList.errorOccurred")}
               </p>
               <p className="text-muted-foreground">{error}</p>
             </div>
@@ -163,17 +165,17 @@ export const ServerList: React.FC<ServerListProps> = ({
     );
   }
 
-  if (!servers || servers.length === 0) {
+  if (!instances || instances.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("serverList.title")}</CardTitle>
+          <CardTitle>{t("instanceList.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <p className="text-muted-foreground">
-                {t("serverList.noServersFound")}
+                {t("instanceList.noInstancesFound")}
               </p>
             </div>
           </div>
@@ -185,39 +187,39 @@ export const ServerList: React.FC<ServerListProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("serverList.title")}</CardTitle>
+        <CardTitle>{t("instanceList.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("serverList.tableHeader.name")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.name")}</TableHead>
 
-                <TableHead>{t("serverList.tableHeader.osVersion")}</TableHead>
-                <TableHead>{t("serverList.tableHeader.workload")}</TableHead>
-                <TableHead>{t("serverList.tableHeader.status")}</TableHead>
-                <TableHead>{t("serverList.tableHeader.createdAt")}</TableHead>
-                <TableHead>{t("serverList.tableHeader.manager")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.osVersion")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.workload")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.status")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.createdAt")}</TableHead>
+                <TableHead>{t("instanceList.tableHeader.manager")}</TableHead>
                 <TableHead className="text-center">
-                  {t("serverList.tableHeader.actions")}
+                  {t("instanceList.tableHeader.actions")}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {servers.map((server) => (
-                <TableRow key={server.id}>
+              {instances.map((instance) => (
+                <TableRow key={instance.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">{server.name}</span>
+                      <span className="font-medium">{instance.name}</span>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="h-6 w-6 p-0 hover:bg-muted"
-                        onClick={() => handleCopyIP(server.name)}
-                        title={t("serverList.copyIpTooltip")}
+                        onClick={() => handleCopyIP(instance.name)}
+                        title={t("instanceList.copyIpTooltip")}
                       >
-                        {copiedIP === server.name ? (
+                        {copiedIP === instance.name ? (
                           <Check className="h-3 w-3 text-green-600" />
                         ) : (
                           <Copy className="h-3 w-3" />
@@ -226,14 +228,14 @@ export const ServerList: React.FC<ServerListProps> = ({
                     </div>
                   </TableCell>
                   <TableCell>
-                    {server.os_version || t("serverList.unknown")}
+                    {instance.os_version || t("instanceList.unknown")}
                   </TableCell>
                   <TableCell>
-                    {server.workload_name || t("serverList.unknown")}
+                    {instance.workload_name || t("instanceList.unknown")}
                   </TableCell>
-                  <TableCell>{getStatusBadge(server.status)}</TableCell>
-                  <TableCell>{formatDate(server.created_at)}</TableCell>
-                  <TableCell>{server.nameofmanager}</TableCell>
+                  <TableCell>{getStatusBadge(instance.status)}</TableCell>
+                  <TableCell>{formatDate(instance.created_at)}</TableCell>
+                  <TableCell>{instance.nameofmanager}</TableCell>
                   {/* Cột Actions với phân quyền */}
                   <UserOnly>
                     <TableCell className="text-center">
@@ -242,10 +244,10 @@ export const ServerList: React.FC<ServerListProps> = ({
                           <Button
                             variant="ghost"
                             className="h-8 w-8 p-0"
-                            title={t("serverList.actionsMenuTooltip")}
+                            title={t("instanceList.actionsMenuTooltip")}
                           >
                             <span className="sr-only">
-                              {t("serverList.openActionsMenu")}
+                              {t("instanceList.openActionsMenu")}
                             </span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -253,29 +255,14 @@ export const ServerList: React.FC<ServerListProps> = ({
                         <DropdownMenuContent align="end" className="w-48">
                           {/* View - Tất cả user có thể xem */}
                           <DropdownMenuItem
-                            onClick={() => handleView(server)}
+                            onClick={() => handleView(instance)}
                             className="cursor-pointer"
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            {t("serverList.action.viewServer")}
+                            {t("instanceList.action.viewInstance")}
                           </DropdownMenuItem>
 
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleEdit(server)}
-                            className="cursor-pointer"
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            {t("serverList.action.editServer")}
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(server)}
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            {t("serverList.action.deleteServer")}
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

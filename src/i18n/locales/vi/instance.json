@@ -1,5 +1,5 @@
 {
-  "serverPage": {
+  "instancePage": {
     "filter": {
       "allStatuses": "Tất cả trạng thái",
       "active": "Hoạt động",
@@ -8,18 +8,18 @@
       "searchPlaceholder": "Tìm kiếm theo địa chỉ IP hoặc hostname"
     }
   },
-  "serverHeader": {
-    "title": "Quản lý Server",
-    "description": "Quản lý và giám sát các server trong hệ thống",
+  "instanceHeader": {
+    "title": "Quản lý instance",
+    "description": "Quản lý và giám sát các instance trong hệ thống",
     "refreshButton": "Làm mới",
-    "uploadButton": "Upload Server"
+    "uploadButton": "Upload instance"
   },
-  "serverList": {
-    "title": "Danh sách Server",
+  "instanceList": {
+    "title": "Danh sách instance",
 
     "loading": "Đang tải dữ liệu...",
     "errorOccurred": "Có lỗi xảy ra:",
-    "noServersFound": "Không có server nào được tìm thấy.",
+    "noinstancesFound": "Không có instance nào được tìm thấy.",
     "status": {
       "online": "Online",
       "offline": "Offline"
@@ -28,8 +28,8 @@
     "toast": {
       "copySuccess": "Đã copy địa chỉ IP!",
       "copyFail": "Không thể copy địa chỉ IP",
-      "editNotImplemented": "Chức năng sửa server sẽ được triển khai sau",
-      "deleteNotImplemented": "Chức năng xóa server sẽ được triển khai sau",
+      "editNotImplemented": "Chức năng sửa instance sẽ được triển khai sau",
+      "deleteNotImplemented": "Chức năng xóa instance sẽ được triển khai sau",
       "historyNotImplemented": "Chức năng xem lịch sử hardening sẽ được triển khai sau"
     },
     "tableHeader": {
@@ -47,19 +47,19 @@
     "actionsMenuTooltip": "Xem thêm hành động",
     "openActionsMenu": "Mở menu hành động",
     "action": {
-      "editServer": "Sửa server",
-      "deleteServer": "Xóa server",
+      "editinstance": "Sửa instance",
+      "deleteinstance": "Xóa instance",
       "viewHistory": "Xem lịch sử hardening",
-      "viewServer": "Xem chi tiết server"
+      "viewinstance": "Xem chi tiết instance"
     }
   },
 
-  "serverViewDialog": {
-    "title": "Thông tin Server",
+  "instanceViewDialog": {
+    "title": "Thông tin instance",
     "loading": "Đang tải thông tin...",
-    "errorMessage": "Không thể tải thông tin server",
+    "errorMessage": "Không thể tải thông tin instance",
     "toast": {
-      "loadError": "Không thể tải thông tin server",
+      "loadError": "Không thể tải thông tin instance",
       "copySuccess": "Đã sao chép địa chỉ IP",
       "copyError": "Không thể sao chép địa chỉ IP"
     },
@@ -85,11 +85,11 @@
       "title": "Thông tin khác",
       "createdDate": "Ngày tạo",
       "lastUpdated": "Cập nhật lần cuối",
-      "serverId": "Server ID"
+      "instanceId": "instance ID"
     }
   },
-  "serverFormDialog": {
-    "title": "Chỉnh sửa Server",
+  "instanceFormDialog": {
+    "title": "Chỉnh sửa instance",
     "loadingData": "Đang tải dữ liệu...",
     "loadingWorkloads": "Đang tải...",
     "fields": {
@@ -102,7 +102,7 @@
       "sshPassword": "SSH Password"
     },
     "placeholders": {
-      "hostname": "web-server-01",
+      "hostname": "web-instance-01",
       "ipAddress": "192.168.1.100",
       "osVersion": "Ubuntu 24.04 LTS",
       "workload": "Chọn workload...",
@@ -123,17 +123,17 @@
     },
     "alerts": {
       "fixValidationErrors": "Vui lòng sửa các lỗi validation trước khi test connection.",
-      "testConnectionRequired": "Bạn đã thay đổi thông tin server. Vui lòng test connection trước khi cập nhật.",
-      "connectionTestMustSucceed": "Connection test phải thành công trước khi có thể cập nhật server."
+      "testConnectionRequired": "Bạn đã thay đổi thông tin instance. Vui lòng test connection trước khi cập nhật.",
+      "connectionTestMustSucceed": "Connection test phải thành công trước khi có thể cập nhật instance."
     },
     "buttons": {
       "cancel": "Hủy",
       "update": "Cập nhật"
     }
   },
-  "serverDeleteDialog": {
-    "title": "Xác nhận xóa Server",
-    "description": "Bạn có chắc chắn muốn xóa server này không? Hành động này không thể hoàn tác.",
+  "instanceDeleteDialog": {
+    "title": "Xác nhận xóa instance",
+    "description": "Bạn có chắc chắn muốn xóa instance này không? Hành động này không thể hoàn tác.",
     "fields": {
       "hostname": "Hostname",
       "ipAddress": "IP Address",
@@ -141,25 +141,25 @@
     },
     "unknown": "Không xác định",
     "messages": {
-      "deleteSuccess": "Đã xóa server \"{{hostname}}\" thành công!",
-      "deleteError": "Lỗi khi xóa server: {{error}}",
-      "deleteErrorDefault": "Không thể xóa server"
+      "deleteSuccess": "Đã xóa instance \"{{hostname}}\" thành công!",
+      "deleteError": "Lỗi khi xóa instance: {{error}}",
+      "deleteErrorDefault": "Không thể xóa instance"
     },
     "buttons": {
       "cancel": "Hủy",
-      "delete": "Xóa Server"
+      "delete": "Xóa instance"
     }
   },
-  "serverUploadDialog": {
-    "title": "Upload Server",
+  "instanceUploadDialog": {
+    "title": "Upload instance",
     "descriptions": {
-      "selectWorkload": "Chọn workload sẽ áp dụng cho các server được upload",
-      "uploadFile": "Upload file Excel chứa thông tin các server"
+      "selectWorkload": "Chọn workload sẽ áp dụng cho các instance được upload",
+      "uploadFile": "Upload file Excel chứa thông tin các instance"
     }
   },
   "workloadSelector": {
     "title": "Chọn Workload",
-    "label": "Workload áp dụng cho các server",
+    "label": "Workload áp dụng cho các instance",
     "placeholder": "Chọn workload...",
     "loading": "Đang tải...",
     "buttons": {
@@ -167,7 +167,7 @@
       "continue": "Tiếp tục"
     }
   },
-  "serverUploadHeader": {
+  "instanceUploadHeader": {
     "title": "thêm máy chủ cho Workload",
     "downloadTemplate": "Tải mẫu",
     "toast": {
@@ -175,7 +175,7 @@
       "downloadError": "Lỗi khi tải mẫu: {{message}}"
     }
   },
-  "serverUploadArea": {
+  "instanceUploadArea": {
     "errors": {
       "title": "Có lỗi xảy ra"
     },
@@ -185,8 +185,8 @@
     },
     "fileSupport": "Hỗ trợ file .xlsx, .xls (tối đa 10MB)"
   },
-  "serverManagement": {
-    "title": "Danh sách Server ({{count}} server)",
+  "instanceManagement": {
+    "title": "Danh sách instance ({{count}} instance)",
     "notDetermined": "Chưa xác định",
     "status": {
       "testing": "Testing...",
@@ -197,15 +197,15 @@
     "buttons": {
       "cancel": "Hủy",
       "testConnection": "Test Connection",
-      "addServers": "Thêm Server ({{count}})"
+      "addinstances": "Thêm instance ({{count}})"
     },
     "tooltips": {
-      "testConnectionRequired": "Vui lòng test connection thành công cho tất cả server trước khi thêm"
+      "testConnectionRequired": "Vui lòng test connection thành công cho tất cả instance trước khi thêm"
     },
     "alerts": {
-      "allConnected": "Tất cả server đã kết nối thành công! Bạn có thể thêm chúng vào hệ thống.",
-      "failedConnections": "Một số server không thể kết nối hoặc đã tồn tại trong hệ thống. Các server lỗi sẽ được tự động loại bỏ sau khi test connection.",
-      "testRequired": "Vui lòng test connection để kiểm tra tính hợp lệ của các server trước khi thêm vào hệ thống."
+      "allConnected": "Tất cả instance đã kết nối thành công! Bạn có thể thêm chúng vào hệ thống.",
+      "failedConnections": "Một số instance không thể kết nối hoặc đã tồn tại trong hệ thống. Các instance lỗi sẽ được tự động loại bỏ sau khi test connection.",
+      "testRequired": "Vui lòng test connection để kiểm tra tính hợp lệ của các instance trước khi thêm vào hệ thống."
     },
     "tableHeaders": {
       "ipAddress": "IP Address",
