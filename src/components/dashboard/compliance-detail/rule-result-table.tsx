@@ -23,7 +23,7 @@ import { useServerFix } from "@/hooks/rule-result/use-fix-rule-result";
 
 interface RuleResultTableProps {
   ruleResults: RuleResult[];
-  serverId: number;
+  instanceId: number;
   loading: boolean;
   error: string | null;
   currentPage: number;
@@ -41,7 +41,7 @@ interface RuleResultTableProps {
 
 export function RuleResultTable({
   ruleResults,
-  serverId,
+  instanceId,
   loading,
   error,
   currentPage,
@@ -169,7 +169,8 @@ export function RuleResultTable({
   const handleExecuteFix = async (ruleResultId: number) => {
     try {
       // Gọi API thông qua hook với single rule result
-      const result = await executeServerFix(serverId, [ruleResultId]);
+      console.log("Executing fix for ruleResultId:", ruleResultId);
+      const result = await executeServerFix(instanceId, [ruleResultId]);
 
       if (result.successful_fixes === 1) {
         // Show success toast

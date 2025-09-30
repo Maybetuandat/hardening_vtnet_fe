@@ -1,5 +1,5 @@
 export interface ServerFixRequest {
-  server_id: number;
+  instance_id: number;
   rule_result_ids: number[];
 }
 export interface SingleRuleFixResult {
@@ -13,8 +13,8 @@ export interface SingleRuleFixResult {
 }
 export interface ServerFixResponse {
   message: string;
-  server_id: number;
-  server_ip: string;
+  instance_id: number;
+  instance_ip: string;
   total_fixes: number;
   successful_fixes: number;
   failed_fixes: number;

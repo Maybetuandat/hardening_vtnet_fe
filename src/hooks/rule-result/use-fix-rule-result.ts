@@ -18,7 +18,7 @@ export function useServerFix(): UseServerFixReturn {
 
   const executeServerFix = useCallback(
     async (
-      serverId: number,
+      instanceId: number,
       ruleResultIds: number[]
     ): Promise<ServerFixResponse> => {
       try {
@@ -30,7 +30,7 @@ export function useServerFix(): UseServerFixReturn {
         }
 
         const requestData: ServerFixRequest = {
-          server_id: serverId,
+          instance_id: instanceId,
           rule_result_ids: ruleResultIds,
         };
 
@@ -44,7 +44,7 @@ export function useServerFix(): UseServerFixReturn {
         // Show success/warning messages based on results
         if (response.successful_fixes > 0) {
           toastHelper.success(
-            `Successfully executed ${response.successful_fixes} fix(es) on server ${response.server_ip}`
+            `Successfully executed ${response.successful_fixes} fix(es) on instance ${response.instance_ip}`
           );
         }
 

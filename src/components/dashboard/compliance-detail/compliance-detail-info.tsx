@@ -138,13 +138,9 @@ export function ComplianceDetailInfo({
                 {t("info.title")}
               </CardTitle>
               <p className="text-muted-foreground mt-1">
-                {t("info.serverIP", { ip: compliance.server_ip })}
+                {t("info.serverIP", { ip: compliance.instance_ip })}
               </p>
-              {compliance.server_hostname && (
-                <p className="text-sm text-muted-foreground">
-                  {t("info.hostname", { hostname: compliance.server_hostname })}
-                </p>
-              )}
+
               {compliance.workload_name && (
                 <p className="text-sm text-muted-foreground">
                   {t("info.workload", { workload: compliance.workload_name })}

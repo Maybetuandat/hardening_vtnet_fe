@@ -248,7 +248,7 @@ export default function ComplianceDetailPage() {
       {/* Rule Results Table */}
       <RuleResultTable
         ruleResults={ruleResults}
-        serverId={complianceDetail?.server_id || 0}
+        instanceId={complianceDetail?.instance_id || 0}
         loading={loadingRules}
         error={error}
         currentPage={currentPage}
