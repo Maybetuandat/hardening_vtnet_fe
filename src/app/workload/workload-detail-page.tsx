@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
-import { WorkloadInstancesSection } from "@/components/work-loads/workload-detail/workload-instances-section";
+import { WorkloadInstancesSection } from "@/components/work-loads/workload-detail/instance/workload-instances-section";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
 import { WorkloadResponse } from "@/types/workload";
 import toastHelper from "@/utils/toast-helper";

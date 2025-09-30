@@ -4,6 +4,8 @@ import {
   InstanceCreate,
   InstanceUpdate,
   InstanceListResponse,
+  AssignInstancesPayload,
+  AssignInstancesResponse,
 } from "@/types/instance";
 import { api } from "@/lib/api";
 
@@ -34,6 +36,10 @@ interface UseInstancesReturn {
     page?: number,
     pageSize?: number
   ) => Promise<void>;
+  assignInstancesToWorkload: (
+    workloadId: number,
+    instanceIds: number[]
+  ) => Promise<AssignInstancesResponse>;
 }
 
 export function useInstances(): UseInstancesReturn {
@@ -116,6 +122,25 @@ export function useInstances(): UseInstancesReturn {
     },
     [handleError]
   );
+  const assignInstancesToWorkload = useCallback(
+    async (
+      workloadId: number,
+      instanceIds: number[]
+    ): Promise<AssignInstancesResponse> => {
+      try {
+        const response = await api.put<AssignInstancesResponse>(
+          `/instance/assign-workload?workload_id=${workloadId}`,
+          instanceIds
+        );
+
+        return response;
+      } catch (err) {
+        handleError(err, "assign instances to workload");
+        throw err;
+      }
+    },
+    [handleError]
+  );
 
   const createInstance = useCallback(
     async (InstanceData: InstanceCreate): Promise<Instance> => {
@@ -188,5 +213,6 @@ export function useInstances(): UseInstancesReturn {
     updateInstance,
     deleteInstance,
     searchInstances,
+    assignInstancesToWorkload,
   };
 }

@@ -58,25 +58,6 @@ export const InstanceList: React.FC<InstanceListProps> = ({
   const [copiedIP, setCopiedIP] = React.useState<string | null>(null);
 
   console.log("Rendering InstanceList with instances:", instances);
-  const getStatusBadge = (status?: boolean) => {
-    if (status === true) {
-      return (
-        <Badge
-          variant="default"
-          className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-100"
-        >
-          <Circle className="h-2 w-2 fill-green-500 text-green-500" />
-          {t("instanceList.status.online")}
-        </Badge>
-      );
-    } else {
-      return (
-        <Badge variant="destructive" className="bg-red-100 text-red-800">
-          {t("instanceList.status.offline")}
-        </Badge>
-      );
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(t("locale"), {
@@ -198,7 +179,7 @@ export const InstanceList: React.FC<InstanceListProps> = ({
 
                 <TableHead>{t("instanceList.tableHeader.osVersion")}</TableHead>
                 <TableHead>{t("instanceList.tableHeader.workload")}</TableHead>
-                <TableHead>{t("instanceList.tableHeader.status")}</TableHead>
+
                 <TableHead>{t("instanceList.tableHeader.createdAt")}</TableHead>
                 <TableHead>{t("instanceList.tableHeader.manager")}</TableHead>
                 <TableHead className="text-center">
@@ -233,7 +214,7 @@ export const InstanceList: React.FC<InstanceListProps> = ({
                   <TableCell>
                     {instance.workload_name || t("instanceList.unknown")}
                   </TableCell>
-                  <TableCell>{getStatusBadge(instance.status)}</TableCell>
+
                   <TableCell>{formatDate(instance.created_at)}</TableCell>
                   <TableCell>{instance.nameofmanager}</TableCell>
                   {/* Cột Actions với phân quyền */}

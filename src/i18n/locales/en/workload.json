@@ -212,6 +212,16 @@
       "empty": {
         "noInstances": "No Instances Found",
         "description": "This workload doesn't have any instances yet."
+      },
+      "assign": {
+        "button": "Assign Instances",
+        "selectAll": " Select All",
+        "deselectAll": " Deselect All",
+        "selected": "selected",
+        "searchPlaceholder": "Search instances by name or IP...",
+        "confirm": "Confirm",
+        "title": "Assign Instances to Workload",
+        "description": "Select instances to assign to this workload"
       }
     },
     "searchPlaceholder": "Search rule result by rule name or command...",

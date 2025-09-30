@@ -51,85 +51,18 @@ export interface InstanceListResponse {
   total_pages: number;
 }
 
-export interface InstanceConnectionInfo {
-  ip: string;
-  ssh_user: string;
-  ssh_password: string;
-  ssh_port: number;
+export interface AssignInstancesPayload {
+  workload_id: number;
+  instance_ids: number[];
 }
 
-export interface InstanceConnectionResult {
-  ip: string;
-  ssh_user: string;
-  ssh_port: number;
-  status: string;
+export interface AssignInstancesResponse {
+  success: boolean;
   message: string;
-  hostname?: string;
-  os_version?: string;
-  error_details?: string;
-}
-
-export interface TestConnectionRequest {
-  Instances: InstanceConnectionInfo[];
-}
-
-export interface TestConnectionResponse {
-  results: InstanceConnectionResult[];
-  total_Instances: number;
-  successful_connections: number;
-  failed_connections: number;
-}
-
-export interface ValidationResult {
-  hostname: string;
-  exists: boolean;
-  valid: boolean;
-  message: string;
-}
-
-export interface IpValidationResult {
-  ip_address: string;
-  exists: boolean;
-  valid: boolean;
-  message: string;
-}
-
-// doi tuong su dung trong form upload Instance
-export interface InstanceUploadData {
-  id: string;
-  ip_address: string;
-  ssh_user: string;
-  ssh_port: number;
-  ssh_password: string;
-  hostname?: string;
-  os_version?: string;
-  status: string;
-  connection_status?: "untested" | "testing" | "success" | "failed";
-  connection_message?: string;
-}
-export interface UseInstanceUploadReturn {
-  dragActive: boolean;
-  uploading: boolean;
-  testing: boolean;
-  adding: boolean;
-  Instances: InstanceUploadData[];
-  uploadedFileName: string;
-  errors: string[];
-  isDirty: boolean;
-  allInstancesConnected: boolean;
-  anyInstanceTesting: boolean;
-  hasFailedConnections: boolean;
-  canAddInstances: boolean;
-
-  setDragActive: (active: boolean) => void;
-  handleFileUpload: (file: File) => Promise<void>;
-  removeInstance: (InstanceId: string) => void;
-  handleDiscard: () => void;
-  handleTestConnection: () => Promise<void>;
-  cancelAllOperations: () => void;
-  handleAddInstancesWithWorkload: (
-    workloadId: number,
-    onSuccess?: () => void,
-    onRefreshList?: () => void
-  ) => Promise<void>;
+  data: {
+    assigned_count: number;
+    failed_count: number;
+    assigned_instances: number[];
+    failed_instances: number[];
+  };
 }
