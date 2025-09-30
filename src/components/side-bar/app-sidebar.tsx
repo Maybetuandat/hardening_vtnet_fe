@@ -8,7 +8,8 @@ import {
   Package,
   Shield,
   Bell,
-  HardDrive, // Thêm icon cho OS
+  HardDrive,
+  ScrollText, // Thêm icon cho OS
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -56,13 +57,13 @@ export function AppSidebar({
       {
         title: t("navigation.os"),
         url: "/os",
-        icon: HardDrive, // Hoặc Terminal tùy bạn chọn
+        icon: HardDrive,
         isActive: location.pathname.startsWith("/os"),
       },
       {
         title: t("navigation.log"),
         url: "/logs",
-        icon: HardDrive, // Hoặc Terminal tùy bạn chọn
+        icon: ScrollText,
         isActive: location.pathname.startsWith("/logs"),
       },
     ],
