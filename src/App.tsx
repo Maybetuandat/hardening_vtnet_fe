@@ -28,6 +28,7 @@ import ProfilePage from "./app/profile/profile-page";
 import UnauthorizedPage from "./app/auth/unauthor-page";
 import LoginPage from "./app/login/login-page";
 import LogsPage from "./app/logs/log-page";
+import NotificationsPage from "./app/notifications/notification-page";
 
 const RootRedirect: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -84,6 +85,16 @@ function App() {
               <UserRoute>
                 <MainLayout>
                   <LogsPage />
+                </MainLayout>
+              </UserRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <UserRoute>
+                <MainLayout>
+                  <NotificationsPage />
                 </MainLayout>
               </UserRoute>
             }
