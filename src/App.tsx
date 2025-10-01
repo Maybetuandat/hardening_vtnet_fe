@@ -102,7 +102,7 @@ function App() {
           />
 
           <Route
-            path="/notifications"
+            path="/requests"
             element={
               <UserRoute>
                 <MainLayout>
