@@ -7,7 +7,8 @@
     "instances": "Instances",
     "os": "Operating Systems",
     "notification": "Notifications",
-    "log": "Logs"
+    "log": "Logs",
+    "requests": "Requests"
   },
   "common": {
     "search": "Search",

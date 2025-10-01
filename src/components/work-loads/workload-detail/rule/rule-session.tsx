@@ -1,6 +1,3 @@
-// src/components/work-loads/workload-detail/rule/rule-session.tsx
-// UPDATED VERSION - Thêm button View Requests
-
 import React, {
   useState,
   useEffect,

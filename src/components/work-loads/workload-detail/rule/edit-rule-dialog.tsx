@@ -1,5 +1,3 @@
-// src/components/work-loads/workload-detail/rule/edit-rule-dialog.tsx
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -26,6 +24,7 @@ import { useRules } from "@/hooks/rule/use-rules";
 import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { RuleCreate, RuleResponse } from "@/types/rule";
 import { useTranslation } from "react-i18next";
+import { useRuleChangeRequests } from "@/hooks/rule/use-rule-change-request";
 
 interface EditRuleDialogProps {
   rule: RuleResponse;
@@ -62,7 +61,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   });
 
   const { updateRule } = useRules();
-  const { createUpdateRequest } = useRuleChangeRequest();
+  const { createUpdateRequest } = useRuleChangeRequests();
 
   // Kiểm tra quyền
   const canDirectEdit = () => isAdmin();
@@ -414,6 +413,3 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     </Dialog>
   );
 };
-function useRuleChangeRequest(): { createUpdateRequest: any } {
-  throw new Error("Function not implemented.");
-}

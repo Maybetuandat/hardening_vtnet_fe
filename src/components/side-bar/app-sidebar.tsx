@@ -66,6 +66,12 @@ export function AppSidebar({
         icon: ScrollText,
         isActive: location.pathname.startsWith("/logs"),
       },
+      {
+        title: t("navigation.requests"),
+        url: "/requests",
+        icon: ScrollText,
+        isActive: location.pathname.startsWith("/requests"),
+      },
     ],
     navSecondary: [
       {

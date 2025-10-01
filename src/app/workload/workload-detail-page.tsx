@@ -1,5 +1,3 @@
-// src/app/workload/workload-detail-page.tsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Shield, Server } from "lucide-react";
@@ -34,7 +32,6 @@ export const WorkloadDetailPage: React.FC = () => {
 
   const { getWorkloadById } = useWorkloads();
 
-  // Fetch workload detail function
   const fetchWorkloadDetail = async (id: number) => {
     try {
       setLoading(true);
@@ -55,7 +52,6 @@ export const WorkloadDetailPage: React.FC = () => {
     }
   };
 
-  // Initial load
   useEffect(() => {
     if (!hasInitialized.current && workloadId) {
       hasInitialized.current = true;

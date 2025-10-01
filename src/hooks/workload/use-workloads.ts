@@ -9,6 +9,7 @@ import {
 
 export function useWorkloads() {
   const [workloads, setWorkloads] = useState<WorkloadResponse[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
@@ -87,16 +88,17 @@ export function useWorkloads() {
   );
 
   const updateWorkload = useCallback(
-    async (id: number, workloadData: WorkloadUpdate): Promise<void> => {
+    async (
+      id: number,
+      workloadData: WorkloadUpdate
+    ): Promise<WorkloadResponse> => {
       try {
         const response = await api.put<WorkloadResponse>(
           `/workloads/${id}`,
           workloadData
         );
 
-        setWorkloads((prev) =>
-          prev.map((workload) => (workload.id === id ? response : workload))
-        );
+        return response;
       } catch (err: any) {
         throw new Error(err.message || "Failed to update workload");
       }
@@ -151,6 +153,7 @@ export function useWorkloads() {
 
   return {
     workloads,
+
     loading,
     error,
     totalItems,

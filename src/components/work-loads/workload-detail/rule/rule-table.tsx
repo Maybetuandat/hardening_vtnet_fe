@@ -169,16 +169,18 @@ export const RulesTable: React.FC<RulesTableProps> = ({
                         <Edit className="h-4 w-4 mr-2" />
                         {t("workloadDetail.rules.table.actions.edit")}
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteRule(rule);
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        {t("workloadDetail.rules.table.actions.delete")}
-                      </DropdownMenuItem>
+                      <AdminOnly>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteRule(rule);
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {t("workloadDetail.rules.table.actions.delete")}
+                        </DropdownMenuItem>
+                      </AdminOnly>
                     </UserOnly>
                   </DropdownMenuContent>
                 </DropdownMenu>

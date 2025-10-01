@@ -111,7 +111,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       // Đóng dialog
       onOpenChange(false);
 
-      onSuccess(workload);
+      onSuccess(updatedWorkload);
     } catch (error: any) {
       // Hiển thị lỗi nếu có
       toastHelper.error(

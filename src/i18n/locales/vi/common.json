@@ -7,7 +7,8 @@
     "instances": "Máy chủ",
     "os": "Hệ điều hành",
     "notification": "Thông báo",
-    "log": "Lịch sử chỉnh sửa"
+    "log": "Lịch sử chỉnh sửa",
+    "requests": "Yêu cầu"
   },
   "common": {
     "search": "Tìm kiếm",

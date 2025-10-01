@@ -1,8 +1,11 @@
-// src/hooks/rule/use-rule-change-requests.ts
-
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import toastHelper from "@/utils/toast-helper";
+
+export interface RuleChangeRequestCreate {
+  rule_id: number;
+  new_value: Record<string, any>;
+}
 
 export interface RuleChangeRequestResponse {
   id: number;
@@ -32,6 +35,9 @@ export interface RuleChangeRequestListResponse {
 interface UseRuleChangeRequestsReturn {
   requests: RuleChangeRequestResponse[];
   loading: boolean;
+  createUpdateRequest: (
+    data: RuleChangeRequestCreate
+  ) => Promise<RuleChangeRequestResponse>;
   fetchWorkloadRequests: (workloadId: number, status?: string) => Promise<void>;
   fetchPendingRequests: () => Promise<void>;
   approveRequest: (requestId: number, adminNote?: string) => Promise<void>;
@@ -41,6 +47,34 @@ interface UseRuleChangeRequestsReturn {
 export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
   const [requests, setRequests] = useState<RuleChangeRequestResponse[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // CREATE UPDATE REQUEST - Method cho user tạo request
+  const createUpdateRequest = useCallback(
+    async (
+      data: RuleChangeRequestCreate
+    ): Promise<RuleChangeRequestResponse> => {
+      try {
+        console.log("Creating rule change request:", data);
+        const response = await api.post<RuleChangeRequestResponse>(
+          "/rule-change-requests/update",
+          data
+        );
+
+        toastHelper.success(
+          "Rule change request created successfully! Waiting for admin approval."
+        );
+
+        return response;
+      } catch (err: any) {
+        console.error("Error creating rule change request:", err);
+        const errorMessage =
+          err.message || "Failed to create rule change request";
+        toastHelper.error(`Failed to create request: ${errorMessage}`);
+        throw err;
+      }
+    },
+    []
+  );
 
   const fetchWorkloadRequests = useCallback(
     async (workloadId: number, status?: string) => {
@@ -127,6 +161,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
   return {
     requests,
     loading,
+    createUpdateRequest, // ✅ Export method này
     fetchWorkloadRequests,
     fetchPendingRequests,
     approveRequest,
