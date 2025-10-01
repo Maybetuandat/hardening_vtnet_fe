@@ -1,3 +1,5 @@
+// src/hooks/rule/use-rule-change-request.ts
+
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import toastHelper from "@/utils/toast-helper";
@@ -35,9 +37,19 @@ export interface RuleChangeRequestListResponse {
 interface UseRuleChangeRequestsReturn {
   requests: RuleChangeRequestResponse[];
   loading: boolean;
+
+  // User operations
   createUpdateRequest: (
     data: RuleChangeRequestCreate
   ) => Promise<RuleChangeRequestResponse>;
+  fetchMyRequests: () => Promise<void>;
+  updateMyRequest: (
+    requestId: number,
+    newValue: Record<string, any>
+  ) => Promise<void>;
+  deleteMyRequest: (requestId: number) => Promise<void>;
+
+  // Admin operations
   fetchWorkloadRequests: (workloadId: number, status?: string) => Promise<void>;
   fetchPendingRequests: () => Promise<void>;
   approveRequest: (requestId: number, adminNote?: string) => Promise<void>;
@@ -48,7 +60,8 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
   const [requests, setRequests] = useState<RuleChangeRequestResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // CREATE UPDATE REQUEST - Method cho user tạo request
+  // ===== USER OPERATIONS =====
+
   const createUpdateRequest = useCallback(
     async (
       data: RuleChangeRequestCreate
@@ -75,6 +88,63 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     },
     []
   );
+
+  const fetchMyRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<RuleChangeRequestListResponse>(
+        "/rule-change-requests/my-requests"
+      );
+      setRequests(response.requests);
+    } catch (err: any) {
+      console.error("Error fetching my requests:", err);
+      toastHelper.error("Failed to load your requests");
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateMyRequest = useCallback(
+    async (requestId: number, newValue: Record<string, any>) => {
+      try {
+        await api.put(`/rule-change-requests/${requestId}`, {
+          new_value: newValue,
+        });
+        toastHelper.success("Request updated successfully!");
+
+        // Update local state
+        setRequests((prev) =>
+          prev.map((req) =>
+            req.id === requestId ? { ...req, new_value: newValue } : req
+          )
+        );
+      } catch (err: any) {
+        console.error("Error updating request:", err);
+        const errorMessage = err.message || "Failed to update request";
+        toastHelper.error(errorMessage);
+        throw err;
+      }
+    },
+    []
+  );
+
+  const deleteMyRequest = useCallback(async (requestId: number) => {
+    try {
+      await api.delete(`/rule-change-requests/${requestId}`);
+      toastHelper.success("Request deleted successfully!");
+
+      // Remove from local state
+      setRequests((prev) => prev.filter((req) => req.id !== requestId));
+    } catch (err: any) {
+      console.error("Error deleting request:", err);
+      const errorMessage = err.message || "Failed to delete request";
+      toastHelper.error(errorMessage);
+      throw err;
+    }
+  }, []);
+
+  // ===== ADMIN OPERATIONS =====
 
   const fetchWorkloadRequests = useCallback(
     async (workloadId: number, status?: string) => {
@@ -126,7 +196,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request approved successfully!");
 
-        // Refresh list
+        // Remove from local state
         setRequests((prev) => prev.filter((req) => req.id !== requestId));
       } catch (err: any) {
         console.error("Error approving request:", err);
@@ -146,7 +216,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request rejected");
 
-        // Refresh list
+        // Remove from local state
         setRequests((prev) => prev.filter((req) => req.id !== requestId));
       } catch (err: any) {
         console.error("Error rejecting request:", err);
@@ -161,7 +231,14 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
   return {
     requests,
     loading,
-    createUpdateRequest, // ✅ Export method này
+
+    // User operations
+    createUpdateRequest,
+    fetchMyRequests,
+    updateMyRequest,
+    deleteMyRequest,
+
+    // Admin operations
     fetchWorkloadRequests,
     fetchPendingRequests,
     approveRequest,

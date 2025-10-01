@@ -1,0 +1,97 @@
+{
+  "page": {
+    "title": "Yêu Cầu Thay Đổi Quy Tắc",
+    "subtitle": "Xem và quản lý các yêu cầu thay đổi quy tắc của bạn",
+    "refresh": "Làm mới"
+  },
+  "filters": {
+    "status": {
+      "placeholder": "Lọc theo trạng thái",
+      "all": "Tất cả",
+      "pending": "Đang chờ",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối"
+    }
+  },
+  "table": {
+    "columns": {
+      "type": "Loại",
+      "ruleName": "Tên Rule",
+      "workload": "Workload",
+      "status": "Trạng thái",
+      "created": "Ngày tạo",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "pending": "Đang chờ",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối"
+    },
+    "type": {
+      "create": "Tạo mới",
+      "update": "Cập nhật"
+    },
+    "actions": {
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "empty": {
+      "title": "Không tìm thấy yêu cầu nào",
+      "description": "Bạn chưa tạo yêu cầu thay đổi rule nào"
+    },
+    "newRule": "Rule Mới",
+    "na": "N/A"
+  },
+  "expandedRow": {
+    "newRuleData": "Dữ liệu Rule mới:",
+    "changes": "Thay đổi:",
+    "oldLabel": "Cũ:",
+    "newLabel": "Mới:",
+    "processingInfo": {
+      "title": "Thông tin xử lý:",
+      "processedBy": "Xử lý bởi:",
+      "date": "Ngày:",
+      "adminNote": "Ghi chú của Admin:"
+    }
+  },
+  "editDialog": {
+    "title": "Chỉnh Sửa Yêu Cầu Thay Đổi Quy Tắc",
+    "description": "Cập nhật yêu cầu của bạn trước khi admin xem xét",
+    "fields": {
+      "name": {
+        "label": "Tên Quy Tắc",
+        "placeholder": "Nhập tên quy tắc",
+        "required": "bắt buộc"
+      },
+      "description": {
+        "label": "Mô tả",
+        "placeholder": "Nhập mô tả quy tắc (tùy chọn)"
+      },
+      "command": {
+        "label": "Lệnh Thực Thi",
+        "placeholder": "Nhập lệnh sẽ được thực thi",
+        "help": "Lệnh này sẽ được thực thi khi rule được kích hoạt",
+        "required": "bắt buộc"
+      },
+      "parameters": {
+        "label": "Tham số (JSON)",
+        "placeholder": "{\"key\": \"value\"}",
+        "help": "Nhập tham số dưới dạng JSON. Ví dụ: {\"key\": \"value\"}",
+        "invalidJson": "Định dạng JSON không hợp lệ. Vui lòng kiểm tra cú pháp."
+      },
+      "suggestedFix": {
+        "label": "Gợi Ý Khắc Phục",
+        "placeholder": "Nhập gợi ý khắc phục (tùy chọn)",
+        "help": "Cung cấp gợi ý khắc phục hoặc các bước xử lý cho rule này"
+      }
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "save": "Lưu Thay Đổi",
+      "saving": "Đang lưu..."
+    }
+  },
+  "deleteConfirm": {
+    "message": "Bạn có chắc chắn muốn xóa yêu cầu này?"
+  }
+}

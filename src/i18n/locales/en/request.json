@@ -1,0 +1,97 @@
+{
+  "page": {
+    "title": "Rule Change Requests",
+    "subtitle": "View and manage your rule change requests",
+    "refresh": "Refresh"
+  },
+  "filters": {
+    "status": {
+      "placeholder": "Filter by status",
+      "all": "All Status",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "table": {
+    "columns": {
+      "type": "Type",
+      "ruleName": "Rule Name",
+      "workload": "Workload",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "type": {
+      "create": "Create",
+      "update": "Update"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": {
+      "title": "No requests found",
+      "description": "You haven't created any rule change requests yet"
+    },
+    "newRule": "New Rule",
+    "na": "N/A"
+  },
+  "expandedRow": {
+    "newRuleData": "New Rule Data:",
+    "changes": "Changes:",
+    "oldLabel": "Old:",
+    "newLabel": "New:",
+    "processingInfo": {
+      "title": "Processing Information:",
+      "processedBy": "Processed by:",
+      "date": "Date:",
+      "adminNote": "Admin Note:"
+    }
+  },
+  "editDialog": {
+    "title": "Edit Rule Change Request",
+    "description": "Update your request before admin reviews it",
+    "fields": {
+      "name": {
+        "label": "Rule Name",
+        "placeholder": "Enter rule name",
+        "required": "required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter rule description (optional)"
+      },
+      "command": {
+        "label": "Execution Command",
+        "placeholder": "Enter the command to be executed",
+        "help": "This command will be executed when the rule is triggered",
+        "required": "required"
+      },
+      "parameters": {
+        "label": "Parameters (JSON)",
+        "placeholder": "{\"key\": \"value\"}",
+        "help": "Enter parameters as JSON. For example: {\"key\": \"value\"}",
+        "invalidJson": "Invalid JSON format. Please check your syntax."
+      },
+      "suggestedFix": {
+        "label": "Suggested Fix",
+        "placeholder": "Enter suggested fix (optional)",
+        "help": "Provide a suggested fix or remediation steps for this rule"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving..."
+    }
+  },
+  "deleteConfirm": {
+    "message": "Are you sure you want to delete this request?"
+  }
+}

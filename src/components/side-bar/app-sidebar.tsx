@@ -9,7 +9,8 @@ import {
   Shield,
   Bell,
   HardDrive,
-  ScrollText, // Thêm icon cho OS
+  ScrollText,
+  FileEdit, // Thêm icon cho OS
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -69,7 +70,7 @@ export function AppSidebar({
       {
         title: t("navigation.requests"),
         url: "/requests",
-        icon: ScrollText,
+        icon: FileEdit,
         isActive: location.pathname.startsWith("/requests"),
       },
     ],
