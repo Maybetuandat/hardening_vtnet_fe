@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-
+import { useAutoRequestPermission } from "@/hooks/notifications/use-auto-request-permission";
 import { useCompliance } from "@/hooks/compliance/use-compliance";
 import { ComplianceTable } from "@/components/dashboard/compliance-table";
 import FilterBar from "@/components/ui/filter-bar";
@@ -50,6 +50,7 @@ export default function SystemHardeningDashboard() {
     );
   }, [fetchComplianceResults]);
 
+  useAutoRequestPermission();
   // Effect khi searchKeyword hoặc status thay đổi
   useEffect(() => {
     fetchComplianceResults(

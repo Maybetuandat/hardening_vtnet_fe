@@ -64,9 +64,9 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markAsRead = useCallback(async (notificationId: number) => {
     try {
-      await api.post(`/notifications/${notificationId}/read`);
+      // ✅ Đổi từ POST sang PATCH
+      await api.patch(`/notifications/${notificationId}/read`);
 
-      // Update local state
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
@@ -79,12 +79,11 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markAllAsRead = useCallback(async () => {
     try {
-      await api.post("/notifications/mark-all-read");
+      // ✅ Đổi endpoint và method
+      await api.patch("/notifications/read-all");
 
-      // Update local state
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
-
       toastHelper.success("All notifications marked as read");
     } catch (err: any) {
       console.error("Error marking all as read:", err);

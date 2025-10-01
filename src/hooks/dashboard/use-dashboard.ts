@@ -9,6 +9,9 @@ export const useDashboard = () => {
     compliance_rate: 0,
     critical_issues: 0,
     last_audit: null,
+    passed_servers: 0,
+    failed_servers: 0,
+    workload_stats: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,14 +22,19 @@ export const useDashboard = () => {
       setError(null);
 
       const data = await api.get<DashboardStats>("/dashboard/statistics");
-      data.compliance_rate = Math.round(data.compliance_rate * 100);
+
+      // Nhân compliance_rate với 100 nếu nó ở dạng 0-1
+      if (data.compliance_rate <= 1) {
+        data.compliance_rate = Math.round(data.compliance_rate * 100);
+      }
+
       setStats(data);
 
-      console.log(" Dashboard stats fetched:", data); // Debug log
+      console.log("✅ Dashboard stats fetched:", data);
     } catch (err: any) {
       const errorMessage = err.message || "Error fetching dashboard statistics";
       setError(errorMessage);
-      console.error(" Error fetching dashboard statistics:", err);
+      console.error("❌ Error fetching dashboard statistics:", err);
     } finally {
       setLoading(false);
     }
@@ -45,7 +53,7 @@ export const useDashboard = () => {
 
         toastHelper.success("Data has been updated");
       } catch (err) {
-        toastHelper.error("Error updating dashboard data  ");
+        toastHelper.error("Error updating dashboard data");
       }
     },
     [fetchStatistics]

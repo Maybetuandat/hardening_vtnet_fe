@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FilterBar from "@/components/ui/filter-bar";
@@ -14,10 +15,13 @@ import {
 import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { FileEdit, RefreshCw, ShieldCheck } from "lucide-react";
 import { AdminRequestsTable } from "@/components/rule-request/admin-requests-table";
+import toastHelper from "@/utils/toast-helper";
 
 export default function RequestPage() {
   const { t } = useTranslation("request");
   const { isAdmin } = usePermissions();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const {
     requests,
@@ -30,10 +34,15 @@ export default function RequestPage() {
     rejectRequest,
   } = useRuleChangeRequests();
 
+  // Get query params from URL
+  const requestIdFromUrl = searchParams.get("requestId");
+  const workloadIdFromUrl = searchParams.get("workloadId");
+  const ruleNameFromUrl = searchParams.get("ruleName");
+
   // Filter states
   const [filterStatus, setFilterStatus] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchTerm, setSearchTerm] = useState(ruleNameFromUrl || "");
+  const [searchKeyword, setSearchKeyword] = useState(ruleNameFromUrl || "");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,6 +61,43 @@ export default function RequestPage() {
     }
   }, []);
 
+  // Handle highlighting request from notification
+  useEffect(() => {
+    if (requestIdFromUrl && requests.length > 0) {
+      // Find the request in the list
+      const targetRequest = requests.find(
+        (req) => req.id === parseInt(requestIdFromUrl)
+      );
+
+      if (targetRequest) {
+        // Scroll to the request element
+        setTimeout(() => {
+          const element = document.getElementById(
+            `request-${requestIdFromUrl}`
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Add highlight animation
+            element.classList.add("highlight-request");
+
+            // Remove highlight after 2 seconds
+            setTimeout(() => {
+              element.classList.remove("highlight-request");
+            }, 2000);
+          }
+        }, 100);
+
+        // Show toast notification
+        toastHelper.info(
+          `Showing request: ${targetRequest.rule_name || "Rule"}`
+        );
+      } else {
+        toastHelper.warning("Request not found in current view");
+      }
+    }
+  }, [requestIdFromUrl, requests]);
+
   // Handle search
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -69,7 +115,7 @@ export default function RequestPage() {
     } else {
       fetchMyRequests();
     }
-  }, []);
+  }, [isAdmin, fetchPendingRequests, fetchMyRequests]);
 
   // User actions
   const handleEdit = (request: RuleChangeRequestResponse) => {
@@ -112,7 +158,12 @@ export default function RequestPage() {
         ?.toLowerCase()
         .includes(searchKeyword.toLowerCase());
 
-    return matchStatus && matchSearch;
+    // If workloadId is in URL, filter by it
+    const matchWorkload = workloadIdFromUrl
+      ? request.workload_id === parseInt(workloadIdFromUrl)
+      : true;
+
+    return matchStatus && matchSearch && matchWorkload;
   });
 
   // Pagination
@@ -152,6 +203,31 @@ export default function RequestPage() {
           <p className="text-muted-foreground mt-2">
             {isAdmin() ? t("page.subtitleAdmin") : t("page.subtitle")}
           </p>
+
+          {/* Show filter info if coming from notification */}
+          {(workloadIdFromUrl || ruleNameFromUrl) && (
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Filtered by:</span>
+              {ruleNameFromUrl && (
+                <span className="px-2 py-1 bg-primary/10 rounded">
+                  Rule: {ruleNameFromUrl}
+                </span>
+              )}
+              {workloadIdFromUrl && (
+                <span className="px-2 py-1 bg-primary/10 rounded">
+                  Workload ID: {workloadIdFromUrl}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/requests")}
+                className="h-6 text-xs"
+              >
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
 
         <Button
@@ -172,27 +248,31 @@ export default function RequestPage() {
         onSearchSubmit={handleSearchSubmit}
         filters={
           isAdmin()
-            ? [] // Admin không cần filter status
+            ? [] // Admin không cần filter (chỉ pending)
             : [
                 {
                   value: filterStatus,
                   onChange: setFilterStatus,
                   options: [
-                    { value: "all", label: t("filters.status.all") },
-                    { value: "pending", label: t("filters.status.pending") },
-                    { value: "approved", label: t("filters.status.approved") },
-                    { value: "rejected", label: t("filters.status.rejected") },
+                    { value: "all", label: t("filters.allStatus") },
+                    { value: "pending", label: t("filters.pending") },
+                    { value: "approved", label: t("filters.approved") },
+                    { value: "rejected", label: t("filters.rejected") },
                   ],
-                  placeholder: t("filters.status.placeholder"),
+                  placeholder: t("filters.status"),
                   widthClass: "w-40",
                 },
               ]
         }
       />
 
-      {/* Table - Khác nhau cho User vs Admin */}
+      {/* Table */}
       <Card>
-        {isAdmin() ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        ) : isAdmin() ? (
           <AdminRequestsTable
             requests={paginatedRequests}
             loading={loading}
@@ -209,28 +289,30 @@ export default function RequestPage() {
         )}
 
         {/* Pagination */}
-        {!loading && paginatedRequests.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalElements={totalItems}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            loading={loading}
-            showInfo={true}
-            showPageSizeSelector={true}
-            pageSizeOptions={[5, 10, 20, 50]}
-          />
+        {totalItems > 0 && (
+          <div className="p-4 border-t">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalElements={totalItems}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              loading={loading}
+              showInfo={true}
+              showPageSizeSelector={true}
+              pageSizeOptions={[5, 10, 20, 50]}
+            />
+          </div>
         )}
       </Card>
 
-      {/* Edit Request Dialog - chỉ cho User */}
-      {!isAdmin() && editingRequest && (
+      {/* Edit Dialog */}
+      {editingRequest && (
         <EditRequestDialog
           request={editingRequest}
           open={!!editingRequest}
-          onOpenChange={(open) => !open && setEditingRequest(null)}
+          onOpenChange={() => setEditingRequest(null)}
           onSave={handleSaveEdit}
         />
       )}

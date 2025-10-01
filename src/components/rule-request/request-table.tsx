@@ -1,5 +1,3 @@
-// src/components/rule-request/request-table.tsx
-
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -103,7 +101,6 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
       );
     }
 
-    // Update request
     return (
       <div className="space-y-2 p-4 bg-muted rounded-md">
         <p className="text-sm font-medium">{t("expandedRow.changes")}</p>
@@ -182,7 +179,10 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
         <TableBody>
           {requests.map((request) => (
             <React.Fragment key={request.id}>
-              <TableRow className="cursor-pointer hover:bg-muted/50">
+              <TableRow
+                id={`request-${request.id}`}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+              >
                 <TableCell>
                   <Button
                     variant="ghost"
@@ -240,15 +240,11 @@ export const RequestsTable: React.FC<RequestsTableProps> = ({
                 </TableCell>
               </TableRow>
 
-              {/* Expanded Row */}
               {expandedRow === request.id && (
                 <TableRow>
                   <TableCell colSpan={7} className="bg-muted/30">
                     <div className="py-4 space-y-4">
-                      {/* Changes */}
                       {renderChanges(request)}
-
-                      {/* Processed Info */}
                       {request.status !== "pending" && (
                         <div className="text-sm space-y-1 p-4 bg-card rounded-md">
                           <p className="font-medium mb-2">

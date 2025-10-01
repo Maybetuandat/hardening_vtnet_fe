@@ -1,6 +1,7 @@
-// src/components/notifications/notification-card.tsx
+// src/components/notification/notification-card.tsx
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
   onMarkAsRead,
   onDelete,
 }) => {
+  const navigate = useNavigate();
+
   const getIcon = () => {
     switch (notification.type) {
       case "compliance_completed":
@@ -74,44 +77,93 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     }
   };
 
+  const handleNotificationClick = () => {
+    if (!notification.is_read) {
+      onMarkAsRead(notification.id);
+    }
+
+    switch (notification.type) {
+      case "rule_change_request":
+      case "rule_change_approved":
+      case "rule_change_rejected":
+        const params = new URLSearchParams();
+
+        if (notification.meta_data?.workload_id) {
+          params.append(
+            "workloadId",
+            notification.meta_data.workload_id.toString()
+          );
+        }
+        if (notification.meta_data?.rule_name) {
+          params.append("ruleName", notification.meta_data.rule_name);
+        }
+        if (notification.meta_data?.request_id) {
+          params.append(
+            "requestId",
+            notification.meta_data.request_id.toString()
+          );
+        }
+
+        navigate(`/requests?${params.toString()}`);
+        break;
+
+      case "compliance_completed":
+      case "compliance_failed":
+        if (notification.meta_data?.compliance_id) {
+          navigate(`/compliance/${notification.meta_data.compliance_id}`);
+        }
+        break;
+
+      default:
+        navigate("/notifications");
+        break;
+    }
+  };
+
   return (
     <Card
       className={cn(
-        "transition-all hover:shadow-md",
-        !notification.is_read && "border-l-4 border-l-primary bg-blue-50/50"
+        "overflow-hidden transition-all hover:shadow-md cursor-pointer",
+        !notification.is_read && "border-l-4 border-l-primary bg-primary/5"
       )}
+      onClick={handleNotificationClick}
     >
       <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          {/* Icon */}
+        <div className="flex gap-3">
           <div className="flex-shrink-0 mt-1">{getIcon()}</div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h4 className="font-semibold text-sm">{notification.title}</h4>
-                <Badge variant={getTypeBadgeVariant()} className="text-xs">
-                  {getTypeLabel()}
-                </Badge>
-                {!notification.is_read && (
-                  <Badge variant="outline" className="text-xs bg-blue-100">
-                    New
+          <div className="flex-1 space-y-2 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    variant={getTypeBadgeVariant() as any}
+                    className="text-xs"
+                  >
+                    {getTypeLabel()}
                   </Badge>
-                )}
+                  {!notification.is_read && (
+                    <Badge variant="default" className="text-xs">
+                      New
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm font-medium mt-1 break-words">
+                  {notification.title}
+                </p>
               </div>
               <span className="text-xs text-muted-foreground whitespace-nowrap">
                 {format(new Date(notification.created_at), "MMM dd, HH:mm")}
               </span>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-3 whitespace-pre-line">
-              {notification.message}
-            </p>
+            {notification.message && (
+              <p className="text-sm text-muted-foreground break-words">
+                {notification.message}
+              </p>
+            )}
 
-            {/* Meta data */}
             {notification.meta_data && (
-              <div className="mb-3 p-2 bg-muted/50 rounded text-xs space-y-1">
+              <div className="text-xs text-muted-foreground space-y-1">
                 {notification.meta_data.workload_name && (
                   <div>
                     <span className="font-medium">Workload:</span>{" "}
@@ -139,13 +191,15 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex gap-2">
               {!notification.is_read && (
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onMarkAsRead(notification.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMarkAsRead(notification.id);
+                  }}
                   className="h-7 text-xs"
                 >
                   <Eye className="h-3 w-3 mr-1" />
@@ -155,7 +209,10 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => onDelete(notification.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(notification.id);
+                }}
                 className="h-7 text-xs text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-3 w-3 mr-1" />

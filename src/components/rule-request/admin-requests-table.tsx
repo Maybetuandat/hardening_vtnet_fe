@@ -104,7 +104,6 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
       );
     }
 
-    // Update request
     return (
       <div className="space-y-2 p-4 bg-muted rounded-md">
         <p className="text-sm font-medium">{t("expandedRow.changes")}</p>
@@ -183,7 +182,10 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
         <TableBody>
           {requests.map((request) => (
             <React.Fragment key={request.id}>
-              <TableRow className="cursor-pointer hover:bg-muted/50">
+              <TableRow
+                id={`request-${request.id}`}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+              >
                 <TableCell>
                   <Button
                     variant="ghost"
@@ -228,15 +230,11 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
                 </TableCell>
               </TableRow>
 
-              {/* Expanded Row */}
               {expandedRow === request.id && (
                 <TableRow>
                   <TableCell colSpan={7} className="bg-muted/30">
                     <div className="py-4 space-y-4">
-                      {/* Changes */}
                       {renderChanges(request)}
-
-                      {/* Admin Note Input */}
                       <div className="space-y-2">
                         <Label htmlFor={`note-${request.id}`}>
                           {t("admin.adminNote.label")}
@@ -250,8 +248,6 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
                           disabled={processingId === request.id}
                         />
                       </div>
-
-                      {/* Action Buttons */}
                       <div className="flex gap-2 justify-end">
                         <Button
                           variant="outline"
