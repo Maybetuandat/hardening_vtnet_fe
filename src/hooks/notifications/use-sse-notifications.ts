@@ -1,29 +1,38 @@
+// src/hooks/notifications/use-sse-notifications.ts
+
 import { ComplianceResult } from "@/types/compliance";
 import { useEffect, useRef, useCallback, useState } from "react";
-
-import { useAuth } from "@/hooks/authentication/use-auth"; // Import useAuth hook
-import toastHelper from "@/utils/toast-helper";
+import { useAuth } from "@/hooks/authentication/use-auth";
+import { useBrowserNotifications } from "./use-browser-notifications";
 
 interface SSEMessage {
   type: string;
   data?: any;
   timestamp?: string;
   message?: string;
+  title?: string;
+  meta_data?: any;
+  recipient_id?: number;
 }
 
 export interface UseSSENotificationsReturn {
   isConnected: boolean;
   connectionError: string | null;
   lastMessage: SSEMessage | null;
+  unreadCount: number;
 }
 
 export function useSSENotifications(
-  onComplianceCompleted?: (data: ComplianceResult) => void
+  onComplianceCompleted?: (data: ComplianceResult) => void,
+  onNewNotification?: () => void // Callback để refresh notification list
 ): UseSSENotificationsReturn {
   const { token, isAuthenticated, isLoading } = useAuth();
+  const { showNotification, permission } = useBrowserNotifications();
+
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<SSEMessage | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -31,27 +40,16 @@ export function useSSENotifications(
   const maxReconnectAttempts = 5;
 
   const connect = useCallback(() => {
-    // Không kết nối nếu đang loading hoặc không authenticated
     if (isLoading || !isAuthenticated || !token) {
-      if (!isLoading && !isAuthenticated) {
-        console.log("SSE: Not authenticated, skipping connection.");
-      }
-      if (!isLoading && isAuthenticated && !token) {
-        console.log(
-          "SSE: Authenticated but no token found, skipping connection."
-        );
-      }
       return;
     }
 
     if (eventSourceRef.current) {
-      // Đã có kết nối, không tạo lại
       return;
     }
 
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      // Thêm token vào URL làm query parameter
       const sseURL = `${baseURL}/notifications/stream?token=${token}`;
 
       const eventSource = new EventSource(sseURL);
@@ -61,17 +59,17 @@ export function useSSENotifications(
         setIsConnected(true);
         setConnectionError(null);
         reconnectAttempts.current = 0;
-        console.log(" SSE connection established");
+        console.log("✅ SSE connection established");
       };
 
       eventSource.onmessage = (event) => {
-        console.log("🔥 SSE Raw message received:", event.data); // Debug raw data
+        console.log("🔥 SSE Raw message received:", event.data);
 
         try {
           const message: SSEMessage = JSON.parse(event.data);
           setLastMessage(message);
 
-          console.log("📩 SSE Parsed message type:", message.type); // Debug message type
+          console.log("📩 SSE Parsed message type:", message.type);
 
           switch (message.type) {
             case "connected":
@@ -81,21 +79,20 @@ export function useSSENotifications(
             case "completed":
               console.log("🎉 Compliance scan completed:", message.data);
 
-              toastHelper.success(
-                `Scan successful for ${
-                  message.data.server_hostname || message.data.server_ip
-                }`,
-                {
-                  description: `Score: ${message.data.score}% (${message.data.passed_rules}/${message.data.total_rules} rules passed)`,
-                  duration: 300,
-                  action: {
-                    label: "View",
-                    onClick: () => {
-                      /* Handle view action */
-                    },
-                  },
-                }
-              );
+              // ✅ Show browser notification
+              if (permission === "granted") {
+                showNotification("Compliance Scan Completed", {
+                  body: `Score: ${message.data.score}% (${message.data.passed_rules}/${message.data.total_rules} rules passed)`,
+                  tag: `compliance-${message.data.id}`,
+                  requireInteraction: false,
+                });
+              }
+
+              // Increase unread count
+              setUnreadCount((prev) => prev + 1);
+
+              // Trigger callback to refresh notification list
+              onNewNotification?.();
 
               if (onComplianceCompleted) {
                 onComplianceCompleted(message.data as ComplianceResult);
@@ -103,28 +100,82 @@ export function useSSENotifications(
               break;
 
             case "failed":
-              toastHelper.error(
-                `Scan failed: ${message.message || "Unknown error"}`,
-                {
-                  duration: 300,
-                }
-              );
+              // ✅ Show browser notification for failure
+              if (permission === "granted") {
+                showNotification("Compliance Scan Failed", {
+                  body: message.message || "Unknown error",
+                  tag: "compliance-failed",
+                  requireInteraction: false,
+                });
+              }
+
+              setUnreadCount((prev) => prev + 1);
+              onNewNotification?.();
 
               if (onComplianceCompleted) {
                 onComplianceCompleted(message.data as ComplianceResult);
               }
               break;
 
+            // ✅ NEW: Rule change notifications with browser notifications
+            case "rule_change_request":
+              console.log("📬 New rule change request notification");
+
+              if (permission === "granted") {
+                showNotification(message.title || "New Rule Change Request", {
+                  body: message.message,
+                  tag: `rule-request-${message.meta_data?.request_id}`,
+                  requireInteraction: true, // Keep notification until clicked
+                  icon: "/icons/rule-change.png",
+                });
+              }
+
+              setUnreadCount((prev) => prev + 1);
+              onNewNotification?.();
+              break;
+
+            case "rule_change_approved":
+              console.log("✅ Rule change request approved");
+
+              if (permission === "granted") {
+                showNotification(message.title || "Request Approved", {
+                  body: message.message,
+                  tag: `rule-approved-${message.meta_data?.request_id}`,
+                  requireInteraction: false,
+                  icon: "/icons/success.png",
+                });
+              }
+
+              setUnreadCount((prev) => prev + 1);
+              onNewNotification?.();
+              break;
+
+            case "rule_change_rejected":
+              console.log("❌ Rule change request rejected");
+
+              if (permission === "granted") {
+                showNotification(message.title || "Request Rejected", {
+                  body: message.message,
+                  tag: `rule-rejected-${message.meta_data?.request_id}`,
+                  requireInteraction: false,
+                  icon: "/icons/error.png",
+                });
+              }
+
+              setUnreadCount((prev) => prev + 1);
+              onNewNotification?.();
+              break;
+
             case "heartbeat":
-              console.log(" SSE Heartbeat received at:", message.timestamp);
+              console.log("💓 SSE Heartbeat received at:", message.timestamp);
               break;
 
             default:
-              console.log(" Unknown SSE message type:", message.type);
+              console.log("⚠️ Unknown SSE message type:", message.type);
           }
         } catch (error) {
           console.error(
-            " Error parsing SSE message:",
+            "❌ Error parsing SSE message:",
             error,
             "Raw data:",
             event.data
@@ -133,7 +184,7 @@ export function useSSENotifications(
       };
 
       eventSource.onerror = (error) => {
-        console.error(" SSE Error:", error);
+        console.error("❌ SSE Error:", error);
         setIsConnected(false);
         setConnectionError("Connection failed");
 
@@ -149,76 +200,54 @@ export function useSSENotifications(
           const delay = Math.min(
             1000 * Math.pow(2, reconnectAttempts.current),
             30000
-          ); // Max 30 seconds delay
+          );
 
           console.log(
-            `Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`
+            `🔄 Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            connect(); // Gọi lại connect
+            connect();
           }, delay);
         } else if (!isAuthenticated || !token) {
           console.log(
-            "SSE: Not authenticated or no token, stopping reconnection attempts."
+            "⚠️ SSE: Not authenticated or no token, stopping reconnection attempts."
           );
           setConnectionError(
             "Session expired or not logged in. Please re-login."
           );
         } else {
-          console.error(" Max reconnection attempts reached");
+          console.error("❌ Max reconnection attempts reached");
           setConnectionError("Unable to reconnect. Please refresh the page.");
         }
       };
     } catch (error) {
-      console.error(" Failed to create SSE connection:", error);
-      setConnectionError("Failed to create connection");
+      console.error("❌ Error creating SSE connection:", error);
+      setConnectionError("Failed to establish connection");
     }
-  }, [token, isAuthenticated, isLoading, onComplianceCompleted]);
+  }, [
+    token,
+    isAuthenticated,
+    isLoading,
+    onComplianceCompleted,
+    onNewNotification,
+    showNotification,
+    permission,
+  ]);
 
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-
-    setIsConnected(false);
-    setConnectionError(null); // Clear error on disconnect
-    reconnectAttempts.current = 0; // Reset attempts
-    console.log(" SSE Disconnected");
-  }, []);
-
-  // Effect để quản lý kết nối dựa trên trạng thái xác thực và token
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated && token) {
-        connect();
-      } else {
-        disconnect(); // Ngắt kết nối nếu không authenticated hoặc không có token
+    connect();
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
-    }
-
-    // Cleanup khi component unmount hoặc khi dependencies thay đổi
-    return () => {
-      disconnect();
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
     };
-  }, [isAuthenticated, token, isLoading, connect, disconnect]);
+  }, [connect]);
 
-  // Cleanup on unmount (đảm bảo ngắt kết nối khi component bị hủy)
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-  }, [disconnect]);
-
-  return {
-    isConnected,
-    connectionError,
-    lastMessage,
-  };
+  return { isConnected, connectionError, lastMessage, unreadCount };
 }
