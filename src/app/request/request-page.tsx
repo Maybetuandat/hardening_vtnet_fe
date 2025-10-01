@@ -50,7 +50,7 @@ export default function RequestPage() {
     } else {
       fetchMyRequests(); // User: xem my requests
     }
-  }, [isAdmin, fetchMyRequests, fetchPendingRequests]);
+  }, []);
 
   // Handle search
   const handleSearchChange = useCallback((value: string) => {
@@ -69,7 +69,7 @@ export default function RequestPage() {
     } else {
       fetchMyRequests();
     }
-  }, [isAdmin, fetchMyRequests, fetchPendingRequests]);
+  }, []);
 
   // User actions
   const handleEdit = (request: RuleChangeRequestResponse) => {

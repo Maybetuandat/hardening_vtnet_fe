@@ -1,7 +1,9 @@
 {
   "page": {
     "title": "Rule Change Requests",
+    "titleAdmin": "Pending Rule Requests",
     "subtitle": "View and manage your rule change requests",
+    "subtitleAdmin": "Review and process pending rule change requests from users",
     "refresh": "Refresh"
   },
   "filters": {
@@ -41,6 +43,23 @@
     },
     "newRule": "New Rule",
     "na": "N/A"
+  },
+  "admin": {
+    "columns": {
+      "requester": "Requester"
+    },
+    "empty": {
+      "title": "No pending requests",
+      "description": "There are no pending rule change requests to review at this time"
+    },
+    "adminNote": {
+      "label": "Admin Note (Optional)",
+      "placeholder": "Add a note about this decision (visible to the requester)..."
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject"
+    }
   },
   "expandedRow": {
     "newRuleData": "New Rule Data:",

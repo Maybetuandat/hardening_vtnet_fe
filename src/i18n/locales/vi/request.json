@@ -1,7 +1,9 @@
 {
   "page": {
     "title": "Yêu Cầu Thay Đổi Quy Tắc",
+    "titleAdmin": "Yêu Cầu Đang Chờ Duyệt",
     "subtitle": "Xem và quản lý các yêu cầu thay đổi quy tắc của bạn",
+    "subtitleAdmin": "Xem xét và xử lý các yêu cầu thay đổi quy tắc đang chờ duyệt từ người dùng",
     "refresh": "Làm mới"
   },
   "filters": {
@@ -41,6 +43,23 @@
     },
     "newRule": "Rule Mới",
     "na": "N/A"
+  },
+  "admin": {
+    "columns": {
+      "requester": "Người yêu cầu"
+    },
+    "empty": {
+      "title": "Không có yêu cầu đang chờ",
+      "description": "Hiện tại không có yêu cầu thay đổi rule nào đang chờ xem xét"
+    },
+    "adminNote": {
+      "label": "Ghi chú của Admin (Tùy chọn)",
+      "placeholder": "Thêm ghi chú về quyết định này (người yêu cầu sẽ nhìn thấy)..."
+    },
+    "actions": {
+      "approve": "Phê duyệt",
+      "reject": "Từ chối"
+    }
   },
   "expandedRow": {
     "newRuleData": "Dữ liệu Rule mới:",

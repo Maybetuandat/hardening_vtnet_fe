@@ -1,5 +1,3 @@
-// src/components/rule-request/admin-requests-table.tsx
-
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
