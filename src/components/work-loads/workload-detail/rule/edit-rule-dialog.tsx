@@ -1,3 +1,5 @@
+// src/components/work-loads/workload-detail/rule/edit-rule-dialog.tsx
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -18,8 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Save, X, Terminal, Lock, Info } from "lucide-react";
+import { Save, X, Terminal, Lock, Info, Send } from "lucide-react";
 import { useRules } from "@/hooks/rule/use-rules";
+
 import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { RuleCreate, RuleResponse } from "@/types/rule";
 import { useTranslation } from "react-i18next";
@@ -31,7 +34,6 @@ interface EditRuleDialogProps {
   onSuccess: () => void;
 }
 
-// Các giá trị có thể có cho is_active
 const STATUS_OPTIONS = [
   { value: "active", label: "Active" },
   { value: "inactive", label: "Inactive" },
@@ -46,8 +48,6 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   const { t } = useTranslation("workload");
   const { isAdmin } = usePermissions();
   const [loading, setLoading] = useState(false);
-
-  // State riêng cho parameters text để user có thể edit một cách tự nhiên
   const [parametersText, setParametersText] = useState("");
   const [isValidJson, setIsValidJson] = useState(true);
 
@@ -62,29 +62,19 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
   });
 
   const { updateRule } = useRules();
+  const { createUpdateRequest } = useRuleChangeRequest();
 
-  // Kiểm tra quyền chỉnh sửa
-  const canEdit = () => {
-    if (isAdmin()) {
-      return true; // Admin luôn có quyền edit
-    }
+  // Kiểm tra quyền
+  const canDirectEdit = () => isAdmin();
+  const canRequestEdit = () => !isAdmin() && rule.can_be_copied === true;
+  const isEditDisabled = !canDirectEdit() && !canRequestEdit();
 
-    // User thường chỉ có quyền edit nếu can_be_copied là true
-    return rule.can_be_copied === true;
-  };
-
-  const isEditDisabled = !canEdit();
-
+  // Reset form khi dialog mở
   useEffect(() => {
     if (open) {
-      const initialParametersText = JSON.stringify(
-        rule.parameters || {},
-        null,
-        2
-      );
-      setParametersText(initialParametersText);
+      const initialParams = JSON.stringify(rule.parameters || {}, null, 2);
+      setParametersText(initialParams);
       setIsValidJson(true);
-
       setFormData({
         name: rule.name,
         description: rule.description || "",
@@ -97,6 +87,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     }
   }, [open, rule]);
 
+  // Handle submit
   const handleSubmit = async () => {
     if (
       !formData.name.trim() ||
@@ -109,24 +100,44 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
 
     try {
       setLoading(true);
-      await updateRule(rule.id, formData);
-      onSuccess();
+
+      if (canDirectEdit()) {
+        // Admin: Sửa trực tiếp
+        await updateRule(rule.id, formData);
+        onSuccess();
+      } else if (canRequestEdit()) {
+        // User: Tạo request
+        const changedFields: Record<string, any> = {};
+        if (formData.name !== rule.name) changedFields.name = formData.name;
+        if (formData.description !== rule.description)
+          changedFields.description = formData.description;
+        if (formData.command !== rule.command)
+          changedFields.command = formData.command;
+        if (formData.suggested_fix !== rule.suggested_fix)
+          changedFields.suggested_fix = formData.suggested_fix;
+        if (
+          JSON.stringify(formData.parameters) !==
+          JSON.stringify(rule.parameters)
+        ) {
+          changedFields.parameters = formData.parameters;
+        }
+
+        await createUpdateRequest({
+          rule_id: rule.id,
+          new_value: changedFields,
+        });
+        onSuccess();
+      }
     } catch (error) {
-      // Error is already handled in the hook
+      // Error handled in hooks
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    const initialParametersText = JSON.stringify(
-      rule.parameters || {},
-      null,
-      2
-    );
-    setParametersText(initialParametersText);
+    setParametersText(JSON.stringify(rule.parameters || {}, null, 2));
     setIsValidJson(true);
-
     setFormData({
       name: rule.name,
       description: rule.description || "",
@@ -139,9 +150,18 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     onOpenChange(false);
   };
 
-  const getStatusLabel = (status: string) => {
-    const option = STATUS_OPTIONS.find((opt) => opt.value === status);
-    return option ? t(`ruleDialog.status.${option.value}`) : status;
+  const handleParametersChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newText = e.target.value;
+    setParametersText(newText);
+    try {
+      const params = JSON.parse(newText);
+      setFormData((prev) => ({ ...prev, parameters: params }));
+      setIsValidJson(true);
+    } catch {
+      setIsValidJson(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -156,22 +176,25 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
     }
   };
 
-  // Xử lý thay đổi parameters
-  const handleParametersChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const newText = e.target.value;
-    setParametersText(newText); // Luôn update text hiển thị
-
-    try {
-      const params = JSON.parse(newText);
-      setFormData((prev) => ({ ...prev, parameters: params }));
-      setIsValidJson(true);
-    } catch {
-      // JSON không hợp lệ, chỉ update text, không update formData.parameters
-      setIsValidJson(false);
+  // Button config
+  const getButtonConfig = () => {
+    if (canDirectEdit()) {
+      return {
+        text: "Save Changes",
+        icon: <Save className="w-4 h-4" />,
+        loadingText: "Saving...",
+      };
+    } else if (canRequestEdit()) {
+      return {
+        text: "Request Change",
+        icon: <Send className="w-4 h-4" />,
+        loadingText: "Requesting...",
+      };
     }
+    return null;
   };
+
+  const buttonConfig = getButtonConfig();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -179,20 +202,37 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Terminal className="h-5 w-5" />
-            {t("ruleDialog.title")}
+            Edit Rule
             {isEditDisabled && (
               <Lock className="h-4 w-4 text-muted-foreground" />
             )}
           </DialogTitle>
-          <DialogDescription>{t("ruleDialog.description")}</DialogDescription>
+          <DialogDescription>
+            {canDirectEdit()
+              ? "Update rule information. Click save to apply changes."
+              : canRequestEdit()
+              ? "You can request changes to this rule. An admin will review your request."
+              : "You don't have permission to edit or request changes to this rule."}
+          </DialogDescription>
         </DialogHeader>
 
-        {/* Hiển thị thông báo nếu user không có quyền edit */}
+        {/* Alert cho User cần request */}
+        {canRequestEdit() && !canDirectEdit() && (
+          <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
+              As a user, your changes will be submitted as a request for admin
+              approval. The rule will not be updated immediately.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Alert không có quyền */}
         {isEditDisabled && (
           <Alert className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-            <Info className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            <Lock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             <AlertDescription className="text-orange-800 dark:text-orange-200">
-              {t("ruleDialog.permissions.waitForApproval")}
+              You don't have permission to edit or request changes to this rule.
             </AlertDescription>
           </Alert>
         )}
@@ -201,8 +241,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              {t("ruleDialog.nameLabel")}{" "}
-              <span className="text-red-500">*</span>
+              Rule Name <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
@@ -211,7 +250,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder={t("ruleDialog.namePlaceholder")}
+              placeholder="Enter rule name"
               disabled={loading || isEditDisabled}
               required
             />
@@ -219,9 +258,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
 
           {/* Description Field */}
           <div className="space-y-2">
-            <Label htmlFor="description">
-              {t("ruleDialog.descriptionLabel")}
-            </Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -231,7 +268,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                   description: e.target.value,
                 }))
               }
-              placeholder={t("ruleDialog.descriptionPlaceholder")}
+              placeholder="Enter rule description (optional)"
               rows={3}
               disabled={loading || isEditDisabled}
             />
@@ -240,8 +277,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
           {/* Command Field */}
           <div className="space-y-2">
             <Label htmlFor="command">
-              {t("ruleDialog.commandLabel")}{" "}
-              <span className="text-red-500">*</span>
+              Execution Command <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="command"
@@ -249,22 +285,20 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, command: e.target.value }))
               }
-              placeholder={t("ruleDialog.commandPlaceholder")}
+              placeholder="Enter the command to be executed"
               rows={4}
               disabled={loading || isEditDisabled}
               className="font-mono text-sm"
               required
             />
             <p className="text-xs text-muted-foreground">
-              {t("ruleDialog.commandHelp")}
+              This command will be executed when the rule is triggered.
             </p>
           </div>
 
-          {/* Parameters Field - Fixed with separate text state */}
+          {/* Parameters Field */}
           <div className="space-y-2">
-            <Label htmlFor="parameters">
-              {t("ruleDialog.parametersLabel")}
-            </Label>
+            <Label htmlFor="parameters">Parameters (JSON)</Label>
             <Textarea
               id="parameters"
               value={parametersText}
@@ -278,7 +312,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
             />
             <div className="flex flex-col gap-1">
               <p className="text-xs text-muted-foreground">
-                {t("ruleDialog.parametersHelp")}
+                Enter parameters as JSON. For example: {'{"key": "value"}'}
               </p>
               {!isValidJson && (
                 <p className="text-xs text-red-500">
@@ -290,9 +324,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
 
           {/* Suggested Fix Field */}
           <div className="space-y-2">
-            <Label htmlFor="suggested_fix">
-              {t("ruleDialog.suggestedFixLabel")}
-            </Label>
+            <Label htmlFor="suggested_fix">Suggested Fix</Label>
             <Textarea
               id="suggested_fix"
               value={formData.suggested_fix}
@@ -302,19 +334,19 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                   suggested_fix: e.target.value,
                 }))
               }
-              placeholder={t("ruleDialog.suggestedFixPlaceholder")}
+              placeholder="Enter suggested fix (optional)"
               rows={3}
               disabled={loading || isEditDisabled}
             />
             <p className="text-xs text-muted-foreground">
-              {t("ruleDialog.suggestedFixHelp")}
+              Provide a suggested fix or remediation steps for this rule.
             </p>
           </div>
 
-          {/* Status Field - Only admin can see and edit status, hide if original rule is pending */}
+          {/* Status Field - Only admin */}
           {isAdmin() && rule.is_active !== "pending" && (
             <div className="space-y-2">
-              <Label htmlFor="is_active">{t("ruleDialog.statusLabel")}</Label>
+              <Label htmlFor="is_active">Status</Label>
               <Select
                 value={formData.is_active}
                 onValueChange={(value) =>
@@ -323,9 +355,7 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                 disabled={loading}
               >
                 <SelectTrigger>
-                  <SelectValue
-                    placeholder={t("ruleDialog.selectStatusPlaceholder")}
-                  />
+                  <SelectValue placeholder="Select status..." />
                 </SelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map((option) => (
@@ -335,12 +365,10 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
                           className={`w-2 h-2 rounded-full ${
                             option.value === "active"
                               ? "bg-green-500"
-                              : option.value === "inactive"
-                              ? "bg-gray-400"
-                              : "bg-yellow-500"
+                              : "bg-gray-400"
                           }`}
                         />
-                        {getStatusLabel(option.value)}
+                        <span>{option.label}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -348,35 +376,44 @@ export const EditRuleDialog: React.FC<EditRuleDialogProps> = ({
               </Select>
             </div>
           )}
+        </div>
 
-          {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t">
+        {/* Footer Buttons */}
+        <div className="flex justify-end gap-2 mt-6">
+          <Button variant="outline" onClick={handleCancel} disabled={loading}>
+            <X className="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
+
+          {buttonConfig && (
             <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={loading}
-            >
-              <X className="h-4 w-4 mr-2" />
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="button"
               onClick={handleSubmit}
               disabled={
                 loading ||
-                !formData.name.trim() ||
-                !formData.command.trim() ||
+                isEditDisabled ||
                 !isValidJson ||
-                isEditDisabled
+                !formData.name.trim() ||
+                !formData.command.trim()
               }
             >
-              <Save className="h-4 w-4 mr-2" />
-              {loading ? t("common.saving") : t("common.saveChanges")}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {buttonConfig.loadingText}
+                </>
+              ) : (
+                <>
+                  {buttonConfig.icon}
+                  <span className="ml-2">{buttonConfig.text}</span>
+                </>
+              )}
             </Button>
-          </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
   );
 };
+function useRuleChangeRequest(): { createUpdateRequest: any } {
+  throw new Error("Function not implemented.");
+}

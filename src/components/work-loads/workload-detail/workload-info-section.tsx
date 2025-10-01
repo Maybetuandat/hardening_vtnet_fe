@@ -18,7 +18,7 @@ import type { WorkloadResponse } from "@/types/workload";
 
 interface WorkloadInfoSectionProps {
   workload: WorkloadResponse;
-  onUpdate: () => void;
+  onUpdate: (updatedWorkload: WorkloadResponse) => void | Promise<void>;
 }
 
 export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
@@ -41,9 +41,9 @@ export const WorkloadInfoSection: React.FC<WorkloadInfoSectionProps> = ({
     }).format(date);
   };
 
-  const handleEditSuccess = () => {
+  const handleEditSuccess = (updatedWorkload: WorkloadResponse) => {
     setIsEditDialogOpen(false);
-    onUpdate();
+    onUpdate(updatedWorkload);
   };
 
   return (

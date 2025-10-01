@@ -1,3 +1,5 @@
+// src/app/workload/workload-detail-page.tsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Shield, Server } from "lucide-react";
@@ -9,7 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RulesSection } from "@/components/work-loads/workload-detail/rule/rule-session";
 import { WorkloadInfoSection } from "@/components/work-loads/workload-detail/workload-info-section";
 import { WorkloadInstancesSection } from "@/components/work-loads/workload-detail/instance/workload-instances-section";
+import { RuleChangeRequestsDialog } from "@/components/work-loads/workload-detail/rule/rule-change-requests-dialog";
 import { useWorkloads } from "@/hooks/workload/use-workloads";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 import { WorkloadResponse } from "@/types/workload";
 import toastHelper from "@/utils/toast-helper";
 
@@ -17,12 +21,16 @@ export const WorkloadDetailPage: React.FC = () => {
   const { t } = useTranslation("workload");
   const { workloadId } = useParams<{ workloadId: string }>();
   const navigate = useNavigate();
+  const { isAdmin } = usePermissions();
+
   const [selectedRuleId, setSelectedRuleId] = useState<number | null>(null);
   const [workload, setWorkload] = useState<WorkloadResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("rules");
+  const [requestsDialogOpen, setRequestsDialogOpen] = useState(false);
   const hasInitialized = useRef(false);
+  const rulesSectionRef = useRef<{ refreshRules: () => void }>(null);
 
   const { getWorkloadById } = useWorkloads();
 
@@ -39,53 +47,53 @@ export const WorkloadDetailPage: React.FC = () => {
         setError(t("workloadDetail.errors.notFound"));
       }
     } catch (err: any) {
-      console.error("Error fetching workload detail:", err);
-      setError(err.message || t("workloadDetail.errors.loadError"));
-      toastHelper.error(t("workloadDetail.messages.loadError"));
+      console.error("Error fetching workload:", err);
+      setError(err.message || t("workloadDetail.errors.loadFailed"));
+      toastHelper.error(err.message || t("workloadDetail.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
   };
 
+  // Initial load
   useEffect(() => {
-    if (hasInitialized.current) return;
-
-    if (!workloadId) {
-      navigate("/workloads");
-      return;
+    if (!hasInitialized.current && workloadId) {
+      hasInitialized.current = true;
+      const id = parseInt(workloadId);
+      if (!isNaN(id)) {
+        fetchWorkloadDetail(id);
+      } else {
+        setError(t("workloadDetail.errors.invalidId"));
+        setLoading(false);
+      }
     }
-
-    const id = Number(workloadId);
-    if (isNaN(id) || id <= 0) {
-      toastHelper.error(t("workloadDetail.errors.invalidId"));
-      navigate("/workloads");
-      return;
-    }
-
-    fetchWorkloadDetail(id);
-    hasInitialized.current = true;
-  }, [workloadId, navigate, getWorkloadById, t]);
+  }, [workloadId]);
 
   const handleBack = () => {
     navigate("/workloads");
   };
 
-  const handleUpdateWorkload = () => {
-    if (workload?.id) {
-      fetchWorkloadDetail(workload.id);
+  const handleUpdateWorkload = async (updatedWorkload: WorkloadResponse) => {
+    setWorkload(updatedWorkload);
+    toastHelper.success(t("workloadDetail.messages.updateSuccess"));
+  };
+
+  const handleRequestProcessed = () => {
+    // Refresh rules list when a request is approved/rejected
+    if (rulesSectionRef.current?.refreshRules) {
+      rulesSectionRef.current.refreshRules();
     }
   };
 
   if (loading) {
     return (
       <div className="p-6 space-y-6">
-        <div className="flex items-center space-x-4">
-          <div className="h-8 w-8 bg-muted animate-pulse rounded" />
-          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
-        </div>
-        <div className="space-y-6">
-          <div className="h-64 bg-muted animate-pulse rounded-lg" />
-          <div className="h-96 bg-muted animate-pulse rounded-lg" />
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-muted-foreground">
+              {t("workloadDetail.loading")}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -93,19 +101,26 @@ export const WorkloadDetailPage: React.FC = () => {
 
   if (error || !workload) {
     return (
-      <div className="p-6">
-        <div className="flex items-center space-x-4 mb-6">
+      <div className="p-6 space-y-6">
+        <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-semibold">
-            {t("workloadDetail.title")}
-          </h1>
+          <div>
+            <h1 className="text-2xl font-semibold">
+              {t("workloadDetail.title")}
+            </h1>
+          </div>
         </div>
-        <div className="text-center py-12">
-          <p className="text-destructive">
-            {error || t("workloadDetail.errors.notFound")}
-          </p>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-destructive">
+              {error || t("workloadDetail.errors.notFound")}
+            </p>
+            <Button onClick={handleBack} className="mt-4">
+              {t("workloadDetail.actions.backToList")}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -163,9 +178,12 @@ export const WorkloadDetailPage: React.FC = () => {
 
         <TabsContent value="rules" className="space-y-4">
           <RulesSection
+            ref={rulesSectionRef}
             workloadId={workload.id}
             selectedRuleId={selectedRuleId}
             onRuleSelect={setSelectedRuleId}
+            onOpenRequests={() => setRequestsDialogOpen(true)}
+            showRequestsButton={isAdmin()}
           />
         </TabsContent>
 
@@ -173,6 +191,16 @@ export const WorkloadDetailPage: React.FC = () => {
           <WorkloadInstancesSection workloadId={workload.id} />
         </TabsContent>
       </Tabs>
+
+      {/* Rule Change Requests Dialog */}
+      {isAdmin() && (
+        <RuleChangeRequestsDialog
+          workloadId={workload.id}
+          open={requestsDialogOpen}
+          onOpenChange={setRequestsDialogOpen}
+          onRequestProcessed={handleRequestProcessed}
+        />
+      )}
     </div>
   );
 };

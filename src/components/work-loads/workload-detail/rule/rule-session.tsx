@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+// src/components/work-loads/workload-detail/rule/rule-session.tsx
+// UPDATED VERSION - Thêm button View Requests
+
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { AdminOnly } from "@/components/auth/role-guard";
 
-import { Search, X, FileSpreadsheet } from "lucide-react";
+import { Search, X, FileSpreadsheet, Bell } from "lucide-react";
 
 import { useRules } from "@/hooks/rule/use-rules";
 
@@ -22,284 +30,275 @@ interface RulesSectionProps {
   workloadId: number;
   onRuleSelect: (ruleId: number | null) => void;
   selectedRuleId: number | null;
+  onOpenRequests?: () => void;
+  showRequestsButton?: boolean;
 }
 
-export const RulesSection: React.FC<RulesSectionProps> = ({
-  workloadId,
-  onRuleSelect,
-  selectedRuleId,
-}) => {
-  const { t } = useTranslation("workload");
-  const [searchInput, setSearchInput] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [isSearching, setIsSearching] = useState(false);
+export const RulesSection = forwardRef<
+  { refreshRules: () => void },
+  RulesSectionProps
+>(
+  (
+    {
+      workloadId,
+      onRuleSelect,
+      selectedRuleId,
+      onOpenRequests,
+      showRequestsButton = false,
+    },
+    ref
+  ) => {
+    const { t } = useTranslation("workload");
+    const [searchInput, setSearchInput] = useState("");
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [isSearching, setIsSearching] = useState(false);
 
-  // Dialog states
-  const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
-  const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
-  const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
-  const [viewingRule, setViewingRule] = useState<RuleResponse | null>(null);
+    // Dialog states
+    const [isExcelUploadOpen, setIsExcelUploadOpen] = useState(false);
+    const [editingRule, setEditingRule] = useState<RuleResponse | null>(null);
+    const [deletingRule, setDeletingRule] = useState<RuleResponse | null>(null);
+    const [viewingRule, setViewingRule] = useState<RuleResponse | null>(null);
 
-  const { rules, loading, error, totalRules, totalPages, fetchRules } =
-    useRules();
+    const { rules, loading, error, totalRules, totalPages, fetchRules } =
+      useRules();
 
-  useEffect(() => {
-    const fetchParams = {
-      keyword: searchKeyword || undefined,
-      workload_id: workloadId,
-      page: currentPage,
-      page_size: pageSize,
+    const doFetchRules = () => {
+      const fetchParams = {
+        keyword: searchKeyword || undefined,
+        workload_id: workloadId,
+        page: currentPage,
+        page_size: pageSize,
+      };
+
+      console.log("Fetching rules with params:", fetchParams);
+      fetchRules(fetchParams);
     };
 
-    console.log("Fetching rules with params:", fetchParams);
-    fetchRules(fetchParams);
-  }, [
-    workloadId,
-    currentPage,
-    pageSize,
-    searchKeyword,
-    isSearching,
-    fetchRules,
-  ]);
+    // Expose refresh function to parent
+    useImperativeHandle(ref, () => ({
+      refreshRules: doFetchRules,
+    }));
 
-  useEffect(() => {
-    if (searchInput === "") handleClearSearch();
-  }, [searchInput]);
-  const handleSearchInputChange = (value: string) => {
-    setSearchInput(value);
-  };
+    useEffect(() => {
+      doFetchRules();
+    }, [workloadId, currentPage, pageSize, searchKeyword, isSearching]);
 
-  const handleSearchSubmit = (value: string) => {
-    const trimmedValue = value.trim();
-    setSearchKeyword(trimmedValue);
-    setCurrentPage(1);
-    setIsSearching(trimmedValue !== "");
-  };
+    useEffect(() => {
+      if (searchInput === "") handleClearSearch();
+    }, [searchInput]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearchSubmit(searchInput);
-    }
-  };
+    const handleSearchInputChange = (value: string) => {
+      setSearchInput(value);
+    };
 
-  const handleClearSearch = () => {
-    setSearchInput("");
-    setSearchKeyword("");
-    setCurrentPage(1);
-    setIsSearching(false);
-  };
+    const handleSearchSubmit = (value: string) => {
+      const trimmedValue = value.trim();
+      setSearchKeyword(trimmedValue);
+      setCurrentPage(1);
+      setIsSearching(trimmedValue !== "");
+    };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSearchSubmit(searchInput);
+      }
+    };
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1);
-  };
+    const handleClearSearch = () => {
+      setSearchInput("");
+      setSearchKeyword("");
+      setCurrentPage(1);
+      setIsSearching(false);
+    };
 
-  const handleRulesUploaded = () => {
-    setIsExcelUploadOpen(false);
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
 
-    fetchRules({
-      keyword: searchKeyword || undefined,
-      workload_id: workloadId,
-      page: currentPage,
-      page_size: pageSize,
-    });
-  };
+    const handlePageSizeChange = (newPageSize: number) => {
+      setPageSize(newPageSize);
+      setCurrentPage(1);
+    };
 
-  const handleRuleUpdated = () => {
-    setEditingRule(null);
-    fetchRules({
-      keyword: searchKeyword || undefined,
-      workload_id: workloadId,
-      page: currentPage,
-      page_size: pageSize,
-    });
-  };
+    const handleRulesUploaded = () => {
+      setIsExcelUploadOpen(false);
+      doFetchRules();
+    };
 
-  const handleRuleDeleted = () => {
-    setDeletingRule(null);
+    const handleRuleUpdated = () => {
+      setEditingRule(null);
+      doFetchRules();
+    };
 
-    if (deletingRule && selectedRuleId === deletingRule.id) {
-      onRuleSelect(null);
-    }
+    const handleRuleDeleted = () => {
+      setDeletingRule(null);
 
-    fetchRules({
-      keyword: searchKeyword || undefined,
-      workload_id: isSearching ? undefined : workloadId,
-      page: currentPage,
-      page_size: pageSize,
-    });
-  };
+      if (deletingRule && selectedRuleId === deletingRule.id) {
+        onRuleSelect(null);
+      }
 
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">
-              {t("workloadDetail.rules.title.workload", { count: totalRules })}
-            </CardTitle>
+      doFetchRules();
+    };
 
-            <AdminOnly>
-              <Button
-                onClick={() => setIsExcelUploadOpen(true)}
-                size="sm"
-                className="h-8 flex items-center gap-2"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                {t("workloadDetail.rules.actions.addFromExcel")}
-              </Button>
-            </AdminOnly>
-          </div>
-
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={
-                isSearching
-                  ? t("workloadDetail.rules.search.placeholderAll")
-                  : t("workloadDetail.rules.search.placeholderWorkload")
-              }
-              value={searchInput}
-              onChange={(e) => handleSearchInputChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="pl-10 pr-10"
-            />
-            {(searchInput || searchKeyword) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearSearch}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {searchInput && searchInput !== searchKeyword && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-yellow-50 border border-yellow-200 rounded-lg p-2">
-              <Search className="h-4 w-4 text-yellow-600" />
-              <span>
-                {t("workloadDetail.rules.search.pressEnter", {
-                  query: searchInput,
+    return (
+      <>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl">
+                {t("workloadDetail.rules.title.workload", {
+                  count: totalRules,
                 })}
-              </span>
-            </div>
-          )}
+              </CardTitle>
 
-          {isSearching && (
-            <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center space-x-2">
-                <Search className="h-4 w-4 text-blue-600" />
-                <span className="text-sm text-blue-800">
-                  {t("workloadDetail.rules.search.searching", {
-                    keyword: searchKeyword,
-                  })}
-                </span>
+              <div className="flex gap-2">
+                {/* Button View Requests - CHỈ HIỂN THỊ VỚI ADMIN */}
+                {showRequestsButton && onOpenRequests && (
+                  <Button
+                    onClick={onOpenRequests}
+                    variant="outline"
+                    size="sm"
+                    className="h-8 flex items-center gap-2"
+                  >
+                    <Bell className="h-4 w-4" />
+                    View Requests
+                  </Button>
+                )}
+
+                {/* Button Add Rules from Excel */}
+                <AdminOnly>
+                  <Button
+                    onClick={() => setIsExcelUploadOpen(true)}
+                    size="sm"
+                    className="h-8 flex items-center gap-2"
+                  >
+                    <FileSpreadsheet className="h-4 w-4" />
+                    {t("workloadDetail.rules.actions.addFromExcel")}
+                  </Button>
+                </AdminOnly>
               </div>
             </div>
-          )}
-        </CardHeader>
 
-        <CardContent>
-          {loading ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-12 bg-muted animate-pulse rounded" />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12">
-              <p className="text-red-500">
-                {t("workloadDetail.rules.error", { error })}
-              </p>
-            </div>
-          ) : rules.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {searchKeyword
-                  ? t("workloadDetail.rules.empty.noRulesFound", {
-                      keyword: searchKeyword,
-                    })
-                  : isSearching
-                  ? t("workloadDetail.rules.empty.noRulesSystem")
-                  : t("workloadDetail.rules.empty.noRulesWorkload")}
-              </p>
-              {searchInput && searchInput !== searchKeyword && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {t("workloadDetail.rules.search.pressEnterSearch", {
-                    query: searchInput,
-                  })}
-                </p>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={
+                  isSearching
+                    ? t("workloadDetail.rules.search.placeholderAll")
+                    : t("workloadDetail.rules.search.placeholderWorkload")
+                }
+                value={searchInput}
+                onChange={(e) => handleSearchInputChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="pl-10 pr-10"
+              />
+              {searchInput && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               )}
             </div>
-          ) : (
-            <>
-              <RulesTable
-                rules={rules}
-                selectedRuleId={selectedRuleId}
-                onRuleSelect={onRuleSelect}
-                onViewRule={(rule) => setViewingRule(rule)}
-                onEditRule={(rule) => setEditingRule(rule)}
-                onDeleteRule={(rule) => setDeletingRule(rule)}
-              />
+          </CardHeader>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalElements={totalRules}
-                pageSize={pageSize}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-                loading={loading}
-                showInfo={true}
-                showPageSizeSelector={true}
-                pageSizeOptions={[5, 10, 20, 50, 100]}
-              />
-            </>
-          )}
-        </CardContent>
-      </Card>
+          <CardContent>
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Loading...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-500">
+                  {t("workloadDetail.rules.error", { error })}
+                </p>
+              </div>
+            ) : rules.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  {searchKeyword
+                    ? t("workloadDetail.rules.empty.noRulesFound", {
+                        keyword: searchKeyword,
+                      })
+                    : isSearching
+                    ? t("workloadDetail.rules.empty.noRulesSystem")
+                    : t("workloadDetail.rules.empty.noRulesWorkload")}
+                </p>
+                {searchInput && searchInput !== searchKeyword && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {t("workloadDetail.rules.search.pressEnterSearch", {
+                      query: searchInput,
+                    })}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <RulesTable
+                  rules={rules}
+                  selectedRuleId={selectedRuleId}
+                  onRuleSelect={onRuleSelect}
+                  onViewRule={(rule) => setViewingRule(rule)}
+                  onEditRule={(rule) => setEditingRule(rule)}
+                  onDeleteRule={(rule) => setDeletingRule(rule)}
+                />
 
-      <AdminOnly>
-        <RuleExcelUploadDialog
-          workloadId={workloadId}
-          open={isExcelUploadOpen}
-          onOpenChange={setIsExcelUploadOpen}
-          onSuccess={handleRulesUploaded}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalElements={totalRules}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                  loading={loading}
+                  showInfo={true}
+                  showPageSizeSelector={true}
+                  pageSizeOptions={[5, 10, 20, 50, 100]}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        <AdminOnly>
+          <RuleExcelUploadDialog
+            workloadId={workloadId}
+            open={isExcelUploadOpen}
+            onOpenChange={setIsExcelUploadOpen}
+            onSuccess={handleRulesUploaded}
+          />
+        </AdminOnly>
+
+        <RuleViewDialog
+          open={!!viewingRule}
+          onOpenChange={() => setViewingRule(null)}
+          rule={viewingRule}
         />
-      </AdminOnly>
 
-      <RuleViewDialog
-        open={!!viewingRule}
-        onOpenChange={() => setViewingRule(null)}
-        rule={viewingRule}
-      />
+        {editingRule && (
+          <EditRuleDialog
+            rule={editingRule}
+            open={!!editingRule}
+            onOpenChange={() => setEditingRule(null)}
+            onSuccess={handleRuleUpdated}
+          />
+        )}
 
-      {editingRule && (
-        <EditRuleDialog
-          rule={editingRule}
-          open={!!editingRule}
-          onOpenChange={() => setEditingRule(null)}
-          onSuccess={handleRuleUpdated}
-        />
-      )}
+        {deletingRule && (
+          <DeleteRuleDialog
+            rule={deletingRule}
+            open={!!deletingRule}
+            onOpenChange={() => setDeletingRule(null)}
+            onSuccess={handleRuleDeleted}
+          />
+        )}
+      </>
+    );
+  }
+);
 
-      {deletingRule && (
-        <DeleteRuleDialog
-          rule={deletingRule}
-          open={!!deletingRule}
-          onOpenChange={() => setDeletingRule(null)}
-          onSuccess={handleRuleDeleted}
-        />
-      )}
-    </>
-  );
-};
+RulesSection.displayName = "RulesSection";

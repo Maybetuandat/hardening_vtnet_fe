@@ -70,6 +70,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
             parameters: rule.parameters || {},
             is_active: "active",
             command: rule.command,
+            suggested_fix: "", // Add default or parsed value for suggested_fix
           }));
 
           setRules(rulesForApi);
@@ -168,6 +169,7 @@ export function useRuleExcelUpload(): UseRuleExcelUploadReturn {
           parameters: result.parameters || {},
           is_active: "active",
           command: result.command,
+          suggested_fix: "", // Add default or parsed value for suggested_fix
         }));
 
         console.log(" Rule data to create:", ruleDataList);

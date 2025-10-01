@@ -24,7 +24,7 @@ interface EditWorkloadDialogProps {
   workload: WorkloadResponse;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (updatedWorkload: WorkloadResponse) => void;
 }
 
 export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
@@ -61,11 +61,9 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
 
   // Set initial OS version ID when OS versions are loaded
   useEffect(() => {
-    if (osVersions.length > 0 && workload.os_version) {
+    if (osVersions.length > 0 && workload.os_name) {
       // Tìm OS ID từ version string của workload hiện tại
-      const currentOS = osVersions.find(
-        (os) => os.version === workload.os_version
-      );
+      const currentOS = osVersions.find((os) => os.name === workload.os_name);
 
       if (currentOS) {
         setSelectedOSVersionId(currentOS.id);
@@ -75,7 +73,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
         }));
       }
     }
-  }, [osVersions, workload.os_version]);
+  }, [osVersions, workload.os_name]);
 
   // Handle OS ID change from OSSelector
   const handleOSChange = (osVersionId: number) => {
@@ -103,7 +101,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       setLoading(true);
 
       // Gọi updateWorkload từ useWorkloads hook
-      await updateWorkload(workload.id, formData);
+      const updatedWorkload = await updateWorkload(workload.id, formData);
 
       // Hiển thị thông báo thành công
       toastHelper.success(
@@ -113,7 +111,7 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
       // Đóng dialog
       onOpenChange(false);
 
-      onSuccess();
+      onSuccess(workload);
     } catch (error: any) {
       // Hiển thị lỗi nếu có
       toastHelper.error(
@@ -133,10 +131,8 @@ export const EditWorkloadDialog: React.FC<EditWorkloadDialogProps> = ({
     });
 
     // Reset selected OS version ID
-    if (osVersions.length > 0 && workload.os_version) {
-      const currentOS = osVersions.find(
-        (os) => os.version === workload.os_version
-      );
+    if (osVersions.length > 0 && workload.os_name) {
+      const currentOS = osVersions.find((os) => os.name === workload.os_name);
       if (currentOS) {
         setSelectedOSVersionId(currentOS.id);
       }
