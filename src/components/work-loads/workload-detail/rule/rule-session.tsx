@@ -69,7 +69,6 @@ export const RulesSection = forwardRef<
         page_size: pageSize,
       };
 
-      console.log("Fetching rules with params:", fetchParams);
       fetchRules(fetchParams);
     };
 

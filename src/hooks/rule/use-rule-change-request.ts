@@ -1,5 +1,3 @@
-// src/hooks/rule/use-rule-change-request.ts
-
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import toastHelper from "@/utils/toast-helper";
