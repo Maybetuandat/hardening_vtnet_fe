@@ -35,7 +35,8 @@
     },
     "actions": {
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "review": "Review"
     },
     "empty": {
       "title": "No requests found",
@@ -58,7 +59,8 @@
     },
     "actions": {
       "approve": "Approve",
-      "reject": "Reject"
+      "reject": "Reject",
+      "review": "Review"
     }
   },
   "expandedRow": {

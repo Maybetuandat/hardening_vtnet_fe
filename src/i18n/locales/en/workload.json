@@ -213,6 +213,9 @@
         "noInstances": "No Instances Found",
         "description": "This workload doesn't have any instances yet."
       },
+      "search": {
+        "placeholder": "Search instances by IP..."
+      },
       "assign": {
         "button": "Assign Instances",
         "selectAll": " Select All",

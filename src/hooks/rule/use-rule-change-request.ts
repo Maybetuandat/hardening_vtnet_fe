@@ -50,6 +50,7 @@ interface UseRuleChangeRequestsReturn {
   // Admin operations
   fetchWorkloadRequests: (workloadId: number, status?: string) => Promise<void>;
   fetchPendingRequests: () => Promise<void>;
+  fetchAllRequests: () => Promise<void>; // Thêm hàm mới
   approveRequest: (requestId: number, adminNote?: string) => Promise<void>;
   rejectRequest: (requestId: number, adminNote?: string) => Promise<void>;
 }
@@ -186,6 +187,23 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     }
   }, []);
 
+  // Thêm hàm mới để fetch tất cả requests cho admin
+  const fetchAllRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<RuleChangeRequestListResponse>(
+        "/rule-change-requests/all"
+      );
+      setRequests(response.requests);
+    } catch (err: any) {
+      console.error("Error fetching all requests:", err);
+      toastHelper.error("Failed to load all requests");
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const approveRequest = useCallback(
     async (requestId: number, adminNote?: string) => {
       try {
@@ -194,8 +212,14 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request approved successfully!");
 
-        // Remove from local state
-        setRequests((prev) => prev.filter((req) => req.id !== requestId));
+        // Cập nhật status trong local state thay vì remove
+        setRequests((prev) =>
+          prev.map((req) =>
+            req.id === requestId
+              ? { ...req, status: "approved" as const, admin_note: adminNote }
+              : req
+          )
+        );
       } catch (err: any) {
         console.error("Error approving request:", err);
         const errorMessage = err.message || "Failed to approve request";
@@ -214,8 +238,14 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request rejected");
 
-        // Remove from local state
-        setRequests((prev) => prev.filter((req) => req.id !== requestId));
+        // Cập nhật status trong local state thay vì remove
+        setRequests((prev) =>
+          prev.map((req) =>
+            req.id === requestId
+              ? { ...req, status: "rejected" as const, admin_note: adminNote }
+              : req
+          )
+        );
       } catch (err: any) {
         console.error("Error rejecting request:", err);
         const errorMessage = err.message || "Failed to reject request";
@@ -239,6 +269,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     // Admin operations
     fetchWorkloadRequests,
     fetchPendingRequests,
+    fetchAllRequests, // Export hàm mới
     approveRequest,
     rejectRequest,
   };

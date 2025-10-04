@@ -28,6 +28,7 @@ export default function RequestPage() {
     loading,
     fetchMyRequests,
     fetchPendingRequests,
+    fetchAllRequests, // Thêm hook này để fetch tất cả requests cho admin
     updateMyRequest,
     deleteMyRequest,
     approveRequest,
@@ -40,7 +41,7 @@ export default function RequestPage() {
   const ruleNameFromUrl = searchParams.get("ruleName");
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("pending"); // Admin mặc định xem pending
   const [searchTerm, setSearchTerm] = useState(ruleNameFromUrl || "");
   const [searchKeyword, setSearchKeyword] = useState(ruleNameFromUrl || "");
 
@@ -52,14 +53,18 @@ export default function RequestPage() {
   const [editingRequest, setEditingRequest] =
     useState<RuleChangeRequestResponse | null>(null);
 
-  // Initial load - phụ thuộc vào role
+  // Initial load - phụ thuộc vào role và filter status
   useEffect(() => {
     if (isAdmin()) {
-      fetchPendingRequests(); // Admin: xem pending requests
+      if (filterStatus === "all") {
+        fetchAllRequests(); // Fetch tất cả requests
+      } else {
+        fetchPendingRequests(); // Fetch chỉ pending requests
+      }
     } else {
       fetchMyRequests(); // User: xem my requests
     }
-  }, []);
+  }, [filterStatus]); // Thêm filterStatus vào dependency
 
   // Handle highlighting request from notification
   useEffect(() => {
@@ -111,11 +116,21 @@ export default function RequestPage() {
   // Handle refresh
   const handleRefresh = useCallback(() => {
     if (isAdmin()) {
-      fetchPendingRequests();
+      if (filterStatus === "all") {
+        fetchAllRequests();
+      } else {
+        fetchPendingRequests();
+      }
     } else {
       fetchMyRequests();
     }
-  }, [isAdmin, fetchPendingRequests, fetchMyRequests]);
+  }, [
+    isAdmin,
+    filterStatus,
+    fetchAllRequests,
+    fetchPendingRequests,
+    fetchMyRequests,
+  ]);
 
   // User actions
   const handleEdit = (request: RuleChangeRequestResponse) => {
@@ -146,10 +161,9 @@ export default function RequestPage() {
 
   // Filter requests based on status and search
   const filteredRequests = requests.filter((request) => {
-    // Admin chỉ thấy pending, User thấy all/pending/approved/rejected
-    const matchStatus = isAdmin()
-      ? true // Admin luôn thấy (vì đã fetch pending only)
-      : filterStatus === "all" || request.status === filterStatus;
+    // Xử lý filter status cho cả admin và user
+    const matchStatus =
+      filterStatus === "all" || request.status === filterStatus;
 
     const matchSearch =
       !searchKeyword ||
@@ -241,14 +255,27 @@ export default function RequestPage() {
         </Button>
       </div>
 
-      {/* Filter Bar - User có filter status, Admin không cần */}
+      {/* Filter Bar - Admin cũng có filter status */}
       <FilterBar
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         onSearchSubmit={handleSearchSubmit}
         filters={
           isAdmin()
-            ? [] // Admin không cần filter (chỉ pending)
+            ? [
+                {
+                  value: filterStatus,
+                  onChange: setFilterStatus,
+                  options: [
+                    { value: "pending", label: t("filters.pending") },
+                    { value: "approved", label: t("filters.approved") },
+                    { value: "rejected", label: t("filters.rejected") },
+                    { value: "all", label: t("filters.allStatus") },
+                  ],
+                  placeholder: t("filters.status"),
+                  widthClass: "w-40",
+                },
+              ]
             : [
                 {
                   value: filterStatus,

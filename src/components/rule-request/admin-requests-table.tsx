@@ -83,6 +83,37 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
     );
   };
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return (
+          <Badge variant="secondary" className="gap-1">
+            <Clock className="h-3 w-3" />
+            {t("table.status.pending")}
+          </Badge>
+        );
+      case "approved":
+        return (
+          <Badge
+            variant="default"
+            className="gap-1 bg-green-600 hover:bg-green-700"
+          >
+            <CheckCircle className="h-3 w-3" />
+            {t("table.status.approved")}
+          </Badge>
+        );
+      case "rejected":
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <XCircle className="h-3 w-3" />
+            {t("table.status.rejected")}
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
   const renderChanges = (request: RuleChangeRequestResponse) => {
     const { old_value, new_value } = request;
 
@@ -174,6 +205,7 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
             <TableHead>{t("table.columns.workload")}</TableHead>
             <TableHead>{t("admin.columns.requester")}</TableHead>
             <TableHead>{t("table.columns.created")}</TableHead>
+            <TableHead>{t("table.columns.status")}</TableHead>
             <TableHead className="text-right">
               {t("table.columns.actions")}
             </TableHead>
@@ -222,57 +254,81 @@ export const AdminRequestsTable: React.FC<AdminRequestsTableProps> = ({
                     {format(new Date(request.created_at), "MMM dd, yyyy HH:mm")}
                   </span>
                 </TableCell>
+                <TableCell>{getStatusBadge(request.status)}</TableCell>
                 <TableCell className="text-right">
-                  <Badge variant="secondary" className="gap-1">
-                    <Clock className="h-3 w-3" />
-                    {t("table.status.pending")}
-                  </Badge>
+                  {request.status === "pending" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleExpand(request.id)}
+                    >
+                      {t("admin.actions.review")}
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
 
               {expandedRow === request.id && (
                 <TableRow>
-                  <TableCell colSpan={7} className="bg-muted/30">
+                  <TableCell colSpan={8} className="bg-muted/30">
                     <div className="py-4 space-y-4">
                       {renderChanges(request)}
-                      <div className="space-y-2">
-                        <Label htmlFor={`note-${request.id}`}>
-                          {t("admin.adminNote.label")}
-                        </Label>
-                        <Textarea
-                          id={`note-${request.id}`}
-                          placeholder={t("admin.adminNote.placeholder")}
-                          value={adminNote}
-                          onChange={(e) => setAdminNote(e.target.value)}
-                          rows={3}
-                          disabled={processingId === request.id}
-                        />
-                      </div>
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          onClick={() => handleReject(request.id)}
-                          disabled={processingId === request.id}
-                        >
-                          {processingId === request.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : (
-                            <XCircle className="h-4 w-4 mr-2" />
-                          )}
-                          {t("admin.actions.reject")}
-                        </Button>
-                        <Button
-                          onClick={() => handleApprove(request.id)}
-                          disabled={processingId === request.id}
-                        >
-                          {processingId === request.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                          )}
-                          {t("admin.actions.approve")}
-                        </Button>
-                      </div>
+
+                      {/* Hiển thị admin note nếu đã có */}
+                      {request.admin_note && (
+                        <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-md">
+                          <p className="text-sm font-medium mb-2">
+                            {t("admin.adminNote.label")}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {request.admin_note}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Chỉ hiển thị form approve/reject nếu status là pending */}
+                      {request.status === "pending" && (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor={`note-${request.id}`}>
+                              {t("admin.adminNote.label")}
+                            </Label>
+                            <Textarea
+                              id={`note-${request.id}`}
+                              placeholder={t("admin.adminNote.placeholder")}
+                              value={adminNote}
+                              onChange={(e) => setAdminNote(e.target.value)}
+                              rows={3}
+                              disabled={processingId === request.id}
+                            />
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              onClick={() => handleReject(request.id)}
+                              disabled={processingId === request.id}
+                            >
+                              {processingId === request.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <XCircle className="h-4 w-4 mr-2" />
+                              )}
+                              {t("admin.actions.reject")}
+                            </Button>
+                            <Button
+                              onClick={() => handleApprove(request.id)}
+                              disabled={processingId === request.id}
+                            >
+                              {processingId === request.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                              )}
+                              {t("admin.actions.approve")}
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
