@@ -192,7 +192,7 @@ export function useCompliance(): UseComplianceReturn {
 
       setComplianceResults((prev) => {
         const existingIndex = prev.findIndex(
-          (item) => item.id === completedData.id
+          (item) => item.instance_ip === completedData.instance_ip
         );
 
         if (existingIndex >= 0) {

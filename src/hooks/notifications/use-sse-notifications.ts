@@ -1,5 +1,3 @@
-// src/hooks/notifications/use-sse-notifications.ts
-
 import { ComplianceResult } from "@/types/compliance";
 import { useEffect, useRef, useCallback, useState } from "react";
 import { useAuth } from "@/hooks/authentication/use-auth";
@@ -23,8 +21,8 @@ export interface UseSSENotificationsReturn {
 }
 
 export function useSSENotifications(
-  onComplianceCompleted?: (data: ComplianceResult) => void,
-  onNewNotification?: () => void // Callback để refresh notification list
+  onComplianceCompleted?: (data: ComplianceResult) => void, // Callback cho completed/failed - để refresh dashboard
+  onNewNotification?: () => void // Callback cho tất cả notifications - để refresh notification list
 ): UseSSENotificationsReturn {
   const { token, isAuthenticated, isLoading } = useAuth();
   const { showNotification, permission } = useBrowserNotifications();
@@ -91,33 +89,62 @@ export function useSSENotifications(
               // Increase unread count
               setUnreadCount((prev) => prev + 1);
 
-              // Trigger callback to refresh notification list
+              // ✅ Trigger callback to refresh notification list (nếu có)
               onNewNotification?.();
 
+              // ✅ Trigger callback to refresh dashboard data (nếu có)
+              console.log(
+                "🔄 Calling onComplianceCompleted callback:",
+                typeof onComplianceCompleted
+              );
               if (onComplianceCompleted) {
+                console.log(
+                  "✅ Executing onComplianceCompleted with data:",
+                  message.data
+                );
                 onComplianceCompleted(message.data as ComplianceResult);
+              } else {
+                console.log("⚠️ onComplianceCompleted callback not provided");
               }
               break;
 
             case "failed":
+              console.log("❌ Compliance scan failed:", message.data);
+
               // ✅ Show browser notification for failure
               if (permission === "granted") {
                 showNotification("Compliance Scan Failed", {
-                  body: message.message || "Unknown error",
+                  body: `ip_address:${message.data.instance_ip || "Unknown"} ${
+                    message.message || "Unknown error"
+                  }`,
                   tag: "compliance-failed",
                   requireInteraction: false,
                 });
               }
 
+              // Increase unread count
               setUnreadCount((prev) => prev + 1);
+
+              // ✅ Trigger callback to refresh notification list (nếu có)
               onNewNotification?.();
 
+              // ✅ Trigger callback to refresh dashboard data (nếu có)
+              console.log(
+                "🔄 Calling onComplianceCompleted callback for failed:",
+                typeof onComplianceCompleted
+              );
               if (onComplianceCompleted) {
+                console.log(
+                  "✅ Executing onComplianceCompleted with data:",
+                  message.data
+                );
                 onComplianceCompleted(message.data as ComplianceResult);
+              } else {
+                console.log("⚠️ onComplianceCompleted callback not provided");
               }
               break;
 
-            // ✅ NEW: Rule change notifications with browser notifications
+            // ✅ Rule change notifications - CHỈ refresh notification list, KHÔNG refresh dashboard
             case "rule_change_request":
               console.log("📬 New rule change request notification");
 
@@ -125,12 +152,13 @@ export function useSSENotifications(
                 showNotification(message.title || "New Rule Change Request", {
                   body: message.message,
                   tag: `rule-request-${message.meta_data?.request_id}`,
-                  requireInteraction: true, // Keep notification until clicked
+                  requireInteraction: true,
                   icon: "/icons/rule-change.png",
                 });
               }
 
               setUnreadCount((prev) => prev + 1);
+              // CHỈ refresh notification list
               onNewNotification?.();
               break;
 
@@ -147,6 +175,7 @@ export function useSSENotifications(
               }
 
               setUnreadCount((prev) => prev + 1);
+              // CHỈ refresh notification list
               onNewNotification?.();
               break;
 
@@ -163,6 +192,7 @@ export function useSSENotifications(
               }
 
               setUnreadCount((prev) => prev + 1);
+              // CHỈ refresh notification list
               onNewNotification?.();
               break;
 
@@ -200,10 +230,6 @@ export function useSSENotifications(
           const delay = Math.min(
             1000 * Math.pow(2, reconnectAttempts.current),
             30000
-          );
-
-          console.log(
-            `🔄 Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})`
           );
 
           reconnectTimeoutRef.current = setTimeout(() => {

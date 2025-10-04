@@ -8,7 +8,6 @@ import { ComplianceTable } from "@/components/dashboard/compliance-table";
 import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
 import { useSSENotifications } from "@/hooks/notifications/use-sse-notifications";
-import { ComplianceResult } from "@/types/compliance";
 import toastHelper from "@/utils/toast-helper";
 
 export default function SystemHardeningDashboard() {
@@ -28,16 +27,34 @@ export default function SystemHardeningDashboard() {
     pageSize,
     fetchComplianceResults,
     refreshData,
-    updateComplianceResult,
   } = useCompliance();
 
+  // Callback để refresh data khi có compliance completed/failed
+  const handleComplianceUpdate = useCallback(() => {
+    console.log("🔄 [Dashboard] handleComplianceUpdate called!");
+    console.log("📊 [Dashboard] Current filters:", {
+      searchKeyword,
+      status,
+      currentPage,
+      pageSize,
+    });
+    fetchComplianceResults(
+      searchKeyword || undefined,
+      status === "all" ? undefined : status,
+      currentPage,
+      pageSize
+    );
+  }, [fetchComplianceResults, searchKeyword, status, currentPage, pageSize]);
+
+  console.log(
+    "🎯 [Dashboard] Registering SSE with callback:",
+    typeof handleComplianceUpdate
+  );
+
+  // SSE connection với 2 callbacks riêng biệt
   const { isConnected, connectionError } = useSSENotifications(
-    useCallback(
-      (completedData: ComplianceResult) => {
-        updateComplianceResult(completedData);
-      },
-      [updateComplianceResult]
-    )
+    handleComplianceUpdate, // onComplianceCompleted - chỉ gọi cho case completed/failed
+    undefined // onNewNotification - không cần ở dashboard
   );
 
   // Initial data load
@@ -51,6 +68,7 @@ export default function SystemHardeningDashboard() {
   }, [fetchComplianceResults]);
 
   useAutoRequestPermission();
+
   // Effect khi searchKeyword hoặc status thay đổi
   useEffect(() => {
     fetchComplianceResults(
