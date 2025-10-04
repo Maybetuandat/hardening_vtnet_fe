@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Download, Play, RefreshCw, Calendar } from "lucide-react";
 
 import { Button } from "../ui/button";
-import { useDashboard } from "@/hooks/dashboard/use-dashboard";
+import { DashboardStats } from "@/types/dashboard";
 import toastHelper from "@/utils/toast-helper";
 
 import ScanDialog from "./scan-dialog/scan-dialog";
@@ -14,14 +14,18 @@ import { PieChart } from "./charts/pie-chart";
 import { StackedBarChart } from "./charts/stacked-bar-chart";
 
 interface HeaderDashBoardProps {
-  onRefreshCompliance?: () => Promise<void>;
+  stats: DashboardStats;
+  loading: boolean;
+  error: string | null;
+  onRefreshDashboard: () => Promise<void>;
 }
 
 export default function HeaderDashBoard({
-  onRefreshCompliance,
+  stats,
+  loading,
+  onRefreshDashboard,
 }: HeaderDashBoardProps) {
   const { t } = useTranslation("dashboard");
-  const { stats, loading, error, refreshData } = useDashboard();
 
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
@@ -40,16 +44,19 @@ export default function HeaderDashBoard({
   };
 
   const handleRefresh = async () => {
-    await refreshData(onRefreshCompliance);
+    try {
+      await onRefreshDashboard();
+      toastHelper.success(t("messages.dataRefreshed"));
+    } catch (error) {
+      toastHelper.error(t("messages.refreshError"));
+    }
   };
 
   const handleScanComplete = async () => {
-    await refreshData(onRefreshCompliance);
+    // Sau khi scan complete, SSE sẽ tự động trigger refresh
+    // Không cần gọi thêm ở đây vì SSE đã handle
+    console.log("✅ [HeaderDashBoard] Scan completed, waiting for SSE update");
   };
-
-  if (error) {
-    toastHelper.error(t("messages.dashboardLoadError", { error }));
-  }
 
   return (
     <div className="p-6 space-y-6 bg-background">

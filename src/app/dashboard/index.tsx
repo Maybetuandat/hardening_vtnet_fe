@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
 import { useAutoRequestPermission } from "@/hooks/notifications/use-auto-request-permission";
 import { useCompliance } from "@/hooks/compliance/use-compliance";
 import { ComplianceTable } from "@/components/dashboard/compliance-table";
@@ -9,12 +8,21 @@ import FilterBar from "@/components/ui/filter-bar";
 import HeaderDashBoard from "@/components/dashboard/header-dashboard";
 import { useSSENotifications } from "@/hooks/notifications/use-sse-notifications";
 import toastHelper from "@/utils/toast-helper";
+import { useDashboard } from "@/hooks/dashboard/use-dashboard";
 
 export default function SystemHardeningDashboard() {
   const { t } = useTranslation("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // Keyword thực sự dùng để search
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [status, setStatus] = useState("all");
+
+  // Hook for dashboard stats
+  const {
+    stats,
+    loading: dashboardLoading,
+    error: dashboardError,
+    fetchStatistics,
+  } = useDashboard();
 
   // Hook for compliance data
   const {
@@ -29,33 +37,7 @@ export default function SystemHardeningDashboard() {
     refreshData,
   } = useCompliance();
 
-  // Callback để refresh data khi có compliance completed/failed
-  const handleComplianceUpdate = useCallback(() => {
-    console.log("🔄 [Dashboard] handleComplianceUpdate called!");
-    console.log("📊 [Dashboard] Current filters:", {
-      searchKeyword,
-      status,
-      currentPage,
-      pageSize,
-    });
-    fetchComplianceResults(
-      searchKeyword || undefined,
-      status === "all" ? undefined : status,
-      currentPage,
-      pageSize
-    );
-  }, [fetchComplianceResults, searchKeyword, status, currentPage, pageSize]);
-
-  console.log(
-    "🎯 [Dashboard] Registering SSE with callback:",
-    typeof handleComplianceUpdate
-  );
-
-  // SSE connection với 2 callbacks riêng biệt
-  const { isConnected, connectionError } = useSSENotifications(
-    handleComplianceUpdate, // onComplianceCompleted - chỉ gọi cho case completed/failed
-    undefined // onNewNotification - không cần ở dashboard
-  );
+  useAutoRequestPermission();
 
   // Initial data load
   useEffect(() => {
@@ -65,9 +47,54 @@ export default function SystemHardeningDashboard() {
       1,
       pageSize
     );
-  }, [fetchComplianceResults]);
+  }, [fetchComplianceResults, pageSize, status]);
 
-  useAutoRequestPermission();
+  // ✅ CALLBACK khi nhận SSE "completed" hoặc "failed"
+  // Hàm này sẽ refresh CẢ dashboard stats VÀ compliance table
+  const handleComplianceUpdate = useCallback(async () => {
+    console.log("🔄 [Dashboard] handleComplianceUpdate triggered by SSE!");
+    console.log("📊 [Dashboard] Current filters:", {
+      searchKeyword,
+      status,
+      currentPage,
+      pageSize,
+    });
+
+    try {
+      // 1. Refresh dashboard statistics (biểu đồ)
+      await fetchStatistics();
+      console.log("✅ [Dashboard] Dashboard charts refreshed");
+
+      // 2. Refresh compliance table
+      await fetchComplianceResults(
+        searchKeyword || undefined,
+        status === "all" ? undefined : status,
+        currentPage,
+        pageSize
+      );
+      console.log("✅ [Dashboard] Compliance table refreshed");
+
+      // 3. Show success toast
+      toastHelper.success(t("messages.dataRefreshed"));
+    } catch (error) {
+      console.error("❌ [Dashboard] Error refreshing data:", error);
+      toastHelper.error(t("messages.refreshError"));
+    }
+  }, [
+    fetchStatistics,
+    fetchComplianceResults,
+    searchKeyword,
+    status,
+    currentPage,
+    pageSize,
+    t,
+  ]);
+
+  // SSE connection
+  const { isConnected, connectionError } = useSSENotifications(
+    handleComplianceUpdate, // ✅ Callback sẽ được gọi khi có completed/failed event
+    undefined // onNewNotification - không cần ở dashboard
+  );
 
   // Effect khi searchKeyword hoặc status thay đổi
   useEffect(() => {
@@ -101,16 +128,6 @@ export default function SystemHardeningDashboard() {
     setSearchTerm("");
     setSearchKeyword("");
   }, []);
-
-  // Refresh compliance data function for dashboard
-  const handleRefreshCompliance = useCallback(async () => {
-    await fetchComplianceResults(
-      searchKeyword || undefined,
-      status === "all" ? undefined : status,
-      currentPage,
-      pageSize
-    );
-  }, [fetchComplianceResults, searchKeyword, status, currentPage, pageSize]);
 
   const handleRefresh = useCallback(() => {
     refreshData();
@@ -157,7 +174,13 @@ export default function SystemHardeningDashboard() {
 
   return (
     <div className="min-h-screen w-full px-4 px-6 space-y-6">
-      <HeaderDashBoard onRefreshCompliance={handleRefreshCompliance} />
+      {/* Pass stats và fetchStatistics để HeaderDashBoard có thể hiển thị và refresh */}
+      <HeaderDashBoard
+        stats={stats}
+        loading={dashboardLoading}
+        onRefreshDashboard={fetchStatistics}
+        error={dashboardError}
+      />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
