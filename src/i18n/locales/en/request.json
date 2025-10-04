@@ -13,7 +13,11 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected"
-    }
+    },
+    "allStatus": "All Status",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
   },
   "table": {
     "columns": {

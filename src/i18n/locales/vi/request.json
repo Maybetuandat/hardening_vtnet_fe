@@ -13,7 +13,11 @@
       "pending": "Đang chờ",
       "approved": "Đã duyệt",
       "rejected": "Đã từ chối"
-    }
+    },
+    "allStatus": "Tất cả",
+    "pending": "Đang chờ",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối"
   },
   "table": {
     "columns": {

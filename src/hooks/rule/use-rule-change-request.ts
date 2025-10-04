@@ -36,11 +36,11 @@ interface UseRuleChangeRequestsReturn {
   requests: RuleChangeRequestResponse[];
   loading: boolean;
 
-  // User operations
+  // Operations cho cả user và admin
+  fetchMyRequests: (status?: string) => Promise<void>;
   createUpdateRequest: (
     data: RuleChangeRequestCreate
   ) => Promise<RuleChangeRequestResponse>;
-  fetchMyRequests: () => Promise<void>;
   updateMyRequest: (
     requestId: number,
     newValue: Record<string, any>
@@ -49,8 +49,6 @@ interface UseRuleChangeRequestsReturn {
 
   // Admin operations
   fetchWorkloadRequests: (workloadId: number, status?: string) => Promise<void>;
-  fetchPendingRequests: () => Promise<void>;
-  fetchAllRequests: () => Promise<void>; // Thêm hàm mới
   approveRequest: (requestId: number, adminNote?: string) => Promise<void>;
   rejectRequest: (requestId: number, adminNote?: string) => Promise<void>;
 }
@@ -59,7 +57,36 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
   const [requests, setRequests] = useState<RuleChangeRequestResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ===== USER OPERATIONS =====
+  // ===== SHARED OPERATIONS =====
+
+  /**
+   * Fetch my requests - works for both user and admin
+   * - User: xem requests của mình
+   * - Admin: xem requests mà mình đã xử lý
+   * @param status - "pending" | "approved" | "rejected" | undefined (all)
+   */
+  const fetchMyRequests = useCallback(async (status?: string) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (status) {
+        params.append("status", status);
+      }
+
+      const url = `/rule-change-requests/my-requests${
+        params.toString() ? `?${params.toString()}` : ""
+      }`;
+
+      const response = await api.get<RuleChangeRequestListResponse>(url);
+      setRequests(response.requests);
+    } catch (err: any) {
+      console.error("Error fetching my requests:", err);
+      toastHelper.error("Failed to load requests");
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const createUpdateRequest = useCallback(
     async (
@@ -87,22 +114,6 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     },
     []
   );
-
-  const fetchMyRequests = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<RuleChangeRequestListResponse>(
-        "/rule-change-requests/my-requests"
-      );
-      setRequests(response.requests);
-    } catch (err: any) {
-      console.error("Error fetching my requests:", err);
-      toastHelper.error("Failed to load your requests");
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const updateMyRequest = useCallback(
     async (requestId: number, newValue: Record<string, any>) => {
@@ -171,39 +182,6 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     []
   );
 
-  const fetchPendingRequests = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<RuleChangeRequestListResponse>(
-        "/rule-change-requests/pending"
-      );
-      setRequests(response.requests);
-    } catch (err: any) {
-      console.error("Error fetching pending requests:", err);
-      toastHelper.error("Failed to load pending requests");
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Thêm hàm mới để fetch tất cả requests cho admin
-  const fetchAllRequests = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get<RuleChangeRequestListResponse>(
-        "/rule-change-requests/all"
-      );
-      setRequests(response.requests);
-    } catch (err: any) {
-      console.error("Error fetching all requests:", err);
-      toastHelper.error("Failed to load all requests");
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const approveRequest = useCallback(
     async (requestId: number, adminNote?: string) => {
       try {
@@ -212,7 +190,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request approved successfully!");
 
-        // Cập nhật status trong local state thay vì remove
+        // Cập nhật status trong local state
         setRequests((prev) =>
           prev.map((req) =>
             req.id === requestId
@@ -238,7 +216,7 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
         });
         toastHelper.success("Request rejected");
 
-        // Cập nhật status trong local state thay vì remove
+        // Cập nhật status trong local state
         setRequests((prev) =>
           prev.map((req) =>
             req.id === requestId
@@ -260,16 +238,14 @@ export function useRuleChangeRequests(): UseRuleChangeRequestsReturn {
     requests,
     loading,
 
-    // User operations
-    createUpdateRequest,
+    // Shared operations
     fetchMyRequests,
+    createUpdateRequest,
     updateMyRequest,
     deleteMyRequest,
 
     // Admin operations
     fetchWorkloadRequests,
-    fetchPendingRequests,
-    fetchAllRequests, // Export hàm mới
     approveRequest,
     rejectRequest,
   };

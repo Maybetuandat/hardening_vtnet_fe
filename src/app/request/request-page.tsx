@@ -27,8 +27,6 @@ export default function RequestPage() {
     requests,
     loading,
     fetchMyRequests,
-    fetchPendingRequests,
-    fetchAllRequests, // Thêm hook này để fetch tất cả requests cho admin
     updateMyRequest,
     deleteMyRequest,
     approveRequest,
@@ -41,7 +39,10 @@ export default function RequestPage() {
   const ruleNameFromUrl = searchParams.get("ruleName");
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState("pending"); // Admin mặc định xem pending
+  // User: mặc định "all", Admin: mặc định "pending"
+  const [filterStatus, setFilterStatus] = useState(
+    isAdmin() ? "pending" : "all"
+  );
   const [searchTerm, setSearchTerm] = useState(ruleNameFromUrl || "");
   const [searchKeyword, setSearchKeyword] = useState(ruleNameFromUrl || "");
 
@@ -53,47 +54,34 @@ export default function RequestPage() {
   const [editingRequest, setEditingRequest] =
     useState<RuleChangeRequestResponse | null>(null);
 
-  // Initial load - phụ thuộc vào role và filter status
+  // Initial load và khi filterStatus thay đổi
   useEffect(() => {
-    if (isAdmin()) {
-      if (filterStatus === "all") {
-        fetchAllRequests(); // Fetch tất cả requests
-      } else {
-        fetchPendingRequests(); // Fetch chỉ pending requests
-      }
-    } else {
-      fetchMyRequests(); // User: xem my requests
-    }
-  }, [filterStatus]); // Thêm filterStatus vào dependency
+    // Nếu filterStatus là "all", truyền undefined để backend trả về tất cả
+    const statusParam = filterStatus === "all" ? undefined : filterStatus;
+    fetchMyRequests(statusParam);
+  }, [filterStatus, fetchMyRequests]);
 
   // Handle highlighting request from notification
   useEffect(() => {
     if (requestIdFromUrl && requests.length > 0) {
-      // Find the request in the list
       const targetRequest = requests.find(
         (req) => req.id === parseInt(requestIdFromUrl)
       );
 
       if (targetRequest) {
-        // Scroll to the request element
         setTimeout(() => {
           const element = document.getElementById(
             `request-${requestIdFromUrl}`
           );
           if (element) {
             element.scrollIntoView({ behavior: "smooth", block: "center" });
-
-            // Add highlight animation
             element.classList.add("highlight-request");
-
-            // Remove highlight after 2 seconds
             setTimeout(() => {
               element.classList.remove("highlight-request");
             }, 2000);
           }
         }, 100);
 
-        // Show toast notification
         toastHelper.info(
           `Showing request: ${targetRequest.rule_name || "Rule"}`
         );
@@ -115,22 +103,9 @@ export default function RequestPage() {
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
-    if (isAdmin()) {
-      if (filterStatus === "all") {
-        fetchAllRequests();
-      } else {
-        fetchPendingRequests();
-      }
-    } else {
-      fetchMyRequests();
-    }
-  }, [
-    isAdmin,
-    filterStatus,
-    fetchAllRequests,
-    fetchPendingRequests,
-    fetchMyRequests,
-  ]);
+    const statusParam = filterStatus === "all" ? undefined : filterStatus;
+    fetchMyRequests(statusParam);
+  }, [filterStatus, fetchMyRequests]);
 
   // User actions
   const handleEdit = (request: RuleChangeRequestResponse) => {
@@ -159,12 +134,9 @@ export default function RequestPage() {
     await rejectRequest(requestId, adminNote);
   };
 
-  // Filter requests based on status and search
+  // Filter requests based on search
+  // Backend đã filter theo status rồi, frontend chỉ cần filter theo search
   const filteredRequests = requests.filter((request) => {
-    // Xử lý filter status cho cả admin và user
-    const matchStatus =
-      filterStatus === "all" || request.status === filterStatus;
-
     const matchSearch =
       !searchKeyword ||
       request.rule_name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
@@ -177,7 +149,7 @@ export default function RequestPage() {
       ? request.workload_id === parseInt(workloadIdFromUrl)
       : true;
 
-    return matchStatus && matchSearch && matchWorkload;
+    return matchSearch && matchWorkload;
   });
 
   // Pagination
@@ -255,7 +227,7 @@ export default function RequestPage() {
         </Button>
       </div>
 
-      {/* Filter Bar - Admin cũng có filter status */}
+      {/* Filter Bar */}
       <FilterBar
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
