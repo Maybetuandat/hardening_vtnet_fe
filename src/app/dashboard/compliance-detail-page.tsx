@@ -163,7 +163,6 @@ export default function ComplianceDetailPage() {
   if (!id || complianceId <= 0) {
     return (
       <div className="min-h-screen w-full px-4 px-6 space-y-6">
-        <HeaderDashBoard />
         <div className="text-center py-12">
           <p className="text-destructive">
             {t("detail.invalidId", { id, parsedId: complianceId })}

@@ -173,21 +173,19 @@ export function RuleResultTable({
       const result = await executeServerFix(instanceId, [ruleResultId]);
 
       if (result.successful_fixes === 1) {
-        // Show success toast
+        // Refresh data sau khi thành công
         handleRefresh();
       }
-      // Close dialog after successful execution
+
+      // Close dialog sau khi thành công - để component tự xử lý
       handleCloseSuggestedFixDialog();
 
-      // Log kết quả chi tiết
       console.log("Fix execution completed:", result);
-
-      // Có thể trigger refresh data hoặc update UI state
-      // refreshData(); // nếu cần
     } catch (error) {
       console.error("Failed to execute fix:", error);
       // Error đã được handle trong hook và hiển thị toast
-      // Không cần close dialog nếu có lỗi
+      // Không cần close dialog nếu có lỗi để user có thể thử lại
+      throw error; // Re-throw để dialog component biết có lỗi
     }
   };
 
@@ -426,7 +424,6 @@ export function RuleResultTable({
         )}
       </Card>
 
-      {/* Suggested Fix Dialog */}
       <SuggestedFixDialog
         isOpen={fixDialogState.isOpen}
         onClose={handleCloseSuggestedFixDialog}
@@ -434,6 +431,7 @@ export function RuleResultTable({
         suggestedFix={fixDialogState.suggestedFix}
         ruleName={fixDialogState.ruleName}
         onExecuteFix={handleExecuteFix}
+        executing={executing}
       />
     </>
   );

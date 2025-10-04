@@ -27,7 +27,6 @@ interface ComplianceTableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onViewDetail: (compliance: ComplianceResult) => void;
-
   onRefresh: () => void;
 }
 
@@ -41,7 +40,6 @@ export function ComplianceHistoryTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
-
   onRefresh,
 }: ComplianceTableProps) {
   const navigate = useNavigate();
@@ -49,7 +47,7 @@ export function ComplianceHistoryTable({
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleString("vi-VN", {
+    return new Date(dateString).toLocaleString("en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -75,27 +73,27 @@ export function ComplianceHistoryTable({
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       completed: {
-        label: "Hoàn thành",
+        label: "Completed",
         variant: "default" as const,
         className: "bg-green-100 text-green-800",
       },
       running: {
-        label: "Đang chạy",
+        label: "Running",
         variant: "secondary" as const,
         className: "bg-blue-100 text-blue-800",
       },
       pending: {
-        label: "Chờ xử lý",
+        label: "Pending",
         variant: "secondary" as const,
         className: "bg-yellow-100 text-yellow-800",
       },
       failed: {
-        label: "Thất bại",
+        label: "Failed",
         variant: "destructive" as const,
         className: "bg-red-100 text-red-800",
       },
       cancelled: {
-        label: "Đã hủy",
+        label: "Cancelled",
         variant: "secondary" as const,
         className: "bg-gray-100 text-gray-800",
       },
@@ -129,14 +127,14 @@ export function ComplianceHistoryTable({
     try {
       await navigator.clipboard.writeText(ipAddress);
       setCopiedIP(ipAddress);
-      toastHelper.success("Đã copy địa chỉ IP!");
+      toastHelper.success("IP address copied!");
 
       // Reset copy state after 2 seconds
       setTimeout(() => {
         setCopiedIP(null);
       }, 2000);
     } catch (error) {
-      toastHelper.error("Không thể copy địa chỉ IP!");
+      toastHelper.error("Failed to copy IP address!");
       console.error("Copy failed:", error);
     }
   };
@@ -148,7 +146,7 @@ export function ComplianceHistoryTable({
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground">
-              Đang tải kết quả compliance...
+              Loading compliance results...
             </p>
           </div>
         </div>
@@ -166,19 +164,16 @@ export function ComplianceHistoryTable({
               className="ml-2"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Thử lại
+              Retry
             </Button>
           </div>
         </div>
       ) : !complianceResults || complianceResults.length === 0 ? (
         <div className="p-12 text-center">
           <div className="text-muted-foreground">
-            <p className="text-lg font-medium mb-2">
-              Chưa có kết quả compliance
-            </p>
+            <p className="text-lg font-medium mb-2">No compliance results</p>
             <p className="text-sm">
-              Chưa có kết quả scan nào được tìm thấy. Hãy thực hiện scan để xem
-              kết quả.
+              No scan results found. Please run a scan to view results.
             </p>
           </div>
         </div>
@@ -187,15 +182,15 @@ export function ComplianceHistoryTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">STT</TableHead>
+                <TableHead className="w-16">No.</TableHead>
                 <TableHead>Server IP</TableHead>
-                <TableHead>Trạng thái</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-center">Workload</TableHead>
-                <TableHead className="text-right">Tổng rules</TableHead>
-                <TableHead className="text-right">Đạt</TableHead>
-                <TableHead className="text-right">Lỗi</TableHead>
-                <TableHead className="text-center">Điểm số</TableHead>
-                <TableHead className="text-center">Ngày scan</TableHead>
+                <TableHead className="text-right">Total rules</TableHead>
+                <TableHead className="text-right">Passed</TableHead>
+                <TableHead className="text-right">Failed</TableHead>
+                <TableHead className="text-center">Score</TableHead>
+                <TableHead className="text-center">Scan date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -212,7 +207,7 @@ export function ComplianceHistoryTable({
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
                         <div className="font-medium">
-                          {compliance.server_ip}
+                          {compliance.instance_ip}
                         </div>
                         <Button
                           variant="ghost"
@@ -220,11 +215,11 @@ export function ComplianceHistoryTable({
                           className="h-6 w-6 p-0 hover:bg-muted"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleCopyIP(compliance.server_ip || "");
+                            handleCopyIP(compliance.instance_ip || "");
                           }}
-                          title="Copy địa chỉ IP"
+                          title="Copy IP address"
                         >
-                          {copiedIP === compliance.server_ip ? (
+                          {copiedIP === compliance.instance_ip ? (
                             <Check className="h-3 w-3 text-green-600" />
                           ) : (
                             <Copy className="h-3 w-3" />
@@ -240,7 +235,6 @@ export function ComplianceHistoryTable({
                   <TableCell className="text-right ">
                     {compliance.total_rules}
                   </TableCell>
-
                   <TableCell className="text-right  text-green-600">
                     {compliance.passed_rules}
                   </TableCell>

@@ -18,7 +18,6 @@ export interface UseComplianceReturn {
   // Actions
   fetchComplianceResults: (
     keyword?: string,
-
     status?: string,
     page?: number,
     pageSize?: number
@@ -45,14 +44,12 @@ export function useHistoryCompliance(): UseComplianceReturn {
   // Store current search params for refresh
   const [currentSearchParams, setCurrentSearchParams] = useState({
     keyword: "",
-
     status: undefined as string | undefined,
   });
 
   const fetchComplianceResults = useCallback(
     async (
       keyword?: string,
-
       status?: string,
       page: number = 1,
       size: number = 10
@@ -64,12 +61,12 @@ export function useHistoryCompliance(): UseComplianceReturn {
         // Build query params
         const params = new URLSearchParams();
         if (keyword?.trim()) params.append("keyword", keyword.trim());
-
         if (status && status !== "all") params.append("status", status);
         params.append("page", page.toString());
         params.append("page_size", size.toString());
 
         const queryString = params.toString();
+        console.log("Query string:", queryString);
         const url = queryString ? `/compliance/?${queryString}` : "compliance";
 
         const data = await api.get<ComplianceResultListResponse>(url);
@@ -118,7 +115,6 @@ export function useHistoryCompliance(): UseComplianceReturn {
   const refreshData = useCallback(async () => {
     await fetchComplianceResults(
       currentSearchParams.keyword,
-
       currentSearchParams.status,
       currentPage,
       pageSize
@@ -137,7 +133,6 @@ export function useHistoryCompliance(): UseComplianceReturn {
     // Actions
     fetchComplianceResults,
     getComplianceDetail,
-
     refreshData,
   };
 }

@@ -2,13 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-
 import { ArrowLeft } from "lucide-react";
-
 import { ComplianceResult } from "@/types/compliance";
-
 import FilterBar from "@/components/ui/filter-bar";
-
 import { ComplianceHistoryTable } from "@/components/dashboard/compliance-history/compliance-history-table";
 import { useHistoryCompliance } from "@/hooks/compliance/use-history-compliance";
 import toastHelper from "@/utils/toast-helper";
@@ -39,13 +35,14 @@ export default function ServerHardeningHistoryPage() {
     if (!serverIp) return;
 
     const timeoutId = setTimeout(() => {
+      // Always use serverIp as the keyword for filtering
       fetchComplianceResults(
-        searchTerm || serverIp,
+        serverIp,
         status === "all" ? undefined : status,
         1,
         pageSize
       );
-    }, 500); // Debounce search
+    }, 500);
     console.log("Fetching compliance results for server IP:", serverIp);
 
     return () => clearTimeout(timeoutId);
@@ -63,8 +60,9 @@ export default function ServerHardeningHistoryPage() {
 
   const handlePageChange = useCallback(
     (page: number) => {
+      // FIX: Always pass serverIp to maintain the filter
       fetchComplianceResults(
-        undefined,
+        serverIp,
         status === "all" ? undefined : status,
         page,
         pageSize
@@ -75,8 +73,9 @@ export default function ServerHardeningHistoryPage() {
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
+      // FIX: Always pass serverIp to maintain the filter
       fetchComplianceResults(
-        undefined,
+        serverIp,
         status === "all" ? undefined : status,
         1,
         newPageSize

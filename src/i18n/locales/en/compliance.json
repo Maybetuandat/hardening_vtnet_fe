@@ -111,6 +111,15 @@
     "warning": {
       "title": "Warning",
       "description": "Please review the command carefully before executing. This action may modify system configuration and should be tested in a safe environment first."
+    },
+    "copyCommand": "Copy Command",
+    "warningMessage": "This action will execute the fix command on the server. Please review carefully before proceeding.",
+    "executeFix": "Execute Fix",
+    "executing": "Executing...",
+    "messages": {
+      "executeSuccess": "Fix executed successfully",
+      "executeError": "Failed to execute fix",
+      "copied": "Command copied to clipboard"
     }
   }
 }
