@@ -123,6 +123,12 @@ export function WorkloadTable({
                 <TableHead>{t("workloads.table.name")}</TableHead>
                 <TableHead>{t("workloads.table.description")}</TableHead>
                 <TableHead>{t("workloads.table.createdDate")}</TableHead>
+                <TableHead className="text-center">
+                  {t("workloads.table.instanceCount") || "Instances"}
+                </TableHead>
+                <TableHead className="text-center">
+                  {t("workloads.table.ruleCount") || "Rules"}
+                </TableHead>
                 <TableHead>{t("workloads.table.status")}</TableHead>
                 <TableHead className="text-right">
                   {t("workloads.table.actions")}
@@ -154,6 +160,16 @@ export function WorkloadTable({
                     <span className="text-sm text-muted-foreground">
                       {formatDate(workload.created_at)}
                     </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className="font-mono">
+                      {workload.count_instances}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className="font-mono">
+                      {workload.count_rules}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge

@@ -67,7 +67,9 @@
       "deleteTooltip": "Xóa",
       "noDescription": "Không có mô tả",
       "active": "Hoạt động",
-      "inactive": "Không hoạt động"
+      "inactive": "Không hoạt động",
+      "instanceCount": "Máy chủ",
+      "ruleCount": "Quy tắc"
     },
     "pagination": {
       "showing": "Hiển thị {{start}} đến {{end}} trong tổng số {{total}} workload",

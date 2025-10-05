@@ -67,7 +67,9 @@
       "deleteTooltip": "Delete",
       "noDescription": "No description",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "instanceCount": "Instances",
+      "ruleCount": "Rules"
     },
     "pagination": {
       "showing": "Showing {{start}} to {{end}} of {{total}} workloads",

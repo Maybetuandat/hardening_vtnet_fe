@@ -58,9 +58,9 @@
       "index": "#",
       "ruleName": "Rule Name",
       "status": "Status",
-      "parameter": "Parameter",
-      "output": "Output",
-      "createdDate": "Created Date",
+      "parameter": "Expected",
+      "output": "Actual",
+      "createdDate": "Scan Date",
       "toggle": "Toggle",
       "actions": "Actions"
     },

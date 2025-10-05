@@ -11,6 +11,13 @@ interface InstanceListResponse {
   total_pages: number;
 }
 
+interface AssignInstancesResponse {
+  success: boolean;
+  data: {
+    assigned_count: number;
+  };
+}
+
 interface UseWorkloadInstancesReturn {
   instances: Instance[];
   loading: boolean;
@@ -25,6 +32,15 @@ interface UseWorkloadInstancesReturn {
     page?: number,
     size?: number
   ) => Promise<void>;
+  fetchInstanceNotInWorkLoad: (
+    keyword?: string,
+    page?: number,
+    size?: number
+  ) => Promise<void>;
+  assignInstancesToWorkload: (
+    workloadId: number,
+    instanceIds: number[]
+  ) => Promise<AssignInstancesResponse>;
 }
 
 export function useWorkloadInstances(): UseWorkloadInstancesReturn {
@@ -87,6 +103,69 @@ export function useWorkloadInstances(): UseWorkloadInstancesReturn {
     [handleError]
   );
 
+  // Fetch instances NOT assigned to any workload
+  const fetchInstanceNotInWorkLoad = useCallback(
+    async (keyword?: string, page: number = 1, size: number = 100) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const params = new URLSearchParams({
+          instance_not_in_workload: "true",
+          page: page.toString(),
+          page_size: size.toString(),
+        });
+
+        if (keyword?.trim()) {
+          params.append("keyword", keyword.trim());
+        }
+
+        const response = await api.get<InstanceListResponse>(
+          `/instance/?${params.toString()}`
+        );
+
+        console.log("Fetched instances not in workload:", response);
+        setInstances(response.instances || []);
+        setTotalItems(response.total || 0);
+        setTotalPages(response.total_pages || 0);
+        setCurrentPage(response.page || 1);
+        setPageSize(response.page_size || size);
+        setError(null);
+      } catch (err) {
+        handleError(err, "fetch instances not in workload");
+        setInstances([]);
+        setTotalItems(0);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [handleError]
+  );
+
+  // Assign instances to workload
+  const assignInstancesToWorkload = useCallback(
+    async (
+      workloadId: number,
+      instanceIds: number[]
+    ): Promise<AssignInstancesResponse> => {
+      try {
+        const response = await api.post<AssignInstancesResponse>(
+          `/workload/${workloadId}/instances/assign`,
+          {
+            instance_ids: instanceIds,
+          }
+        );
+
+        return response;
+      } catch (err: any) {
+        const errorMessage = err.message || "Failed to assign instances";
+        throw new Error(errorMessage);
+      }
+    },
+    []
+  );
+
   return {
     instances,
     loading,
@@ -96,5 +175,7 @@ export function useWorkloadInstances(): UseWorkloadInstancesReturn {
     totalPages,
     pageSize,
     fetchInstancesByWorkload,
+    fetchInstanceNotInWorkLoad,
+    assignInstancesToWorkload,
   };
 }
