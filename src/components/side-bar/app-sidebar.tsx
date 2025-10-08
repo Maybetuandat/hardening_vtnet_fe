@@ -98,7 +98,7 @@ export function AppSidebar({
               className="data-[slot=sidebar-menu-button]:!p-1.5 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <Link to="/">
-                <Boxes className="h-6 w-6 text-sidebar-primary" />
+                <Shield className="h-6 w-6 text-sidebar-primary" />
                 <span className="text-lg font-semibold text-sidebar-foreground">
                   Hardening System
                 </span>

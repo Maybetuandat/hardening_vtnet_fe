@@ -28,6 +28,7 @@ interface AssignInstancesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   workloadId: number;
+  os_id: number;
   onSuccess: () => void;
 }
 
@@ -35,6 +36,7 @@ export const AssignInstancesDialog: React.FC<AssignInstancesDialogProps> = ({
   open,
   onOpenChange,
   workloadId,
+  os_id,
   onSuccess,
 }) => {
   const { t } = useTranslation("workload");
@@ -59,7 +61,7 @@ export const AssignInstancesDialog: React.FC<AssignInstancesDialogProps> = ({
     if (open) {
       setSearchTerm("");
       setSelectedInstanceIds(new Set());
-      fetchInstanceNotInWorkLoad();
+      fetchInstanceNotInWorkLoad(os_id);
     }
   }, [open, fetchInstanceNotInWorkLoad]);
 

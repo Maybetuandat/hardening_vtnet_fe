@@ -184,7 +184,10 @@ export const WorkloadDetailPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="instances" className="space-y-4">
-          <WorkloadInstancesSection workloadId={workload.id} />
+          <WorkloadInstancesSection
+            workloadId={workload.id}
+            os_id={workload.os_id}
+          />
         </TabsContent>
       </Tabs>
 

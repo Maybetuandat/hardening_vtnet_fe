@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Eye, EyeOff, Shield } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/authentication/use-auth";
 
 interface LoginFormData {
@@ -21,7 +21,7 @@ interface LoginFormData {
 }
 
 const LoginPage: React.FC = () => {
-  const { t } = useTranslation("auth"); // Sử dụng namespace 'auth'
+  const { t } = useTranslation("auth");
   const { login, error, isLoading, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +32,6 @@ const LoginPage: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  // Get redirect path from location state
   const from = (location.state as any)?.from?.pathname || "/";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +41,6 @@ const LoginPage: React.FC = () => {
       [name]: value,
     }));
 
-    // Clear error when user starts typing
     if (error) {
       clearError();
     }
@@ -59,7 +57,6 @@ const LoginPage: React.FC = () => {
       await login(formData);
       navigate(from, { replace: true });
     } catch (error) {
-      // Error is handled by context
       console.error("Login failed:", error);
     }
   };
@@ -68,8 +65,13 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-white" />
+          {/* Logo với hiệu ứng đẹp hơn */}
+          <div className="mx-auto w-24 h-24 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-6 p-4 transform transition-transform hover:scale-105">
+            <img
+              src="/favicon.png"
+              alt="VDT Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {t("login.systemTitle")}

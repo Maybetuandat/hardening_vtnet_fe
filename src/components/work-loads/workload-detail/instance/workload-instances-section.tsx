@@ -11,11 +11,12 @@ import { Pagination } from "@/components/ui/pagination";
 
 interface WorkloadInstancesSectionProps {
   workloadId: number;
+  os_id: number;
 }
 
 export const WorkloadInstancesSection: React.FC<
   WorkloadInstancesSectionProps
-> = ({ workloadId }) => {
+> = ({ workloadId, os_id }) => {
   const { t } = useTranslation("workload");
   const {
     instances,
@@ -139,6 +140,7 @@ export const WorkloadInstancesSection: React.FC<
           open={assignDialogOpen}
           onOpenChange={setAssignDialogOpen}
           workloadId={workloadId}
+          os_id={os_id}
           onSuccess={handleAssignSuccess}
         />
       </>
@@ -236,6 +238,7 @@ export const WorkloadInstancesSection: React.FC<
         onOpenChange={setAssignDialogOpen}
         workloadId={workloadId}
         onSuccess={handleAssignSuccess}
+        os_id={os_id}
       />
     </>
   );

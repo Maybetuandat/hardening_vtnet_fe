@@ -13,6 +13,7 @@ interface InstanceListResponse {
 
 interface AssignInstancesResponse {
   success: boolean;
+  message: string;
   data: {
     assigned_count: number;
   };
@@ -33,6 +34,7 @@ interface UseWorkloadInstancesReturn {
     size?: number
   ) => Promise<void>;
   fetchInstanceNotInWorkLoad: (
+    osId?: number,
     keyword?: string,
     page?: number,
     size?: number
@@ -103,9 +105,14 @@ export function useWorkloadInstances(): UseWorkloadInstancesReturn {
     [handleError]
   );
 
-  // Fetch instances NOT assigned to any workload
+  // Fetch instances NOT assigned to any workload, filtered by OS ID
   const fetchInstanceNotInWorkLoad = useCallback(
-    async (keyword?: string, page: number = 1, size: number = 100) => {
+    async (
+      osId?: number,
+      keyword?: string,
+      page: number = 1,
+      size: number = 100
+    ) => {
       setLoading(true);
       setError(null);
 
@@ -115,6 +122,10 @@ export function useWorkloadInstances(): UseWorkloadInstancesReturn {
           page: page.toString(),
           page_size: size.toString(),
         });
+
+        if (osId) {
+          params.append("os_id", osId.toString());
+        }
 
         if (keyword?.trim()) {
           params.append("keyword", keyword.trim());
@@ -143,18 +154,20 @@ export function useWorkloadInstances(): UseWorkloadInstancesReturn {
     [handleError]
   );
 
-  // Assign instances to workload
+  // Assign instances to workload using PUT /api/instance/assign-workload
   const assignInstancesToWorkload = useCallback(
     async (
       workloadId: number,
       instanceIds: number[]
     ): Promise<AssignInstancesResponse> => {
       try {
-        const response = await api.post<AssignInstancesResponse>(
-          `/workload/${workloadId}/instances/assign`,
-          {
-            instance_ids: instanceIds,
-          }
+        const params = new URLSearchParams({
+          workload_id: workloadId.toString(),
+        });
+
+        const response = await api.put<AssignInstancesResponse>(
+          `/instance/assign-workload?${params.toString()}`,
+          instanceIds // Send array directly as body
         );
 
         return response;

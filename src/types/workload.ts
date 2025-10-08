@@ -30,6 +30,7 @@ export interface WorkloadResponse {
   updated_at: string;
   count_rules: number;
   os_name: string;
+  os_id: number;
   count_instances: number;
 }
 

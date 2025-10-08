@@ -131,6 +131,7 @@
     "steps": {
       "progress": "Workload creation progress"
     },
+
     "basicInfo": {
       "title": "Basic Information",
       "subtitle": "Enter basic information for your workload",
@@ -175,7 +176,8 @@
       "command": "Command:",
       "parameters": "Parameters:",
       "noParameters": "No parameters",
-      "close": "Close"
+      "close": "Close",
+      "suggestedFix": " Suggested Fix:"
     },
     "messages": {
       "createSuccess": "Workload created successfully!",
