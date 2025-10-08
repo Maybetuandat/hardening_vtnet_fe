@@ -1,3 +1,4 @@
+// src/components/dashboard/compliance-detail/rule-result-table.tsx
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -134,11 +135,9 @@ export function RuleResultTable({
     setFixDialogState((prev) => ({ ...prev, loading: true }));
 
     try {
-      // Fetch rule details to get suggested_fix
       const rule: RuleResponse = await getRuleById(ruleResult.rule_id);
 
       if (!rule.suggested_fix || rule.suggested_fix.trim() === "") {
-        // Show error toast or message that no suggested fix available
         console.error("No suggested fix available for this rule");
         return;
       }
@@ -168,29 +167,22 @@ export function RuleResultTable({
 
   const handleExecuteFix = async (ruleResultId: number) => {
     try {
-      // Gọi API thông qua hook với single rule result
       console.log("Executing fix for ruleResultId:", ruleResultId);
       const result = await executeServerFix(instanceId, [ruleResultId]);
 
       if (result.successful_fixes === 1) {
-        // Refresh data sau khi thành công
         handleRefresh();
       }
 
-      // Close dialog sau khi thành công - để component tự xử lý
       handleCloseSuggestedFixDialog();
-
       console.log("Fix execution completed:", result);
     } catch (error) {
       console.error("Failed to execute fix:", error);
-      // Error đã được handle trong hook và hiển thị toast
-      // Không cần close dialog nếu có lỗi để user có thể thử lại
-      throw error; // Re-throw để dialog component biết có lỗi
+      throw error;
     }
   };
 
   const getSuggestedFixButton = (ruleResult: RuleResult) => {
-    // Only show for failed status
     if (ruleResult.status !== "failed") {
       return null;
     }
@@ -403,7 +395,6 @@ export function RuleResultTable({
               </Table>
             </div>
 
-            {/* Pagination */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -430,6 +421,8 @@ export function RuleResultTable({
         ruleResult={fixDialogState.ruleResult}
         suggestedFix={fixDialogState.suggestedFix}
         ruleName={fixDialogState.ruleName}
+        instanceId={instanceId.toString()}
+        loading={fixDialogState.loading}
         onExecuteFix={handleExecuteFix}
         executing={executing}
       />
