@@ -1,5 +1,5 @@
 // src/components/dashboard/compliance-detail/suggest_fix_dialog.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+import { RuleResult } from "@/types/rule-result";
+import { toast } from "sonner";
+import { useFixRequest } from "@/hooks/fix-request/use-fix-request";
+import { usePermissions } from "@/hooks/authentication/use-permissions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,11 +37,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { RuleResult } from "@/types/rule-result";
-import { toast } from "sonner";
-import { useFixRequest } from "@/hooks/fix-request/use-fix-request";
-import { usePermissions } from "@/hooks/authentication/use-permissions";
+} from "./alert-dialog";
 
 interface SuggestedFixDialogProps {
   isOpen: boolean;
@@ -68,13 +69,37 @@ export function SuggestedFixDialog({
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { createFixRequest, loading: creatingFixRequest } = useFixRequest();
 
+  // 🔥 FIX: Lưu ruleResult vào state nội bộ để tránh bị null khi parent reset
+  const [savedRuleResult, setSavedRuleResult] = useState<RuleResult | null>(
+    ruleResult
+  );
+
+  // Cập nhật savedRuleResult khi dialog mở và có ruleResult mới
+  useEffect(() => {
+    if (isOpen && ruleResult) {
+      console.log("💾 Saving ruleResult to internal state:", ruleResult);
+      setSavedRuleResult(ruleResult);
+    }
+  }, [isOpen, ruleResult]);
+
+  // Reset savedRuleResult khi dialog đóng hoàn toàn
+  useEffect(() => {
+    if (!isOpen) {
+      const timer = setTimeout(() => {
+        console.log("🗑️ Clearing saved ruleResult");
+        setSavedRuleResult(null);
+      }, 300); // Delay để animation đóng hoàn tất
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   // Handler thực thi fix trực tiếp (CHỈ ADMIN)
   const handleExecuteFix = async () => {
-    if (!ruleResult || isExecuting || !isAdmin()) return;
+    if (!savedRuleResult || isExecuting || !isAdmin()) return;
 
     setIsExecuting(true);
     try {
-      await onExecuteFix(ruleResult.id);
+      await onExecuteFix(savedRuleResult.id);
       toast.success(t("suggestedFix.messages.executeSuccess"));
       onClose();
     } catch (error) {
@@ -86,26 +111,46 @@ export function SuggestedFixDialog({
 
   // Mở confirmation dialog
   const handleOpenConfirmDialog = () => {
+    console.log("🔵 Opening confirmation dialog");
+    console.log("🔵 Current savedRuleResult:", savedRuleResult);
+    console.log("🔵 Current instanceId:", instanceId);
     setShowConfirmDialog(true);
   };
 
   // Xác nhận và tạo fix request
   const handleConfirmRequestFix = async () => {
-    if (!ruleResult) return;
+    console.log("🔵 handleConfirmRequestFix called");
+    console.log("🔵 savedRuleResult:", savedRuleResult);
+    console.log("🔵 instanceId:", instanceId);
+    console.log("🔵 ruleName:", ruleName);
+    console.log("🔵 suggestedFix:", suggestedFix);
+
+    if (!savedRuleResult) {
+      console.log("🔴 No savedRuleResult, returning early");
+      toast.error("Rule result data is missing. Please try again.");
+      return;
+    }
+
+    const requestData = {
+      rule_result_id: savedRuleResult.id,
+      instance_id: parseInt(instanceId),
+      title: `Fix request for: ${ruleName}`,
+      description: `Please fix the failed rule: ${ruleName}\n\nSuggested fix command:\n${suggestedFix}\n\nError message: ${
+        savedRuleResult.message || "N/A"
+      }`,
+    };
+
+    console.log("🟢 Request data to be sent:", requestData);
 
     try {
-      await createFixRequest({
-        rule_result_id: ruleResult.id,
-        instance_id: parseInt(instanceId), // FIXED: Convert string to number
-        title: `Fix request for: ${ruleName}`,
-        description: `Please fix the failed rule: ${ruleName}\n\nSuggested fix command:\n${suggestedFix}\n\nError message: ${
-          ruleResult.message || "N/A"
-        }`,
-      });
+      console.log("🟡 Calling createFixRequest...");
+      await createFixRequest(requestData);
+      console.log("✅ Fix request created successfully");
       toast.success("Fix request sent to admin successfully!");
       setShowConfirmDialog(false);
       onClose();
     } catch (error) {
+      console.error("❌ Error in handleConfirmRequestFix:", error);
       // Error đã được handle trong hook
     }
   };
@@ -179,12 +224,12 @@ export function SuggestedFixDialog({
                       {t("table.status.failed")}
                     </Badge>
                   </div>
-                  {ruleResult?.message && (
+                  {savedRuleResult?.message && (
                     <div>
                       <span className="font-medium">
                         {t("suggestedFix.message")}:
                       </span>{" "}
-                      {ruleResult.message}
+                      {savedRuleResult.message}
                     </div>
                   )}
                 </div>
@@ -288,7 +333,7 @@ export function SuggestedFixDialog({
             {/* Request Admin Fix Button - CHO CẢ USER VÀ ADMIN */}
             <Button
               onClick={handleOpenConfirmDialog}
-              disabled={isLoading || !ruleResult}
+              disabled={isLoading || !savedRuleResult}
               variant="outline"
               className="flex-1 sm:flex-initial border-blue-300 text-blue-600 hover:bg-blue-50"
             >
@@ -300,7 +345,7 @@ export function SuggestedFixDialog({
             {isAdmin() && (
               <Button
                 onClick={handleExecuteFix}
-                disabled={isLoading || !ruleResult}
+                disabled={isLoading || !savedRuleResult}
                 className="flex-1 sm:flex-initial bg-orange-600 hover:bg-orange-700"
               >
                 {isExecuting || executing ? (
@@ -328,7 +373,10 @@ export function SuggestedFixDialog({
               <AlertTriangle className="h-5 w-5" />
               Xác nhận gửi yêu cầu sửa lỗi
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3 pt-2">
+          </AlertDialogHeader>
+
+          <AlertDialogDescription asChild>
+            <div className="space-y-3 pt-2">
               <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <p className="text-sm font-medium text-orange-900 mb-2">
                   ⚠️ Cảnh báo quan trọng:
@@ -358,7 +406,7 @@ export function SuggestedFixDialog({
                   <div className="flex gap-2 text-muted-foreground">
                     <span>•</span>
                     <div>
-                      <strong>Lỗi:</strong> {ruleResult?.message || "N/A"}
+                      <strong>Lỗi:</strong> {savedRuleResult?.message || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -370,8 +418,9 @@ export function SuggestedFixDialog({
                   <div>✓ Bạn sẽ nhận được thông báo về kết quả</div>
                 </div>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </div>
+          </AlertDialogDescription>
+
           <AlertDialogFooter>
             <AlertDialogCancel disabled={creatingFixRequest}>
               Hủy bỏ

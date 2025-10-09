@@ -33,6 +33,7 @@ export function useFixRequest(): UseFixRequestReturn {
   const createFixRequest = useCallback(async (data: FixRequestCreate) => {
     try {
       setLoading(true);
+      console.log("Creating fix request with data:", data);
       await api.post<FixRequestResponse>("/fix-requests/", data);
       toastHelper.success("Fix request created successfully");
     } catch (error: any) {
